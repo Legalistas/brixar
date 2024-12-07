@@ -1,0 +1,220 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                Int     @id @default(autoincrement())
+  userId            Int
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId], map: "accounts_userId_fkey")
+  @@map("accounts")
+}
+
+model Country {
+  id          Int           @id @default(autoincrement())
+  name        String
+  prefix      String?
+  code        String?
+  status      Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  userProfile UserProfile[]
+
+  @@map("countries")
+}
+
+model Currency {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  flagCode  String?
+  name      String
+  symbol    String
+  rate      Float
+  apiUrl    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("currencies")
+}
+
+// model Products {
+//   id                   Int                @id @default(autoincrement())
+//   categoryId           Int
+//   brandId              Int
+//   slug                 String
+//   name                 String
+//   description          String?
+//   state                ProductState       @default(NEW)
+//   picture              String?
+//   sku                  String?
+//   qty                  Int                @default(0)
+//   qtyBellowMin         Int?               @default(0)
+//   price                Decimal            @default(0.00) @db.Decimal(15, 2)
+//   priceWholeSaller     Decimal            @default(0.00) @db.Decimal(15, 2)
+//   cost                 Decimal            @default(0.00) @db.Decimal(15, 2)
+//   promotionalPrice     Decimal            @default(0.00) @db.Decimal(15, 2)
+//   showPrice            Boolean            @default(true)
+//   showPriceWholeWaller Boolean            @default(false)
+//   status               Boolean            @default(true)
+//   createdAt            DateTime           @default(now())
+//   updatedAt            DateTime           @updatedAt
+//   attributes           ProductAttribute[]
+//   brand                Brand              @relation(fields: [brandId], references: [id], onDelete: Cascade)
+//   category             Category           @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+//   saleDetail           SaleDetail[]
+//   productImage         ProductImage[]
+
+//   @@index([brandId], map: "products_brandId_fkey")
+//   @@index([categoryId], map: "products_categoryId_fkey")
+//   @@map("products")
+// }
+
+// model ProductAttribute {
+//   id              Int      @id @default(autoincrement())
+//   productId       Int
+//   name            String
+//   value           String
+//   qty             Int      @default(0)
+//   qtyBellowMin    Int?     @default(0)
+//   price           Decimal  @default(0.00) @db.Decimal(15, 2)
+//   priceWholesaler Decimal  @default(0.00) @db.Decimal(15, 2)
+//   product         Products @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+//   @@index([productId], map: "product_attributes_productId_fkey")
+//   @@map("product_attributes")
+// }
+
+// model ProductImage {
+//   id        Int      @id @default(autoincrement())
+//   productId Int
+//   product   Products @relation(fields: [productId], references: [id], onDelete: Cascade)
+//   url       String
+//   order     Int      @default(0)
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   @@map("product_images")
+// }
+
+// model Receipt {
+//   id           Int      @id @default(autoincrement())
+//   name         String
+//   letterSerial String
+//   series       String
+//   number       String
+//   createdAt    DateTime @default(now())
+//   updatedAt    DateTime @updatedAt
+
+//   @@map("receipts")
+// }
+
+model Session {
+  id           Int      @id @default(autoincrement())
+  sessionToken String   @unique
+  userId       Int
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "sessions_userId_fkey")
+  @@map("sessions")
+}
+
+model User {
+  id            Int           @id @default(autoincrement())
+  name          String?
+  email         String        @unique
+  emailVerified DateTime?
+  password      String?
+  image         String?
+  role          Role          @default(CUSTOMER)
+  status        Boolean       @default(true)
+  created_at    DateTime      @default(now())
+  updated_at    DateTime      @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  activity      UserActivity?
+  profile       UserProfile?
+
+  @@map("users")
+}
+
+model UserActivity {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @unique
+  registerIp String?
+  lastIp     String?
+  agent      String?
+  onlineTime DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_activities")
+}
+
+model UserProfile {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @unique
+  countryId      Int
+  stateId        Int
+  city           String?
+  cp             String?
+  document       String?
+  documentNumber String?
+  phone          String?
+  address        String?
+  avatar         String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  country        Country  @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  state          State    @relation(fields: [stateId], references: [id], onDelete: Cascade)
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([countryId], map: "user_profiles_countryId_fkey")
+  @@index([stateId], map: "user_profiles_stateId_fkey")
+  @@map("user_profiles")
+}
+
+model State {
+  id          Int           @id @default(autoincrement())
+  countryId   Int
+  name        String
+  status      Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  userProfile UserProfile[]
+
+  @@map("states")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+enum Role {
+  ADMIN
+  SELLER
+  BUILDERS
+  INVESTORS
+  CUSTOMER
+}
