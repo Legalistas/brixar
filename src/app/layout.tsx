@@ -41,7 +41,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${ubuntu.className} antialiased bg-[#F1F5F9]`}
+        className={`${inter.className} antialiased bg-[#F1F5F9]`}
       >
         <Providers>{children}</Providers>
         <ToastContainer />

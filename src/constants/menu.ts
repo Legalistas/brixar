@@ -10,6 +10,7 @@ import {
   FileText,
   HelpCircle,
   Circle,
+  House,
 } from 'lucide-react'
 
 export interface MenuItem {
@@ -24,18 +25,36 @@ export interface MenuItem {
 export const MENU_DATA: MenuItem[] = [
   { icon: Monitor, label: 'Escritorio', href: '/admin/dashboard' },
   {
-    icon: Package,
-    label: 'Almacen',
+    icon: House,
+    label: 'Productos',
     href: '#',
     subItems: [
-      { icon: Circle, label: 'Productos', href: '/admin/products' },
-      { icon: Circle, label: 'Categorías', href: '/admin/categories' },
-      { icon: Circle, label: 'Marcas', href: '/admin/brands' },
+      { icon: Circle, label: 'Departamentos', href: '/admin/departamentos' },
+      { icon: Circle, label: 'Casas', href: '/admin/casas' },
+      { icon: Circle, label: 'Invertir en un Brix', href: '/admin/brix' },
+    ],
+  },
+  {
+    icon: House,
+    label: 'Proyectos',
+    href: '#',
+    subItems: [
+      { icon: Circle, label: 'Abiertos', href: '/admin/abiertos' },
+      { icon: Circle, label: 'Finalizados', href: '/admin/finalizados' },
+    ],
+  },
+  {
+    icon: House,
+    label: 'Créditos',
+    href: '#',
+    subItems: [
+      { icon: Circle, label: 'Créditos hipotecarios', href: '/admin/creditos' },
+      { icon: Circle, label: 'Solicitar financiación', href: '/admin/financiacion' },
     ],
   },
   {
     icon: ShoppingCart,
-    label: 'Ordenes',
+    label: 'Mis inversiones',
     href: '#',
     badge: '0',
     subItems: [
