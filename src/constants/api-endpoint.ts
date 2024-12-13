@@ -21,4 +21,11 @@ export const API_ENDPOINTS = {
   COUNTRIES_INDEX: `${API_BASE_URL}/settings/countries`,
   STATES_INDEX: (countryId: number) =>
     `${API_BASE_URL}/settings/states/${countryId}`,
+
+
+
+
+
+  // ENDPOINTS
+  PROPERTIES_INDEX: `${API_BASE_URL}/properties`,
 }
