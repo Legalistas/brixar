@@ -8,6 +8,7 @@ import { TextField } from '@/components/Fields'
 import { Logomark } from '@/components/Logo'
 import { NavLinks } from '@/components/NavLinks'
 import qrCode from '@/images/qr-code.svg'
+import IconBrixarSingle from './IconBrixarSingle'
 
 interface QrCodeBorderProps extends React.SVGProps<SVGSVGElement> { }
 
@@ -30,16 +31,9 @@ export function Footer(): JSX.Element {
                 <div className="flex flex-col items-start justify-between gap-y-12 pb-6 pt-16 lg:flex-row lg:items-center lg:py-16">
                     <div>
                         <div className="flex items-center text-gray-900">
-                            <Image
-                                src="/images/logos/isonaranja.png"
-                                alt="logo"
-                                width={48}
-                                height={48}
-                                className="h-12 w-auto"
-                                priority
-                            />
+                            <IconBrixarSingle className='h-12 w-auto' />
                             <div className="ml-4">
-                                <p className="text-base font-semibold">Sembrar</p>
+                                <p className="text-base font-semibold">Brixar</p>
                                 <p className="mt-1 text-sm">El inmueble de tus sueños a tu alcance.</p>
                             </div>
                         </div>

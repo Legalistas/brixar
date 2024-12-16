@@ -7,8 +7,8 @@ import { Reviews } from '@/components/Reviews'
 import { SecondaryFeatures } from '@/components/SecondaryFeatures'
 
 export const metadata = {
-    title: 'Sembrar | Construyendo sueños',
-    description: '¿Buscás un inmueble? Sembrar te ofrece una amplia variedad de propiedades para que encuentres la que más se adapte a tus necesidades y presupuesto.',
+    title: 'Brixar | Construyendo sueños',
+    description: '¿Buscás un inmueble? Brixar te ofrece una amplia variedad de propiedades para que encuentres la que más se adapte a tus necesidades y presupuesto.',
 }
 
 

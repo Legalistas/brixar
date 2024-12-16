@@ -202,7 +202,7 @@ export function Reviews() {
                     id="reviews-title"
                     className="text-3xl font-medium tracking-tight text-gray-900 sm:text-center"
                 >
-                    Sembrar está cambiando la vida de muchas familias.
+                    Brixar está cambiando la vida de muchas familias.
                 </h2>
                 <p className="mt-2 text-lg text-gray-600 sm:text-center">
                     Conoce las experiencias y opiniones de quienes ya disfrutan de nuestras viviendas de calidad y a precios accesibles.

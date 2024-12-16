@@ -4,10 +4,10 @@ import { Building, DollarSign, Home, Layers, ShoppingCart, Users } from "lucide-
 
 interface StatisticsProps {
   statistics: {
-    products: number;
-    stockValue: number;
-    sales: number;
-    customers: number;
+    brixs: number;
+    totalBrixs: number;
+    projects: number;
+    properties: number;
   };
 }
 
@@ -16,26 +16,26 @@ const QuickStats = ({ statistics }: StatisticsProps) => {
     {
       title: "Mis Brics",
       color: "border-blue-600",
-      value: statistics.products || 0,
+      value: statistics.brixs || 0,
       icon: <Layers />,
     },
     {
       title: "Valor de mis Brics",
       color: "border-slate-600",
-      value: statistics.stockValue || 0,
+      value: statistics.totalBrixs || 0,
       isAmount: true,
       icon: <DollarSign />,
     },
     {
       title: "Inmuebles Comprados",
       color: "border-green-600",
-      value: statistics.sales || 0,
+      value: statistics.properties || 0,
       icon: <Home />,
     },
     {
       title: "Proyectos invertidos",
       color: "border-sky-600",
-      value: statistics.customers || 0,
+      value: statistics.projects || 0,
       icon: <Building />,
     },
   ];

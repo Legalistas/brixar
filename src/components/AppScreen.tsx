@@ -1,6 +1,7 @@
 import React, { forwardRef, ReactNode } from 'react'
 import clsx from 'clsx'
 import Image from 'next/image'
+import IconBrixarSingle from './IconBrixarSingle'
 
 function Logo(props: React.ImgHTMLAttributes<HTMLImageElement>) {
     return (
@@ -29,9 +30,9 @@ interface AppScreenProps extends React.HTMLAttributes<HTMLDivElement> {
 export function AppScreen({ children, className, ...props }: AppScreenProps) {
     return (
         <div className={clsx('flex flex-col', className)} {...props}>
-            <div className="flex justify-between px-4 pt-4">
+            <div className="flex justify-between px-2.5 pt-4">
                 <MenuIcon className="h-6 w-6 flex-none" />
-                <Logo className="h-6 flex-none" />
+                <IconBrixarSingle className="h-12 w-12 flex-none" />
                 <UserIcon className="h-6 w-6 flex-none" />
             </div>
             {children}

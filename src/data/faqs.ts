@@ -3,7 +3,7 @@ export const faqs = [
     {
       question: '¿Aceptan algún tipo de financiación?',
       answer:
-        'Sí, en Sembrar Construcciones ofrecemos planes de financiación flexibles. Nos adaptamos a las necesidades de nuestros clientes para que puedan acceder a su vivienda ideal de manera accesible.',
+        'Sí, en Brixar Construcciones ofrecemos planes de financiación flexibles. Nos adaptamos a las necesidades de nuestros clientes para que puedan acceder a su vivienda ideal de manera accesible.',
     },
     {
       question: '¿Están construyendo nuevas viviendas en Rafaela?',
@@ -13,7 +13,7 @@ export const faqs = [
     {
       question: '¿Utilizan materiales de calidad en las construcciones?',
       answer:
-        'Absolutamente. En Sembrar Construcciones nos comprometemos a utilizar materiales de alta calidad en todos nuestros proyectos para garantizar la durabilidad y confort de las viviendas.',
+        'Absolutamente. En Brixar Construcciones nos comprometemos a utilizar materiales de alta calidad en todos nuestros proyectos para garantizar la durabilidad y confort de las viviendas.',
     },
   ],
   [

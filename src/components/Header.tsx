@@ -12,6 +12,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Button } from '@/components/Button'
 import { Container } from '@/components/Container'
 import { NavLinks } from '@/components/NavLinks'
+import LogoBrixar from './LogoBrixar'
 
 interface IconProps extends React.SVGProps<SVGSVGElement> { }
 
@@ -62,7 +63,7 @@ export const Header: React.FC = () => {
                     <div className="relative z-10 flex items-center gap-16">
                         <Link href="/" aria-label="Home">
                             {/* <Logo className="h-10 w-auto" /> */}
-                            <img src="/images/logonaranja.png" alt="logo" className="h-12 w-auto" />
+                            <LogoBrixar className="h-12 w-auto" />
                         </Link>
                         <div className="hidden lg:flex lg:gap-10">
                             <NavLinks />

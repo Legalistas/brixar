@@ -200,7 +200,7 @@ export function SecondaryFeatures() {
             en tu <span className="font-bold">hogar propio</span>.
           </h2>
           <p className="mt-2 text-lg text-gray-600">
-            Con Sembrar, nunca es tarde para comenzar a construir el futuro que
+            Con Brixar, nunca es tarde para comenzar a construir el futuro que
             deseas, asegurando una vivienda propia con facilidades de pago.
           </p>
         </div>

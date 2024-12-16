@@ -11,6 +11,10 @@ import {
   HelpCircle,
   Circle,
   House,
+  Box,
+  List,
+  ClipboardList,
+  CircleDollarSign,
 } from 'lucide-react'
 
 export interface MenuItem {
@@ -49,7 +53,11 @@ export const MENU_DATA: MenuItem[] = [
     href: '#',
     subItems: [
       { icon: Circle, label: 'Créditos hipotecarios', href: '/admin/creditos' },
-      { icon: Circle, label: 'Solicitar financiación', href: '/admin/financiacion' },
+      {
+        icon: Circle,
+        label: 'Solicitar financiación',
+        href: '/admin/financiacion',
+      },
     ],
   },
   {
@@ -109,4 +117,49 @@ export const REPORTS_DATA: MenuItem[] = [
     ],
   },
   { icon: HelpCircle, label: 'Ayuda', href: '/help' },
+]
+
+export const MENU_CUSTOMERS_DATA: MenuItem[] = [
+  { icon: Monitor, label: 'Panel de Control', href: '/admin/dashboard' },
+  {
+    icon: House,
+    label: 'Mis inversiones',
+    href: '#',
+    subItems: [
+      {
+        icon: Circle,
+        label: 'Invertir en un Brix',
+        href: '/brix',
+      },
+      {
+        icon: Circle,
+        label: 'Departamentos',
+        href: '/departamentos',
+      },
+      {
+        icon: Circle,
+        label: 'Casas',
+        href: '/casas',
+      },
+    ],
+  },
+  { icon: ClipboardList, label: 'Proyectos', href: '/proyectos' },
+  { icon: CircleDollarSign, label: 'Créditos', href: '/creditos' },
+  {
+    icon: Settings,
+    label: 'Configuración',
+    href: '#',
+    subItems: [
+      {
+        icon: Circle,
+        label: 'Cambiar contraseña',
+        href: '/change-password',
+      },
+      {
+        icon: Circle,
+        label: 'Configurar alertas',
+        href: '/alerts',
+      },
+    ],
+  },
 ]

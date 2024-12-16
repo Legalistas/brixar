@@ -28,7 +28,7 @@ const imgSrcPlaceholder = "https://placehold.co/600x400";
 
 const BestSelling = ({ statistics }: StatisticsProps) => (
   <GeneralCard
-    title="Artículos más vendidos"
+    title="Inmubles disponibles"
     className="h-[300px] overflow-auto p-4"
   >
     {statistics.topProducts && statistics.topProducts.length > 0 ? (

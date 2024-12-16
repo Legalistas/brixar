@@ -208,7 +208,7 @@ export function PrimaryFeatures() {
                         la vivienda que siempre soñaste.
                     </h2>
                     <p className="mt-2 text-lg text-gray-400">
-                        <span className="font-bold">Sembrar</span> trabaja para personas
+                        <span className="font-bold">Brixar</span> trabaja para personas
                         como vos, que buscan calidad y accesibilidad en su nuevo hogar. Te
                         ofrecemos soluciones a medida, nosotros lo hacemos posible.
                     </p>

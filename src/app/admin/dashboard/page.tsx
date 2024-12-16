@@ -2,10 +2,12 @@
 import { getStatisticsDashboard } from "@/services/statistics-service";
 import React, { useState, useEffect } from "react";
 import QuickStats from "./module/QuickStats/QuickStats";
-import QuickStatsSales from "./module/QuickStatsSales/QuickStatsSales";
-import BestSelling from "./module/BestSelling/BestSelling";
-import TopBuyers from "./module/TopBuyers/TopBuyers";
-import ProductLowStock from "./module/ProductLowStock/ProductLowStock";
+import QuickStatsSales from "./module/Old/QuickStatsSales/QuickStatsSales";
+import BestSelling from "./module/Old/BestSelling/BestSelling";
+import TopBuyers from "./module/Old/TopBuyers/TopBuyers";
+import ProductLowStock from "./module/Old/ProductLowStock/ProductLowStock";
+import Properties from "./module/Properties/Properties";
+import Proyects from "./module/Proyects/Proyects";
 
 export default function AdminDashboard() {
   const [statistics, setStatistics] = useState({
@@ -41,21 +43,21 @@ export default function AdminDashboard() {
       <QuickStats statistics={statistics} />
       <div className="mt-4 grid grid-cols-12 gap-4">
         <div className="col-span-12 xl:col-span-9">
-          <BestSelling statistics={statistics} />
+          <Properties  />
         </div>
         <div className="col-span-12 xl:col-span-3 flex flex-col gap-7.5">
-          <QuickStatsSales statistics={statistics} />
+          <Proyects />
         </div>
       </div>
 
-      <div className="mt-4 grid grid-cols-12 gap-4">
+      {/* <div className="mt-4 grid grid-cols-12 gap-4">
         <div className="col-span-12 xl:col-span-6">
           <ProductLowStock statistics={statistics} />
         </div>
         <div className="col-span-12 xl:col-span-6">
           <TopBuyers statistics={statistics} />
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
