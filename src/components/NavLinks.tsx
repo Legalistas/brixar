@@ -11,10 +11,11 @@ export function NavLinks(): JSX.Element[] {
     const timeoutRef = useRef<number | null>(null)
 
     const navItems: NavItem[] = [
-        ['Beneficios', '/#beneficios'],
-        ['Reseñas', '/#reviews'],
-        ['Inmuebles', '/inmuebles'],
-        ['FAQs', '/#faqs'],
+        ['Propiedades', '/propiedades'],
+        ['Proyectos', '/proyectos'],     
+        ['Créditos', '/creditos'],     
+        ['Opiniones', '/#reviews'],      
+        ['Contacto', '/contacto'],
     ]
 
     return navItems.map(([label, href], index) => (
