@@ -15,6 +15,8 @@ import {
   List,
   ClipboardList,
   CircleDollarSign,
+  Home,
+  ChartNoAxesCombined,
 } from 'lucide-react'
 
 export interface MenuItem {
@@ -120,29 +122,13 @@ export const REPORTS_DATA: MenuItem[] = [
 ]
 
 export const MENU_CUSTOMERS_DATA: MenuItem[] = [
-  { icon: Monitor, label: 'Panel de Control', href: '/admin/dashboard' },
+  { icon: Monitor, label: 'Panel de Control', href: '/dashboard' },
   {
-    icon: House,
+    icon: ChartNoAxesCombined,
     label: 'Mis inversiones',
-    href: '#',
-    subItems: [
-      {
-        icon: Circle,
-        label: 'Invertir en un Brix',
-        href: '/brix',
-      },
-      {
-        icon: Circle,
-        label: 'Departamentos',
-        href: '/departamentos',
-      },
-      {
-        icon: Circle,
-        label: 'Casas',
-        href: '/casas',
-      },
-    ],
+    href: '/inversiones',
   },
+  { icon: Home, label: 'Propiedades', href: '/propiedades' },
   { icon: ClipboardList, label: 'Proyectos', href: '/proyectos' },
   { icon: CircleDollarSign, label: 'Créditos', href: '/creditos' },
   {

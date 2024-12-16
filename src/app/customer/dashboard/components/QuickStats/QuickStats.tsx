@@ -14,13 +14,13 @@ interface StatisticsProps {
 const QuickStats = ({ statistics }: StatisticsProps) => {
   const statsData = [
     {
-      title: "Mis Brics",
+      title: "Mis Brixs",
       color: "border-blue-600",
       value: statistics.brixs || 0,
       icon: <Layers />,
     },
     {
-      title: "Valor de mis Brics",
+      title: "Valor de mis Brixs",
       color: "border-slate-600",
       value: statistics.totalBrixs || 0,
       isAmount: true,
