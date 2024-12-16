@@ -36,6 +36,8 @@ model Country {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   userProfile UserProfile[]
+  Property    Property?     @relation(fields: [propertyId], references: [id])
+  propertyId  Int?
 
   @@map("countries")
 }
@@ -55,41 +57,45 @@ model Currency {
 }
 
 model Property {
-  id             Int            @id @default(autoincrement()) // Identificador único de la propiedad
-  slug           String         @unique
-  title          String         // Título del anuncio de la propiedad
-  description    String         // Descripción detallada de la propiedad
-  price          Decimal        // Precio de la propiedad
-  bedrooms       Int            // Número de dormitorios
-  bathrooms      Int            // Número de baños
-  squareMeters   Float          // Área total en metros cuadrados
-  address        String         // Dirección de la calle
-  city           String         // Ciudad donde está ubicada
-  state          String         // Estado o región
-  zipCode        String         // Código postal
-  propertyType   String         // Tipo de propiedad (apartamento, casa, etc.)
-  listingType    String         // Tipo de anuncio (venta, alquiler, etc.)
-  isAvailable    Boolean        @default(true) // Indica si la propiedad está disponible
-  yearBuilt      Int?           // Año de construcción (opcional)
-  parkingSpaces  Int?           // Número de espacios de estacionamiento (opcional)
-  amenities      Json?       // Array de comodidades
-  images         PropertyImage[] // Relación con las imágenes de la propiedad
-  createdAt      DateTime       @default(now()) // Fecha y hora de creación del registro
-  updatedAt      DateTime       @updatedAt // Fecha y hora de la última actualización
+  id            Int             @id @default(autoincrement()) // Identificador único de la propiedad
+  slug          String          @unique
+  title         String // Título del anuncio de la propiedad
+  description   String // Descripción detallada de la propiedad
+  price         Decimal         @default(0.00) // Precio de la propiedad
+  bedrooms      Int // Número de dormitorios
+  bathrooms     Int // Número de baños
+  squareMeters  Float // Área total en metros cuadrados
+  address       String // Dirección de la calle
+  country       Int? // País
+  state         Int? // Estado o región
+  city          String? // Ciudad donde está ubicada
+  zipCode       String? // Código postal
+  propertyType  PropertyState // Tipo de propiedad (apartamento, casa, etc.)
+  listingType   ListingType // Tipo de anuncio (venta, alquiler, etc.)
+  isAvailable   Boolean         @default(true) // Indica si la propiedad está disponible
+  yearBuilt     Int? // Año de construcción (opcional)
+  parkingSpaces Int? // Número de espacios de estacionamiento (opcional)
+  amenities     Json? // Array de comodidades
+  quantity      Int             @default(1)
+  lat           String? // Latitud
+  lng           String? // Longitud
+  images        PropertyImage[] // Relación con las imágenes de la propiedad
+  createdAt     DateTime        @default(now()) // Fecha y hora de creación del registro
+  updatedAt     DateTime        @updatedAt // Fecha y hora de la última actualización
+  states        State[] // Relación con los estados asociados a la propiedad
+  countries     Country[] // Relación con los países asociados a la propiedad
 
   @@map("properties") // Mapea el modelo Property a la tabla "properties" en la base de datos
 }
 
 model PropertyImage {
-  id          Int      @id @default(autoincrement()) // Identificador único de la imagen de la propiedad
-  url         String   // URL donde se almacena la imagen
-  propertyId  Int      // ID de la propiedad asociada
-  property    Property @relation(fields: [propertyId], references: [id]) // Relación con la propiedad
+  id         Int      @id @default(autoincrement()) // Identificador único de la imagen de la propiedad
+  url        String // URL donde se almacena la imagen
+  propertyId Int // ID de la propiedad asociada
+  property   Property @relation(fields: [propertyId], references: [id]) // Relación con la propiedad
 
   @@map("property_images") // Mapea el modelo PropertyImage a la tabla "property_images" en la base de datos
 }
-
-
 
 // model Products {
 //   id                   Int                @id @default(autoincrement())
@@ -235,6 +241,8 @@ model State {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   userProfile UserProfile[]
+  Property    Property?     @relation(fields: [propertyId], references: [id])
+  propertyId  Int?
 
   @@map("states")
 }
@@ -254,4 +262,14 @@ enum Role {
   BUILDERS
   INVESTORS
   CUSTOMER
+}
+
+enum PropertyState {
+  APARTMENT
+  HOUSE
+}
+
+enum ListingType {
+  SALE
+  RENT
 }
