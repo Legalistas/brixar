@@ -7,6 +7,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Address {
+  id          Int      @id @default(autoincrement())
+  propertyId  Int? // Clave foránea opcional
+  proyectId   Int? // Clave foránea opcional
+  countryId   Int? // Clave foránea opcional
+  stateId     Int? // Clave foránea opcional
+  city        String?
+  postalCode  String?
+  streetName  String?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  property  Property?   @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  proyect   Proyect?    @relation(fields: [proyectId], references: [id], onDelete: Cascade)
+  country   Country?    @relation(fields: [countryId], references: [id])
+  state     State?      @relation(fields: [stateId], references: [id])
+  positions Positions[]
+
+  @@map("address")
+}
+
 model Account {
   id                Int     @id @default(autoincrement())
   userId            Int
@@ -36,8 +58,7 @@ model Country {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   userProfile UserProfile[]
-  Property    Property?     @relation(fields: [propertyId], references: [id])
-  propertyId  Int?
+  address     Address[]
 
   @@map("countries")
 }
@@ -57,35 +78,27 @@ model Currency {
 }
 
 model Property {
-  id            Int             @id @default(autoincrement()) // Identificador único de la propiedad
+  id            Int             @id @default(autoincrement())
   slug          String          @unique
-  title         String // Título del anuncio de la propiedad
-  description   String // Descripción detallada de la propiedad
-  price         Decimal         @default(0.00) // Precio de la propiedad
-  bedrooms      Int // Número de dormitorios
-  bathrooms     Int // Número de baños
-  squareMeters  Float // Área total en metros cuadrados
-  address       String // Dirección de la calle
-  country       Int? // País
-  state         Int? // Estado o región
-  city          String? // Ciudad donde está ubicada
-  zipCode       String? // Código postal
-  propertyType  PropertyState // Tipo de propiedad (apartamento, casa, etc.)
-  listingType   ListingType // Tipo de anuncio (venta, alquiler, etc.)
-  isAvailable   Boolean         @default(true) // Indica si la propiedad está disponible
-  yearBuilt     Int? // Año de construcción (opcional)
-  parkingSpaces Int? // Número de espacios de estacionamiento (opcional)
-  amenities     Json? // Array de comodidades
+  title         String
+  description   String
+  price         Decimal         @default(0.00) @db.Decimal(12, 2)
+  bedrooms      Int
+  bathrooms     Int
+  squareMeters  Float
+  propertyType  PropertyState
+  listingType   ListingType
+  isAvailable   Boolean         @default(true)
+  yearBuilt     Int?
+  parkingSpaces Int?
+  amenities     Json?
   quantity      Int             @default(1)
-  lat           String? // Latitud
-  lng           String? // Longitud
-  images        PropertyImage[] // Relación con las imágenes de la propiedad
-  createdAt     DateTime        @default(now()) // Fecha y hora de creación del registro
-  updatedAt     DateTime        @updatedAt // Fecha y hora de la última actualización
-  states        State[] // Relación con los estados asociados a la propiedad
-  countries     Country[] // Relación con los países asociados a la propiedad
+  images        PropertyImage[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  address       Address[]
 
-  @@map("properties") // Mapea el modelo Property a la tabla "properties" en la base de datos
+  @@map("properties")
 }
 
 model PropertyImage {
@@ -97,76 +110,29 @@ model PropertyImage {
   @@map("property_images") // Mapea el modelo PropertyImage a la tabla "property_images" en la base de datos
 }
 
-// model Products {
-//   id                   Int                @id @default(autoincrement())
-//   categoryId           Int
-//   brandId              Int
-//   slug                 String
-//   name                 String
-//   description          String?
-//   state                ProductState       @default(NEW)
-//   picture              String?
-//   sku                  String?
-//   qty                  Int                @default(0)
-//   qtyBellowMin         Int?               @default(0)
-//   price                Decimal            @default(0.00) @db.Decimal(15, 2)
-//   priceWholeSaller     Decimal            @default(0.00) @db.Decimal(15, 2)
-//   cost                 Decimal            @default(0.00) @db.Decimal(15, 2)
-//   promotionalPrice     Decimal            @default(0.00) @db.Decimal(15, 2)
-//   showPrice            Boolean            @default(true)
-//   showPriceWholeWaller Boolean            @default(false)
-//   status               Boolean            @default(true)
-//   createdAt            DateTime           @default(now())
-//   updatedAt            DateTime           @updatedAt
-//   attributes           ProductAttribute[]
-//   brand                Brand              @relation(fields: [brandId], references: [id], onDelete: Cascade)
-//   category             Category           @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-//   saleDetail           SaleDetail[]
-//   productImage         ProductImage[]
+model Proyect {
+  id          Int       @id @default(autoincrement())
+  slug        String    @unique
+  title       String
+  description String
+  image       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  Address     Address[]
 
-//   @@index([brandId], map: "products_brandId_fkey")
-//   @@index([categoryId], map: "products_categoryId_fkey")
-//   @@map("products")
-// }
+  @@map("proyects")
+}
 
-// model ProductAttribute {
-//   id              Int      @id @default(autoincrement())
-//   productId       Int
-//   name            String
-//   value           String
-//   qty             Int      @default(0)
-//   qtyBellowMin    Int?     @default(0)
-//   price           Decimal  @default(0.00) @db.Decimal(15, 2)
-//   priceWholesaler Decimal  @default(0.00) @db.Decimal(15, 2)
-//   product         Products @relation(fields: [productId], references: [id], onDelete: Cascade)
+model Positions {
+  id        Int     @id @default(autoincrement())
+  addressId Int
+  longitude String?
+  latitude  String?
 
-//   @@index([productId], map: "product_attributes_productId_fkey")
-//   @@map("product_attributes")
-// }
+  address Address? @relation(fields: [addressId], references: [id], onDelete: Cascade)
 
-// model ProductImage {
-//   id        Int      @id @default(autoincrement())
-//   productId Int
-//   product   Products @relation(fields: [productId], references: [id], onDelete: Cascade)
-//   url       String
-//   order     Int      @default(0)
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-
-//   @@map("product_images")
-// }
-
-// model Receipt {
-//   id           Int      @id @default(autoincrement())
-//   name         String
-//   letterSerial String
-//   series       String
-//   number       String
-//   createdAt    DateTime @default(now())
-//   updatedAt    DateTime @updatedAt
-
-//   @@map("receipts")
-// }
+  @@map("positions")
+}
 
 model Session {
   id           Int      @id @default(autoincrement())
@@ -241,8 +207,7 @@ model State {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   userProfile UserProfile[]
-  Property    Property?     @relation(fields: [propertyId], references: [id])
-  propertyId  Int?
+  address     Address[]
 
   @@map("states")
 }

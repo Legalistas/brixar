@@ -1,4 +1,0 @@
--- AlterTable
-ALTER TABLE `properties` ADD COLUMN `lat` VARCHAR(191) NULL,
-    ADD COLUMN `lng` VARCHAR(191) NULL,
-    ADD COLUMN `quantity` INTEGER NOT NULL DEFAULT 1;
