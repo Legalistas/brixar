@@ -81,7 +81,7 @@ model Property {
   id            Int             @id @default(autoincrement())
   slug          String          @unique
   title         String
-  description   String
+  description   String?         @db.Text
   price         Decimal         @default(0.00) @db.Decimal(12, 2)
   bedrooms      Int
   bathrooms     Int

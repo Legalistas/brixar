@@ -153,3 +153,14 @@ export const numeroALetras = (numero: number): string => {
 
   return resultado.trim()
 }
+
+export const formatPropertyType = (type: string): string => {
+  switch (type) {
+    case 'HOUSE':
+      return 'CASA'
+    case 'APARTMENT':
+      return 'DEPARTAMENTO'
+    default:
+      return 'Sin documento'
+  }
+}
