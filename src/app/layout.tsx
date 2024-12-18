@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "@/styles/globals.css";
 import "react-toastify/dist/ReactToastify.css";
+import "flag-icons/css/flag-icons.min.css";
 import { ToastContainer } from "react-toastify";
 import { Providers } from "./Providers";
 import { Inter, Ubuntu } from 'next/font/google'
@@ -40,6 +41,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <meta name="apple-mobile-web-app-title" content="Brix.ar" />
+      </head>
       <body
         className={`${inter.className} antialiased bg-[#F1F5F9]`}
       >

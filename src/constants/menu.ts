@@ -122,15 +122,15 @@ export const REPORTS_DATA: MenuItem[] = [
 ]
 
 export const MENU_CUSTOMERS_DATA: MenuItem[] = [
-  { icon: Monitor, label: 'Panel de Control', href: '/dashboard' },
+  { icon: Monitor, label: 'Panel de Control', href: '/customer/dashboard' },
   {
     icon: ChartNoAxesCombined,
     label: 'Mis inversiones',
-    href: '/inversiones',
+    href: '/customer/investments',
   },
-  { icon: Home, label: 'Propiedades', href: '/propiedades' },
-  { icon: ClipboardList, label: 'Proyectos', href: '/proyectos' },
-  { icon: CircleDollarSign, label: 'Créditos', href: '/creditos' },
+  { icon: Home, label: 'Propiedades', href: '/customer/properties' },
+  { icon: ClipboardList, label: 'Proyectos', href: '/customer/proyects' },
+  { icon: CircleDollarSign, label: 'Créditos', href: '/customer/credits' },
   {
     icon: Settings,
     label: 'Configuración',

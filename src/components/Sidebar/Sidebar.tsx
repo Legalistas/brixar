@@ -94,7 +94,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <Link
                   key={subItem.label}
                   href={subItem.href}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-md text-gray-300 hover:bg-white/10 hover:text-white ${pathname.startsWith(subItem.href) ? "bg-white/10 text-white" : ""
+                  className={`flex items-center text-sm gap-3 px-2.5 py-2 rounded-md text-gray-300 hover:bg-white/10 hover:text-white ${pathname.startsWith(subItem.href) ? "bg-white/10 text-white" : ""
                     }`}
                 >
                   <subItem.icon className="h-4 w-4" />
@@ -117,11 +117,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         />
       )}
       <aside
-        className={`fixed left-0 top-0 z-50 h-full w-72 bg-[#2A303C] overflow-y-auto transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed left-0 top-0 z-50 h-full w-60 bg-gray-900 overflow-y-auto transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"
           } lg:translate-x-0 lg:static lg:z-auto`}
       >
         <div className="p-4 flex justify-center">
-          <LogoBrixar className="h-12 w-auto fill-white" />
+          <LogoBrixar className="h-10 w-auto fill-white" />
         </div>
         <div className="p-4">
           <h2 className="px-3 text-xs font-semibold text-gray-400 uppercase">Menu</h2>

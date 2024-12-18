@@ -1,4 +1,6 @@
+import { useCurrency } from '@/context/CurrencyContext'
 import { Property, PropertyType, ListingType } from '@/types/property'
+import { formatCurrency } from '@/utils/formatUtils'
 import { Bath, BedDouble, Home, Maximize } from 'lucide-react'
 
 const formatPropertyType = (propertyType: PropertyType): string => {
@@ -11,6 +13,8 @@ const formatListingType = (listingType: ListingType): string => {
 
 export default function PropertyInfo({ property }: { property: Property }) {
     const mainAddress = property.address[0]
+    const { convertPrice, currentCurrency } = useCurrency()
+
 
     return (
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
@@ -40,7 +44,9 @@ export default function PropertyInfo({ property }: { property: Property }) {
             </div>
             <div className="mt-4">
                 <p className="font-semibold">Precio:</p>
-                <p className="text-2xl text-green-600">{property.price}</p>
+                <p className="text-2xl text-green-600">
+                    {formatCurrency(convertPrice(Number(property.price)))}
+                </p>
             </div>
             <div className="mt-4">
                 <span className="inline-block bg-blue-100 text-blue-800 text-sm font-semibold px-2.5 py-0.5 rounded">

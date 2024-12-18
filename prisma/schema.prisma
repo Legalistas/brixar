@@ -97,6 +97,7 @@ model Property {
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
   address       Address[]
+  Visit         Visit[]
 
   @@map("properties")
 }
@@ -160,6 +161,7 @@ model User {
   sessions      Session[]
   activity      UserActivity?
   profile       UserProfile?
+  Visit         Visit[]
 
   @@map("users")
 }
@@ -210,6 +212,23 @@ model State {
   address     Address[]
 
   @@map("states")
+}
+
+model Visit {
+  id         Int      @id @default(autoincrement())
+  propertyId Int
+  userId     Int
+  visitDate  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  property Property @relation(fields: [propertyId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+
+  @@index([propertyId])
+  @@index([userId])
+
+  @@map("visits")
 }
 
 model VerificationToken {

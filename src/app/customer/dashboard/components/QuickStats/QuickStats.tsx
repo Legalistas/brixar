@@ -41,20 +41,18 @@ const QuickStats = ({ statistics }: StatisticsProps) => {
   ];
 
   return (
-    <div className="flex flex-row w gap-4 w-full">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
       {statsData.map((stat, index) => (
-        <div key={index} className="flex-1 min-w-[200px]">
-          <StatsCard
-            key={index}
-            title={stat.title}
-            color={stat.color}
-            value={stat.value}
-            isAmount={stat.isAmount}
-            icon={cloneElement(stat.icon, {
-              className: "text-lg w-10 h-10 text-slate-700 dark:text-white",
-            })}
-          />
-        </div>
+        <StatsCard
+          key={index}
+          title={stat.title}
+          color={stat.color}
+          value={stat.value}
+          isAmount={stat.isAmount}
+          icon={cloneElement(stat.icon, {
+            className: "text-lg w-10 h-10 text-slate-700 dark:text-white",
+          })}
+        />
       ))}
     </div>
   );

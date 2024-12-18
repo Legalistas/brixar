@@ -25,4 +25,9 @@ export const API_ENDPOINTS = {
   // ENDPOINTS
   PROPERTIES_INDEX: `${API_BASE_URL}/properties`,
   PROPERTY_BY_SLUG: (slug: string) => `${API_BASE_URL}/properties/${slug}`,
+
+  SCHEDULE_VISIT: `${API_BASE_URL}/visits/schedule`,
+  VISITS_INDEX: `${API_BASE_URL}/visits/user`,
+  CHECK_EXISTING_VISIT: (propertyId: number, userId: string) =>
+    `${API_BASE_URL}/visits/check?propertyId=${propertyId}&userId=${userId}`,
 }

@@ -1,9 +1,10 @@
 import Image from 'next/image'
-import { Bath, BedDouble, Home, Maximize, Building, TypeIcon as type, LucideIcon } from 'lucide-react'
+import { Bath, BedDouble, Home, Maximize, Building, TypeIcon as type, LucideIcon, HelpCircle } from 'lucide-react'
 import { Property, PropertyType, ListingType } from '@/types/property'
 import React from 'react'
 import { formatCurrency } from '@/utils/formatUtils'
 import Link from 'next/link'
+import { useCurrency } from '@/context/CurrencyContext'
 
 const propertyTypeIcons: { [key in PropertyType]: LucideIcon } = {
     [PropertyType.HOUSE]: Home,
@@ -24,9 +25,10 @@ const formatListingType = (listingType: ListingType): string => {
     return ListingType[listingType as unknown as keyof typeof ListingType] || 'Listado'
 }
 
-export default function PropertyCard({ property }: { property: Property }) {
-    const mainAddress = property.address[0] // Assuming the first address is the main one
 
+export default function PropertyCard({ property, visitDate }: { property: Property, visitDate: Date }) {
+    const mainAddress = property.address[0] // Assuming the first address is the main one
+    const { convertPrice, currentCurrency } = useCurrency();
     return (
         <div className="max-w-sm bg-white rounded-lg overflow-hidden shadow border-1 border-gray-400">
             {/* Image Container */}
@@ -39,7 +41,7 @@ export default function PropertyCard({ property }: { property: Property }) {
                 />
                 {/* Price Tag */}
                 <div className="absolute bottom-4 right-4 bg-black/80 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                    {formatCurrency(property.price)}
+                    {formatCurrency(convertPrice(Number(property.price)))}
                 </div>
             </div>
 
@@ -87,8 +89,12 @@ export default function PropertyCard({ property }: { property: Property }) {
                     {formatListingType(property.listingType)}
                 </div>
             </div>
-            <div className="p-4 border-t border-gray-200">
-                <Link href={`/customer/properties/${property.slug}`} className="p-2.5 text-xs font-medium block text-center rounded-md bg-slate-500 hover:bg-slate-700 text-white">Ver detalles</Link>
+            <div className="p-4 border-t border-gray-200 flex justify-between items-center">
+                {/* <Link href={`/customer/properties/${property.slug}`} className="p-2.5 text-xs font-medium block text-center rounded-md bg-slate-500 hover:bg-slate-700 text-white">Ver detalles</Link> */}
+                <div className="text-sm"> Visita programada: {new Date(visitDate).toLocaleString()}</div>
+                <Link href={`/customer/properties/${property.slug}`} className="p-2.5 text-xs font-medium block text-center rounded-md bg-[#FB6107] hover:bg-[#FB6107]/90 text-white">
+                    <HelpCircle className="h-4 w-4" />
+                </Link>
             </div>
         </div>
     )
