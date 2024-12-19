@@ -3,7 +3,7 @@ import { Faqs } from '@/components/Faqs'
 import { Hero } from '@/components/Hero'
 import { PrimaryFeatures } from '@/components/PrimaryFeatures'
 import { Reviews } from '@/components/Reviews'
-// import CardContainer from '@/components/Cards/HousesMain/CardContainer'
+import CardContainer from '@/components/Property/PropertyContainer'
 import { SecondaryFeatures } from '@/components/SecondaryFeatures'
 
 export const metadata = {
@@ -16,7 +16,7 @@ export default function Home() {
     return (
         <>
             <Hero />
-            {/* <CardContainer /> */}
+            <CardContainer />
             <PrimaryFeatures />
             <SecondaryFeatures />
             <CallToAction />

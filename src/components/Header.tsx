@@ -17,6 +17,7 @@ import { NavLinks } from '@/components/NavLinks'
 import LogoBrixar from './LogoBrixar'
 import { ChevronDown, FileText, Gift, LogOut, User } from 'lucide-react'
 import { useSession, signOut } from "next-auth/react"
+import { useCurrency } from '@/context/CurrencyContext'
 
 interface IconProps extends React.SVGProps<SVGSVGElement> { }
 
@@ -63,6 +64,7 @@ const ProfileDropdown: React.FC<{ user: any; onClose: () => void; handleLogout: 
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
+
 
     const toggleDropdown = () => setIsOpen(!isOpen);
 
@@ -162,6 +164,8 @@ const ProfileDropdown: React.FC<{ user: any; onClose: () => void; handleLogout: 
 export const Header: React.FC = () => {
     const { data: session, status } = useSession()
     const [dropdownOpen, setDropdownOpen] = useState(false)
+    const [isOpenCurrency, setIsOpenCurrency] = useState(false)
+    const { currencies, currentCurrency, setCurrentCurrency } = useCurrency()
 
     const handleLogout = async () => {
         await signOut()
@@ -254,6 +258,40 @@ export const Header: React.FC = () => {
                             )}
                         </Popover>
                         <div className='hidden lg:flex space-x-3'>
+                            <div className="relative">
+                                <button
+                                    onClick={() => setIsOpenCurrency(!isOpenCurrency)}
+                                    className="flex items-center text-gray-600 hover:text-gray-900 rounded-md hover:bg-gray-100 px-3 py-2 text-sm"
+                                >
+                                    <span className="mr-2">
+                                        <span className={`fi fi-${currentCurrency.flagCode}`} />
+                                    </span>
+                                    <span className="hidden sm:inline">{currentCurrency.name}</span>
+                                    <ChevronDown className="h-4 w-4 ml-2" />
+                                </button>
+                                {isOpenCurrency && (
+                                    <div
+                                        className="absolute top-[calc(100%+0.5rem)] left-0 w-48 rounded-lg shadow-lg bg-white ring-1 ring-black/5 z-50 overflow-hidden">
+                                        <div className="py-1">
+                                            {currencies.map((currency, index) => (
+                                                <button
+                                                    key={index}
+                                                    onClick={() => {
+                                                        setCurrentCurrency(currency)
+                                                        setIsOpenCurrency(false)
+                                                    }}
+                                                    className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
+                                                >
+                                                    <span className="mr-2">
+                                                        <span className={`fi fi-${currency.flagCode}`} />
+                                                    </span>
+                                                    {currency.name}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                             {status === 'authenticated' ? (
                                 <ProfileDropdown
                                     user={session.user}
