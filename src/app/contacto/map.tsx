@@ -6,6 +6,7 @@ import L from 'leaflet'
 import { MapPin } from 'lucide-react'
 import { renderToString } from 'react-dom/server'
 import 'leaflet/dist/leaflet.css'
+import IconBrixarSingle from '@/components/IconBrixarSingle'
 
 interface PropertyMapProps {
   latitude: number
@@ -34,10 +35,10 @@ export default function PropertyMap({ latitude, longitude }: PropertyMapProps) {
         <Marker
           position={[latitude, longitude]}
           icon={L.divIcon({
-            html: renderToString(<MapPin size={30} color="#FF0000" />),
+            html: renderToString(<IconBrixarSingle className='h-8 w-auto' />),
             className: 'custom-icon',
-            iconSize: [30, 30],
-            iconAnchor: [15, 30],
+            iconSize: [48, 48],
+            iconAnchor: [24, 48]
           })}
         >
           <Popup>Ubicación de la propiedad</Popup>

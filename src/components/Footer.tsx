@@ -34,7 +34,7 @@ export function Footer(): JSX.Element {
                             <IconBrixarSingle className='h-12 w-auto' />
                             <div className="ml-4">
                                 <p className="text-base font-semibold">Brixar</p>
-                                <p className="mt-1 text-sm">El inmueble de tus sueños a tu alcance.</p>
+                                <p className="mt-1 text-sm">El hogar de tus sueños.</p>
                             </div>
                         </div>
                         <nav className="mt-11 flex gap-8">

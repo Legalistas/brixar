@@ -99,6 +99,11 @@ export default function PropertiesPage() {
         return type === 'SALE' ? 'Venta' : 'Alquiler'
     }
 
+    const listingTypeColors = {
+        SALE: 'from-red-500 to-yellow-500',
+        RENT: 'from-blue-500 to-green-500'
+    };
+
     return (
         <div className="container mx-auto px-4 py-4">
             <div className="flex flex-col space-y-4">
@@ -172,6 +177,9 @@ export default function PropertiesPage() {
                                 <div key={property.id} className={`bg-white rounded-lg overflow-hidden shadow border border-gray-200 transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-lg ${view === 'list' ? 'flex' : ''}`}>
                                     {/* Image Container */}
                                     <div className={`relative ${view === 'grid' ? 'h-48 w-full' : 'h-40 w-40'} overflow-hidden`}>
+                                        <div className={`absolute top-0 left-0 z-10 px-3 py-1 text-xs font-semibold text-white rounded-br-lg bg-gradient-to-r ${listingTypeColors[property.listingType]}`}>
+                                            {formatListingType(property.listingType)}
+                                        </div>
                                         <Image
                                             src={process.env.NEXT_PUBLIC_BASE_URL + '/uploads/' + property.images[0]?.url || "/placeholder.svg"}
                                             alt={`Imagen de ${property.title}`}
@@ -221,11 +229,6 @@ export default function PropertiesPage() {
                                         <div className="text-xs text-gray-600 mb-2">
                                             <p>{mainAddress.streetName}, {mainAddress.city}</p>
                                             <p>{mainAddress.state.name}, {mainAddress.country.name}</p>
-                                        </div>
-
-                                        {/* Listing Type */}
-                                        <div className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded">
-                                            {formatListingType(property.listingType)}
                                         </div>
                                     </div>
                                     <div className={`p-4 ${view === 'list' ? 'border-l' : 'border-t'} border-gray-200`}>

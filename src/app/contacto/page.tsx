@@ -100,7 +100,7 @@ function ContactForm() {
         />
       </div>
       <div>
-        <Button type="submit" className="w-full">
+        <Button type="submit" className="w-full bg-[#FB6107] dark:bg-[#FB6107]/80 hover:bg-[#FB6107]/90">
           Enviar mensaje
         </Button>
       </div>
@@ -116,15 +116,15 @@ function ContactInfo() {
       </h2>
       <div className="space-y-4">
         <p className="flex items-center text-gray-600 dark:text-gray-300">
-          <Mail className="mr-3 text-cyan-600 dark:text-cyan-400" size={20} />
+          <Mail className="mr-3 text-[#FB6107] dark:text-[#FB6107]/80" size={20} />
           contacto@brixar.ar
         </p>
         <p className="flex items-center text-gray-600 dark:text-gray-300">
-          <Phone className="mr-3 text-cyan-600 dark:text-cyan-400" size={20} />
+          <Phone className="mr-3 text-[#FB6107] dark:text-[#FB6107]/80" size={20} />
           3492 282324
         </p>
         <p className="flex items-center text-gray-600 dark:text-gray-300">
-          <MapPin className="mr-3 text-cyan-600 dark:text-cyan-400" size={20} />
+          <MapPin className="mr-3 text-[#FB6107] dark:text-[#FB6107]/80" size={20} />
           Aconcagua 697, Rafaela, Santa Fe
         </p>
       </div>
@@ -139,13 +139,6 @@ function Map() {
         Nuestra ubicación
       </h2>
       <div className="relative w-full h-96 rounded-lg overflow-hidden">
-        {/*<Image
-          src="/placeholder.svg?height=320&width=480"
-          alt="Mapa de ubicación"
-          layout="fill"
-          objectFit="cover"
-          className="rounded-lg"
-        />*/}
         <PropertyMap latitude={-31.2545} longitude={-61.4867} />
       </div>
     </div>
