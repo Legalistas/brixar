@@ -20,7 +20,7 @@ const Sidebar = ({ onFilterChange }: SidebarProps) => {
   }
 
   return (
-    <div className="w-64 p-4 bg-gray-100">
+    <div className="w-64 p-4">
       <h2 className="text-xl font-semibold mb-4">Filtros</h2>
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700">Precio máximo</label>
