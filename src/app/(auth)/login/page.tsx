@@ -72,7 +72,7 @@ export default function LoginPage() {
     <main className="flex min-h-full overflow-hidden pt-10">
       <div className="mx-auto flex w-full max-w-2xl flex-col px-4 sm:px-6">
         <Link href="/" aria-label="Home">
-          <img src="/images/logonaranja.png" alt="logo" className="h-12 w-auto" />
+          <img src="/images/logos/isonaranja.png" alt="logo" className="h-12 w-auto" />
         </Link>
         <div className="relative mt-12 sm:mt-16">
           <CirclesBackground

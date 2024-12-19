@@ -14,7 +14,7 @@ export function Logomark(props: React.SVGProps<SVGSVGElement>) {
 export function Logo() {
     return (
         <div>
-            <img src="/images/logonaranja.png" alt="logo" className="h-12 w-auto" />
+            <img src="/images/logos/isonaranja.png" alt="logo" className="h-12 w-auto" />
         </div>
     )
 }

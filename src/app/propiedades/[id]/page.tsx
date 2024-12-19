@@ -6,6 +6,8 @@ import { Header } from '@/components/Header'
 import { useEffect, useState } from 'react'
 import { getAllProperties } from '@/services/properties-service'
 import Image from 'next/image'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 
 type Property = {
   id: number
@@ -47,6 +49,8 @@ export default function PropertyPage() {
   const slug = params.id as string
 
   const [property, setProperty] = useState<Property | null>(null)
+
+  console.log('prop:', property)
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -112,7 +116,7 @@ export default function PropertyPage() {
               {property.images.map((image) => (
                 <div key={image.id} className="relative h-48">
                   <Image
-                    src={image.url}
+                    src={"/uploads" + image.url}
                     alt={`Imagen de la propiedad ${image.id}`}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -123,9 +127,17 @@ export default function PropertyPage() {
             </div>
           </div>
         </div>
+        <div className="mt-8 bg-gray-100 p-6 rounded-lg">
+          <h2 className="text-2xl font-semibold mb-4">¿Estás interesado en esta propiedad?</h2>
+          <p className="mb-4">Entra en tu cuenta para comprar</p>
+          <Link href="/login">
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+              Iniciar sesión
+            </Button>
+          </Link>
+        </div>
       </main>
       <Footer />
     </>
   )
 }
-

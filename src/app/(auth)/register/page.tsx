@@ -43,7 +43,7 @@ export default function RegisterPage() {
       <div className="mx-auto flex w-full max-w-2xl flex-col px-4 sm:px-6">
         <Link href="/" aria-label="Home">
           <img
-            src="/images/logonaranja.png"
+            src="/images/logos/isonaranja.png"
             alt="logo"
             className="h-12 w-auto"
           />
