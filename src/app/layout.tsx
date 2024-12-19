@@ -5,6 +5,7 @@ import "flag-icons/css/flag-icons.min.css";
 import { ToastContainer } from "react-toastify";
 import { Providers } from "./Providers";
 import { Inter, Ubuntu } from 'next/font/google'
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 // If loading a variable font, you don't need to specify the font weight
 const inter = Inter({ subsets: ['latin'] })
@@ -14,24 +15,37 @@ const ubuntu = Ubuntu({
 })
 
 export const metadata: Metadata = {
-  title: '',
-  description: '',
-  keywords: [],
-  authors: [],
+  title: 'Brixar | Propiedades y Financiación en Argentina',
+  description: 'Cumplí el sueño del hogar propio con Brixar. Accedé a tu vivienda con financiamiento flexible y proyectos de calidad en Argentina.',
+  keywords: [
+    'Brixar',
+    'propiedades en Argentina',
+    'financiamiento inmobiliario',
+    'vivienda propia',
+    'proyectos habitacionales',
+    'plataforma inmobiliaria',
+    'compra de inmuebles',
+    'créditos hipotecarios',
+    'construcción de viviendas',
+    'inversiones inmobiliarias'
+  ],
+  authors: [
+    { name: 'Brixar Team', url: 'https://www.brixar.ar' }
+  ],
   openGraph: {
     type: 'website',
-    title: '',
-    description: '',
-    url: '',
-    images: [''], // Ajusta el nombre del archivo
-    siteName: '',
+    title: 'Brixar | Propiedades y Financiación',
+    description: 'Cumplí el sueño del hogar propio con Brixar. Accedé a tu vivienda con financiamiento flexible y proyectos de calidad en Argentina.',
+    url: 'https://www.brixar.ar',
+    images: ['https://www.brixar.ar/images/og-image.jpg'],
+    siteName: 'Brixar',
   },
   icons: {
-    icon: [],
-    apple: [],
-    shortcut: [],
+    icon: ['/favicon.ico'],
+    apple: ['/apple-touch-icon.png'],
+    shortcut: ['/shortcut-icon.png'],
   },
-  manifest: '',
+  manifest: '/site.webmanifest',
 };
 
 export default function RootLayout({
@@ -47,8 +61,11 @@ export default function RootLayout({
       <body
         className={`${inter.className} antialiased bg-[#F1F5F9]`}
       >
-        <Providers>{children}</Providers>
-        <ToastContainer />
+        <Providers>
+          {children}
+          <GoogleAnalytics gaId={`${process.env.NEXT_PUBLIC_GID}`} />
+          <ToastContainer />
+        </Providers>
       </body>
     </html>
   );
