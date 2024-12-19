@@ -1,105 +1,133 @@
-// app/register/page.tsx
-"use client";
+'use client'
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { CirclesBackground } from '@/components/CirclesBackground'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 export default function RegisterPage() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const router = useRouter();
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
+    e.preventDefault()
+    setError('')
 
     try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }),
-      });
+      })
 
       if (response.ok) {
-        router.push("/login");
+        router.push('/login')
       } else {
-        const data = await response.json();
-        setError(data.error || "An error occurred during registration.");
+        const data = await response.json()
+        setError(data.error || 'An error occurred during registration.')
       }
     } catch (error) {
-      setError("An error occurred during registration.");
+      setError('An error occurred during registration.')
     }
-  };
+  }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Register</CardTitle>
-          <CardDescription>Create a new account</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit}>
-            <div className="grid w-full items-center gap-4">
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Name</Label>
-                <input
-                  id="name"
-                  placeholder="Enter your name"
-                  value={name}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="email">Email</Label>
-                <input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="password">Password</Label>
-                <input
-                  id="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
+    <main className="flex min-h-full overflow-hidden pt-10">
+      <div className="mx-auto flex w-full max-w-2xl flex-col px-4 sm:px-6">
+        <Link href="/" aria-label="Home">
+          <img
+            src="/images/logonaranja.png"
+            alt="logo"
+            className="h-12 w-auto"
+          />
+        </Link>
+        <div className="relative mt-12 sm:mt-16">
+          <CirclesBackground
+            width="1090"
+            height="1090"
+            className="absolute -top-7 left-1/2 -z-10 h-[788px] -translate-x-1/2 stroke-gray-300/30 [mask-image:linear-gradient(to_bottom,white_20%,transparent_75%)] sm:-top-9 sm:h-auto"
+          />
+          <h1 className="text-center text-2xl font-medium tracking-tight text-gray-900">
+            Crear una cuenta
+          </h1>
+          <p className="mt-3 text-center text-md text-gray-600 font-semibold mr-1">
+            ¿Ya tienes una cuenta?
+            <Link href="/login" className="text-cyan-600 ml-1 hover:underline">
+              Iniciar sesión
+            </Link>
+          </p>
+        </div>
+        <div className="-mx-4 mt-10 flex-auto bg-white px-4 py-10 shadow-2xl shadow-gray-900/10 sm:mx-0 sm:flex-none sm:rounded-5xl sm:p-24">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <Label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Nombre
+              </Label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="Ingresa tu nombre"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Correo electrónico
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Ingresa tu correo electrónico"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Contraseña
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Ingresa tu contraseña"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="mt-1"
+              />
             </div>
             {error && (
-              <Alert variant="destructive" className="mt-4">
+              <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            <CardFooter className="flex justify-between mt-4 px-0">
-              <Button type="submit" className="w-full">
-                Register
-              </Button>
-            </CardFooter>
+            <Button type="submit" className="w-full">
+              Registrarse
+            </Button>
           </form>
-        </CardContent>
-      </Card>
-    </div>
-  );
+        </div>
+      </div>
+    </main>
+  )
 }

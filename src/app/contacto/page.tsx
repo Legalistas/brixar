@@ -1,34 +1,42 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { Mail, Phone, MapPin } from 'lucide-react'
 import Image from 'next/image'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
+import PropertyMap from './map'
 
-export default function Contactopage() { 
-    return (<>
-        <Header/>
-        <div className="min-h-screen bg-background">
-            <h1 className="text-3xl md:text-4xl font-bold text-center py-6 md:py-8">Contáctanos</h1>
-            <main className="container mx-auto px-4 md:px-6 lg:px-8 pb-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-                    <div>
-                        <ContactForm />
-                    </div>
-                    <div>
-                        <ContactInfo />
-                        <Map />
-                    </div>
-                </div>
-            </main>
-        </div>
-        <Footer />
-        </>
-    )
+export default function ContactoPage() {
+  return (
+    <>
+      <Header />
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <main className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900 dark:text-white">
+            Contáctanos
+          </h1>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+              <ContactForm />
+            </div>
+            <div className="space-y-8">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+                <ContactInfo />
+              </div>
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+                <Map />
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+      <Footer />
+    </>
+  )
 }
 
 function ContactForm() {
@@ -49,8 +57,10 @@ function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-xl md:text-2xl font-semibold mb-4">Envíanos un mensaje</h2>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <h2 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-white">
+        Envíanos un mensaje
+      </h2>
       <div>
         <Input
           type="text"
@@ -86,11 +96,13 @@ function ContactForm() {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           required
-          className="w-full min-h-[100px]"
+          className="w-full min-h-[120px]"
         />
       </div>
-      <div className="flex justify-center">
-        <Button type="submit" className="w-full md:w-auto">Enviar mensaje</Button>
+      <div>
+        <Button type="submit" className="w-full">
+          Enviar mensaje
+        </Button>
       </div>
     </form>
   )
@@ -98,20 +110,22 @@ function ContactForm() {
 
 function ContactInfo() {
   return (
-    <div className="mb-8 md:mb-12">
-      <h2 className="text-xl md:text-2xl font-semibold mb-4">Información de contacto</h2>
-      <div className="space-y-2">
-        <p className="flex items-center text-sm md:text-base">
-          <Mail className="mr-2 flex-shrink-0" size={18} />
-          info@tuempresa.com
+    <div>
+      <h2 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-white">
+        Información de contacto
+      </h2>
+      <div className="space-y-4">
+        <p className="flex items-center text-gray-600 dark:text-gray-300">
+          <Mail className="mr-3 text-cyan-600 dark:text-cyan-400" size={20} />
+          contacto@brixar.ar
         </p>
-        <p className="flex items-center text-sm md:text-base">
-          <Phone className="mr-2 flex-shrink-0" size={18} />
-          +1 234 567 890
+        <p className="flex items-center text-gray-600 dark:text-gray-300">
+          <Phone className="mr-3 text-cyan-600 dark:text-cyan-400" size={20} />
+          3492 282324
         </p>
-        <p className="flex items-center text-sm md:text-base">
-          <MapPin className="mr-2 flex-shrink-0" size={18} />
-          123 Calle Principal, Ciudad, País
+        <p className="flex items-center text-gray-600 dark:text-gray-300">
+          <MapPin className="mr-3 text-cyan-600 dark:text-cyan-400" size={20} />
+          Aconcagua 697, Rafaela, Santa Fe
         </p>
       </div>
     </div>
@@ -120,18 +134,20 @@ function ContactInfo() {
 
 function Map() {
   return (
-    <div className="mt-8">
-      <h2 className="text-xl md:text-2xl font-semibold mb-4">Nuestra ubicación</h2>
-      <div className="relative w-full h-48 md:h-64 lg:h-80">
-        <Image
-          src="/placeholder.svg?height=256&width=512"
+    <div>
+      <h2 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-white">
+        Nuestra ubicación
+      </h2>
+      <div className="relative w-full h-96 rounded-lg overflow-hidden">
+        {/*<Image
+          src="/placeholder.svg?height=320&width=480"
           alt="Mapa de ubicación"
           layout="fill"
           objectFit="cover"
           className="rounded-lg"
-        />
+        />*/}
+        <PropertyMap latitude={-31.2545} longitude={-61.4867} />
       </div>
     </div>
   )
 }
-
