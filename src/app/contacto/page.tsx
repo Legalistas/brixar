@@ -8,6 +8,7 @@ import { Mail, Phone, MapPin } from 'lucide-react'
 import Image from 'next/image'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
+import PropertyMap from './map'
 
 export default function ContactoPage() {
   return (
@@ -116,15 +117,15 @@ function ContactInfo() {
       <div className="space-y-4">
         <p className="flex items-center text-gray-600 dark:text-gray-300">
           <Mail className="mr-3 text-cyan-600 dark:text-cyan-400" size={20} />
-          info@tuempresa.com
+          contacto@brixar.ar
         </p>
         <p className="flex items-center text-gray-600 dark:text-gray-300">
           <Phone className="mr-3 text-cyan-600 dark:text-cyan-400" size={20} />
-          +1 234 567 890
+          3492 282324
         </p>
         <p className="flex items-center text-gray-600 dark:text-gray-300">
           <MapPin className="mr-3 text-cyan-600 dark:text-cyan-400" size={20} />
-          123 Calle Principal, Ciudad, País
+          Aconcagua 697, Rafaela, Santa Fe
         </p>
       </div>
     </div>
@@ -137,16 +138,16 @@ function Map() {
       <h2 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-white">
         Nuestra ubicación
       </h2>
-      <div className="relative w-full h-64 lg:h-80">
-        <Image
+      <div className="relative w-full h-96 rounded-lg overflow-hidden">
+        {/*<Image
           src="/placeholder.svg?height=320&width=480"
           alt="Mapa de ubicación"
           layout="fill"
           objectFit="cover"
           className="rounded-lg"
-        />
+        />*/}
+        <PropertyMap latitude={-31.2545} longitude={-61.4867} />
       </div>
     </div>
   )
 }
-
