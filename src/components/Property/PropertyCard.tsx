@@ -116,7 +116,7 @@ const PropertyCard = ({ property }: PropertyProps) => {
 
             {/* Footer */}
             <div className="p-4 border-t border-gray-200 mt-auto">
-                <Link href={`/properties/${property.slug}`} className="p-2 text-xs font-medium block text-center rounded-md bg-[#FB6107] hover:bg-[#FB6107]/90 text-white transition-colors">
+                <Link href={`/propiedades/${property.slug}`} className="p-2 text-xs font-medium block text-center rounded-md bg-[#FB6107] hover:bg-[#FB6107]/90 text-white transition-colors">
                     Ver detalles
                 </Link>
             </div>
