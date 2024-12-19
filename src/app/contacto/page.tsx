@@ -5,10 +5,15 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Mail, Phone, MapPin } from 'lucide-react'
-import Image from 'next/image'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import PropertyMap from './map'
+import dynamic from 'next/dynamic'
+
+const DynamicMap = dynamic(() => import('./map'), {
+  ssr: false,
+  loading: () => <p>Cargando mapa...</p>
+})
 
 export default function ContactoPage() {
   return (
@@ -139,7 +144,11 @@ function Map() {
         Nuestra ubicación
       </h2>
       <div className="relative w-full h-96 rounded-lg overflow-hidden">
+<<<<<<< HEAD
         <PropertyMap latitude={-31.2545} longitude={-61.4867} />
+=======
+        <DynamicMap latitude={-31.2545} longitude={-61.4867} />
+>>>>>>> ac7e2fdde4c54eabab05ec1cfbbed16a06c6d3f8
       </div>
     </div>
   )

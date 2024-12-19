@@ -15,8 +15,10 @@ interface PropertyMapProps {
 
 export default function PropertyMap({ latitude, longitude }: PropertyMapProps) {
   useEffect(() => {
-    // This is needed to re-render the map when the component mounts on the client
-    window.dispatchEvent(new Event('resize'))
+    if (typeof window !== 'undefined') {
+      // This is needed to re-render the map when the component mounts on the client
+      window.dispatchEvent(new Event('resize'))
+    }
   }, [])
 
   console.log(latitude, longitude)
