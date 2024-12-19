@@ -143,7 +143,11 @@ function FeaturesMobile() {
                 {features.map((feature, featureIndex) => (
                     <div
                         key={featureIndex}
-                        ref={(ref) => ref && (slideRefs.current[featureIndex] = ref)}
+                        ref={(ref: HTMLDivElement | null) => {
+                            if (ref) {
+                                slideRefs.current[featureIndex] = ref;
+                            }
+                        }}
                         className="w-full flex-none snap-center px-4 sm:px-6"
                     >
                         <div className="relative transform overflow-hidden rounded-2xl bg-gray-800 px-5 py-6">

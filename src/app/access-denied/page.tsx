@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Button } from "@/components/Ui/button";
+import { Button } from "@/components/ui/button";
 import { ShieldAlert, ArrowLeft } from "lucide-react";
 
 export default function AccessDenied() {

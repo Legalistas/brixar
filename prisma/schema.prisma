@@ -10,7 +10,7 @@ datasource db {
 model Address {
   id          Int      @id @default(autoincrement())
   propertyId  Int? // Clave foránea opcional
-  proyectId   Int? // Clave foránea opcional
+  proyectId   Int? // Clave foránea obligatoria para evitar errores de uno a uno
   countryId   Int? // Clave foránea opcional
   stateId     Int? // Clave foránea opcional
   city        String?
@@ -112,16 +112,84 @@ model PropertyImage {
 }
 
 model Proyect {
-  id          Int       @id @default(autoincrement())
-  slug        String    @unique
-  title       String
-  description String
-  image       String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  Address     Address[]
+  id             Int             @id @default(autoincrement())
+  slug           String          @unique
+  title          String
+  openingLine    String?         @db.Text
+  description    String?         @db.Text
+  promotorId     Int? // Hacemos que sea opcional
+  openingPhase   Int?
+  phase          ProyectPhase    @default(FUNDING)
+  businessModel  BusinessModel
+  fundedDate     DateTime?
+  projectMedia   ProyectMedia[]
+  details        Json?
+  timeline       Json?
+  daysToEnd      Int?
+  priority       Int?
+  daysToStart    Int?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  address        Address[]
+  // Relación opcional con User
+  promotor       User?           @relation(fields: [promotorId], references: [id], onDelete: Cascade)
+  proyectDetails ProyectDetails?
+  proyectFound   ProyectFound?
 
   @@map("proyects")
+}
+
+model ProyectDetails {
+  id                 Int     @id @default(autoincrement())
+  proyectId          Int     @unique
+  type               String?
+  investmentPeriod   Int?
+  surface            Int?
+  rooms              Int?
+  floors             Int?
+  features           Json?
+  buildingYear       Int?
+  riskScore          Int?
+  profitabilityScore Int?
+
+  proyect Proyect? @relation(fields: [proyectId], references: [id], onDelete: Cascade)
+
+  @@map("proyect_details")
+}
+
+model ProyectFound {
+  id                          Int       @id @default(autoincrement())
+  proyectId                   Int       @unique
+  startInvestDate             DateTime?
+  endInvestDate               DateTime?
+  startPreFundingDate         DateTime?
+  endPreFundingDate           DateTime?
+  companyCapital              Decimal   @default(0.00) @db.Decimal(20, 2)
+  quantityFunded              Decimal   @default(0.00) @db.Decimal(20, 2)
+  quantityToFund              Decimal   @default(0.00) @db.Decimal(20, 2)
+  maxOverfunding              Decimal   @default(0.00) @db.Decimal(20, 2)
+  investors                   Int?
+  proyect                     Proyect?  @relation(fields: [proyectId], references: [id], onDelete: Cascade)
+  investor                    User?     @relation(fields: [investors], references: [id], onDelete: Cascade)
+  fields                      Json?
+  rentProfitability           Decimal   @default(0.00) @db.Decimal(20, 2)
+  totalNetProfitability       Decimal   @default(0.00) @db.Decimal(20, 2)
+  totalNetProfitabilityToShow Decimal   @default(0.00) @db.Decimal(20, 2)
+  apreciationProfitability    Decimal   @default(0.00) @db.Decimal(20, 2)
+
+  @@map("proyect_found")
+}
+
+model ProyectMedia {
+  id          Int      @id @default(autoincrement())
+  proyectId   Int?
+  link        String
+  type        String
+  title       String
+  description String?  @db.Text
+  proyect     Proyect? @relation(fields: [proyectId], references: [id], onDelete: Cascade)
+
+  @@map("proyect_media")
 }
 
 model Positions {
@@ -147,21 +215,23 @@ model Session {
 }
 
 model User {
-  id            Int           @id @default(autoincrement())
+  id            Int            @id @default(autoincrement())
   name          String?
-  email         String        @unique
+  email         String         @unique
   emailVerified DateTime?
   password      String?
   image         String?
-  role          Role          @default(CUSTOMER)
-  status        Boolean       @default(true)
-  created_at    DateTime      @default(now())
-  updated_at    DateTime      @updatedAt
+  role          Role           @default(CUSTOMER)
+  status        Boolean        @default(true)
+  created_at    DateTime       @default(now())
+  updated_at    DateTime       @updatedAt
   accounts      Account[]
   sessions      Session[]
   activity      UserActivity?
   profile       UserProfile?
   Visit         Visit[]
+  Proyect       Proyect[]
+  ProyectFound  ProyectFound[]
 
   @@map("users")
 }
@@ -227,7 +297,6 @@ model Visit {
 
   @@index([propertyId])
   @@index([userId])
-
   @@map("visits")
 }
 
@@ -256,4 +325,17 @@ enum PropertyState {
 enum ListingType {
   SALE
   RENT
+}
+
+enum ProyectPhase {
+  IN_STUDY
+  FUNDING
+  CONSTRUCTION
+  COMPLETED
+}
+
+enum BusinessModel {
+  SOLD
+  RENT
+  LEADING
 }

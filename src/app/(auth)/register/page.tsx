@@ -3,8 +3,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/Ui/button";
-import { Label } from "@/components/Ui/label";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import {
   Card,
   CardHeader,
@@ -12,8 +12,8 @@ import {
   CardDescription,
   CardContent,
   CardFooter,
-} from "@/components/Ui/card";
-import { Alert, AlertDescription } from "@/components/Ui/alert";
+} from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
