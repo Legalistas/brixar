@@ -1,12 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
+  swcMinify: false,
   images: {
     remotePatterns: [
       {
-        protocol: 'http',
-        hostname: 'localhost:3000',
+        protocol: 'https',
+        hostname: 'brixar.ar',
         port: '',
         pathname: '/uploads/**',
       },
