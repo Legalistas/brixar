@@ -49,16 +49,16 @@ const ChevronUpIcon: React.FC<IconProps> = (props) => {
 
 interface MobileNavLinkProps extends React.ComponentPropsWithoutRef<typeof Link> { }
 
-// const MobileNavLink: React.FC<MobileNavLinkProps> = ({ href, ...props }: MobileNavLinkProps) => {
-//     return (
-//         <PopoverButton
-//             as={Link}
-//             href={href}
-//             className="text-base font-medium text-gray-900 hover:text-gray-700"
-//             {...props}
-//         />
-//     )
-// }
+const MobileNavLink: React.FC<MobileNavLinkProps> = ({ href, ...props }: MobileNavLinkProps) => {
+    return (
+        <PopoverButton
+            as={Link as any}
+            href={href}
+            className="text-base font-medium text-gray-900 hover:text-gray-700"
+            {...props}
+        />
+    )
+}
 
 const ProfileDropdown: React.FC<{ user: any; onClose: () => void; handleLogout: () => void }> = ({ user, onClose, handleLogout }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -223,7 +223,7 @@ export const Header: React.FC = () => {
                                                     className="absolute inset-x-0 top-0 z-0 origin-top rounded-b-2xl bg-gray-50 px-6 pb-6 pt-32 shadow-2xl shadow-gray-900/20"
                                                 >
                                                     <div className="space-y-4">
-                                                        {/* <MobileNavLink href="/#beneficios">
+                                                        <MobileNavLink href="/#beneficios">
                                                             Beneficios
                                                         </MobileNavLink>
                                                         <MobileNavLink href="/#reviews">
@@ -232,7 +232,7 @@ export const Header: React.FC = () => {
                                                         <MobileNavLink href="/inmuebles">
                                                             Inmuebles
                                                         </MobileNavLink>
-                                                        <MobileNavLink href="/#faqs">FAQs</MobileNavLink> */}
+                                                        <MobileNavLink href="/#faqs">FAQs</MobileNavLink>
                                                     </div>
                                                     <div className="mt-8 flex flex-col gap-4">
                                                         {status === 'authenticated' ? (
