@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import SocialRegister from '../login/modules/SocialLogin/RegisterLogin'
+import LogoBrixar from '@/components/LogoBrixar'
 
 export default function RegisterPage() {
   const [name, setName] = useState('')
@@ -43,11 +44,7 @@ export default function RegisterPage() {
     <main className="flex min-h-full overflow-hidden pt-10">
       <div className="mx-auto flex w-full max-w-2xl flex-col px-4 sm:px-6">
         <Link href="/" aria-label="Home">
-          <img
-            src="/images/logos/isonaranja.png"
-            alt="logo"
-            className="h-12 w-auto"
-          />
+          <LogoBrixar className="h-8 w-auto" />
         </Link>
         <div className="relative mt-12 sm:mt-16">
           <CirclesBackground
