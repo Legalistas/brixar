@@ -130,7 +130,7 @@ export function Hero(): JSX.Element {
                             </PhoneFrame>
                         </div>
                     </div>
-                    <div className="relative -mt-4 lg:col-span-7 lg:mt-0 xl:col-span-6">
+                    <div className="relative mt-4 lg:col-span-7 lg:mt-0 xl:col-span-6">
                         <p className="text-center text-sm font-semibold text-gray-900 lg:text-left">
                             Materiales de primera calidad
                         </p>
