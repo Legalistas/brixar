@@ -120,7 +120,7 @@ export default function RegisterPage() {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full bg-[#fb6107] hover:bg-[#fb6107]/90">
               Registrarse
             </Button>
           </form>

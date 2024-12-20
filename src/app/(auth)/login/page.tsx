@@ -89,7 +89,7 @@ export default function LoginPage() {
             ¿No tienes una cuenta?
             <Link
               href="/register"
-              className="text-cyan-600 ml-1 hover:underline"
+              className="text-[#fb6107] ml-1 hover:underline"
             >
               Registrate
             </Link>

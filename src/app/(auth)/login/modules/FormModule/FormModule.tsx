@@ -78,7 +78,7 @@ const FormModule = ({ redirectBasedOnRole }: { redirectBasedOnRole: any }) => {
       <div className="mb-3">
         <button
           type="submit"
-          className="w-full p-3 bg-blue-600 hover:bg-blue-800 text-white text-lg rounded-lg"
+          className="w-full p-3 bg-[#fb6107] hover:bg-[#fb6107]/90 text-white text-lg rounded-lg"
         >
           Ingresar
         </button>
