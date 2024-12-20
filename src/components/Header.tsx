@@ -223,16 +223,21 @@ export const Header: React.FC = () => {
                                                     className="absolute inset-x-0 top-0 z-0 origin-top rounded-b-2xl bg-gray-50 px-6 pb-6 pt-32 shadow-2xl shadow-gray-900/20"
                                                 >
                                                     <div className="space-y-4">
-                                                        <MobileNavLink href="/#beneficios">
-                                                            Beneficios
+                                                        <MobileNavLink href="/propiedades">
+                                                            Propiedades
+                                                        </MobileNavLink>
+                                                        <MobileNavLink href="/proyectos">
+                                                            Proyectos
+                                                        </MobileNavLink>
+                                                        <MobileNavLink href="/creditos">
+                                                            Créditos
                                                         </MobileNavLink>
                                                         <MobileNavLink href="/#reviews">
-                                                            Reseñas
+                                                            Opiniones
                                                         </MobileNavLink>
-                                                        <MobileNavLink href="/inmuebles">
-                                                            Inmuebles
+                                                        <MobileNavLink href="/contacto">
+                                                            Contacto
                                                         </MobileNavLink>
-                                                        <MobileNavLink href="/#faqs">FAQs</MobileNavLink>
                                                     </div>
                                                     <div className="mt-8 flex flex-col gap-4">
                                                         {status === 'authenticated' ? (
@@ -313,4 +318,3 @@ export const Header: React.FC = () => {
         </header>
     )
 }
-
