@@ -9,6 +9,9 @@ import {
     PopoverButton,
     PopoverBackdrop,
     PopoverPanel,
+    Disclosure,
+    DisclosureButton,
+    DisclosurePanel
 } from '@headlessui/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Button } from '@/components/Button'
@@ -54,7 +57,7 @@ const MobileNavLink: React.FC<MobileNavLinkProps> = ({ href, ...props }: MobileN
         <PopoverButton
             as={Link as any}
             href={href}
-            className="text-base font-medium text-gray-900 hover:text-gray-700"
+            className="text-base font-medium text-black hover:text-gray-700"
             {...props}
         />
     )
@@ -174,10 +177,20 @@ export const Header: React.FC = () => {
     return (
         <header>
             <nav>
-                <Container className="relative z-50 flex justify-between py-8">
+                <Container className="relative z-50 flex justify-between py-8  rounded-e-md">
                     <div className="relative z-10 flex items-center gap-16">
                         <Link href="/" aria-label="Home">
-                            <LogoBrixar className="h-8 w-auto" />
+                            <LogoBrixar className="h-8 w-auto hidden lg:flex" />
+                            <Popover className="lg:hidden">
+                                {({ open }) => (
+                                    <>
+                                        <LogoBrixar
+                                            className={`h-8 w-auto transition-colors duration-200 ${open ? '[&>path]:fill-white' : '[&>path]:fill-black'}`}
+                                            data-headlessui-state={open ? 'open' : undefined}
+                                        />
+                                    </>
+                                )}
+                            </Popover>
                         </Link>
                         <div className="hidden lg:flex lg:gap-10">
                             <NavLinks />
@@ -187,8 +200,9 @@ export const Header: React.FC = () => {
                         <Popover className="lg:hidden">
                             {({ open }) => (
                                 <>
+
                                     <PopoverButton
-                                        className="relative z-10 -m-2 inline-flex items-center rounded-lg stroke-gray-900 p-2 hover:bg-gray-200/50 hover:stroke-gray-600 active:stroke-gray-900 ui-not-focus-visible:outline-none"
+                                        className="relative z-10 -m-2 inline-flex items-center text-white rounded-lg stroke-gray-900 p-2 hover:bg-gray-200/50 hover:stroke-gray-600 active:stroke-gray-900 ui-not-focus-visible:outline-none"
                                         aria-label="Toggle site navigation"
                                     >
                                         {({ open }: { open: boolean }) =>
@@ -220,26 +234,79 @@ export const Header: React.FC = () => {
                                                         y: -32,
                                                         transition: { duration: 0.2 },
                                                     }}
-                                                    className="absolute inset-x-0 top-0 z-0 origin-top rounded-b-2xl bg-gray-50 px-6 pb-6 pt-32 shadow-2xl shadow-gray-900/20"
+                                                    className="absolute inset-x-0 top-0 z-0 origin-top bg-white px-0 pb-6 pt-32 shadow-2xl shadow-gray-900/20"
                                                 >
-                                                    <div className="space-y-4">
-                                                        <MobileNavLink href="/propiedades">
-                                                            Propiedades
+                                                    <div className="flex flex-col">
+                                                        <MobileNavLink href="/" className="w-full px-4 py-3 text-left bg-white text-black hover:bg-gray-100">
+                                                            Inicio
                                                         </MobileNavLink>
-                                                        <MobileNavLink href="/proyectos">
-                                                            Proyectos
-                                                        </MobileNavLink>
-                                                        <MobileNavLink href="/creditos">
+
+                                                        <Disclosure>
+                                                            {({ open }) => (
+                                                                <>
+                                                                    <DisclosureButton className="flex justify-between w-full px-4 py-3 bg-white text-black hover:bg-gray-100">
+                                                                        <span>Propiedades</span>
+                                                                        <ChevronDown className={`w-5 h-5 transition-transform ${open ? 'transform rotate-180' : ''}`} />
+                                                                    </DisclosureButton>
+                                                                    <DisclosurePanel className="bg-gray-100">
+                                                                        <MobileNavLink href="/propiedades/venta" className="block w-full px-6 py-2 text-black hover:bg-gray-200">
+                                                                            En venta
+                                                                        </MobileNavLink>
+                                                                        <MobileNavLink href="/propiedades/alquiler" className="block w-full px-6 py-2 text-black hover:bg-gray-200">
+                                                                            En alquiler
+                                                                        </MobileNavLink>
+                                                                    </DisclosurePanel>
+                                                                </>
+                                                            )}
+                                                        </Disclosure>
+
+                                                        <Disclosure>
+                                                            {({ open }) => (
+                                                                <>
+                                                                    <DisclosureButton className="flex justify-between w-full px-4 py-3 bg-white text-black hover:bg-gray-100">
+                                                                        <span>Proyectos</span>
+                                                                        <ChevronDown className={`w-5 h-5 transition-transform ${open ? 'transform rotate-180' : ''}`} />
+                                                                    </DisclosureButton>
+                                                                    <DisclosurePanel className="bg-gray-100">
+                                                                        <MobileNavLink href="/proyectos/residenciales" className="block w-full px-6 py-2 text-black hover:bg-gray-200">
+                                                                            Residenciales
+                                                                        </MobileNavLink>
+                                                                        <MobileNavLink href="/proyectos/comerciales" className="block w-full px-6 py-2 text-black hover:bg-gray-200">
+                                                                            Comerciales
+                                                                        </MobileNavLink>
+                                                                    </DisclosurePanel>
+                                                                </>
+                                                            )}
+                                                        </Disclosure>
+
+                                                        <MobileNavLink href="/creditos" className="w-full px-4 py-3 text-left bg-white text-black hover:bg-gray-100">
                                                             Créditos
                                                         </MobileNavLink>
-                                                        <MobileNavLink href="/#reviews">
-                                                            Opiniones
-                                                        </MobileNavLink>
-                                                        <MobileNavLink href="/contacto">
+
+                                                        <Disclosure>
+                                                            {({ open }) => (
+                                                                <>
+                                                                    <DisclosureButton className="flex justify-between w-full px-4 py-3 bg-white text-black hover:bg-gray-100">
+                                                                        <span>Opiniones</span>
+                                                                        <ChevronDown className={`w-5 h-5 transition-transform ${open ? 'transform rotate-180' : ''}`} />
+                                                                    </DisclosureButton>
+                                                                    <DisclosurePanel className="bg-gray-100">
+                                                                        <MobileNavLink href="/#reviews" className="block w-full px-6 py-2 text-black hover:bg-gray-200">
+                                                                            Ver todas
+                                                                        </MobileNavLink>
+                                                                        <MobileNavLink href="/opiniones/destacadas" className="block w-full px-6 py-2 text-black hover:bg-gray-200">
+                                                                            Destacadas
+                                                                        </MobileNavLink>
+                                                                    </DisclosurePanel>
+                                                                </>
+                                                            )}
+                                                        </Disclosure>
+
+                                                        <MobileNavLink href="/contacto" className="w-full px-4 py-3 text-left bg-white text-black hover:bg-gray-100">
                                                             Contacto
                                                         </MobileNavLink>
                                                     </div>
-                                                    <div className="mt-8 flex flex-col gap-4">
+                                                    <div className="mt-8 flex flex-col gap-4 p-4">
                                                         {status === 'authenticated' ? (
                                                             <ProfileDropdown
                                                                 user={session.user}
@@ -248,10 +315,10 @@ export const Header: React.FC = () => {
                                                             />
                                                         ) : (
                                                             <>
-                                                                <Button href="/login" variant="outline">
+                                                                <Button href="/login" variant="outline" className='text-black'>
                                                                     Ingresar
                                                                 </Button>
-                                                                <Button href="/register">Registrarme</Button>
+                                                                <Button href="/register" variant='solid' className='bg-blue-600 hover:bg-blue-700 text-white'>Registrarme</Button>
                                                             </>
                                                         )}
                                                     </div>
@@ -305,7 +372,7 @@ export const Header: React.FC = () => {
                                 />
                             ) : (
                                 <>
-                                    <Button variant="outline" href="/login">
+                                    <Button variant="outline" href="/login" className='text-white'>
                                         Ingresar
                                     </Button>
                                     <Button href="/register">Registrarme</Button>
@@ -318,3 +385,4 @@ export const Header: React.FC = () => {
         </header>
     )
 }
+
