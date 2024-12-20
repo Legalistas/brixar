@@ -1,47 +1,48 @@
-"use client";
+'use client'
 
-import React, { useEffect, useCallback, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import Loading from "@/components/ui/Loading";
+import React, { useEffect, useCallback, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
+import Loading from '@/components/ui/Loading'
 
-import { CirclesBackground } from "@/components/CirclesBackground";
-import Link from "next/link";
-import FormModule from "./modules/FormModule/FormModule";
-import SocialLogin from "./modules/SocialLogin/SocialLogin";
+import { CirclesBackground } from '@/components/CirclesBackground'
+import Link from 'next/link'
+import FormModule from './modules/FormModule/FormModule'
+import SocialLogin from './modules/SocialLogin/SocialLogin'
+import LogoBrixar from '@/components/LogoBrixar'
 
 export default function LoginPage() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
+  const { data: session, status } = useSession()
+  const router = useRouter()
 
   const redirectBasedOnRole = useCallback(
     (role?: string) => {
       switch (role) {
-        case "ADMIN":
-        case "SELLER":
-          router.push("/admin");
-          break;
-        case "WHOLESALER":
-          router.push("/Wholesaler");
-          break;
-        case "CUSTOMER":
-          router.push("/customer");
-          break;
+        case 'ADMIN':
+        case 'SELLER':
+          router.push('/admin')
+          break
+        case 'WHOLESALER':
+          router.push('/Wholesaler')
+          break
+        case 'CUSTOMER':
+          router.push('/customer')
+          break
         default:
-          router.push("/");
+          router.push('/')
       }
     },
     [router]
-  );
+  )
 
   useEffect(() => {
-    if (status === "authenticated") {
-      redirectBasedOnRole(session?.user?.role);
+    if (status === 'authenticated') {
+      redirectBasedOnRole(session?.user?.role)
     }
-  }, [status, session, redirectBasedOnRole]);
+  }, [status, session, redirectBasedOnRole])
 
-  if (status === "loading") {
-    return <Loading />; // Show loading component while session is loading
+  if (status === 'loading') {
+    return <Loading /> // Show loading component while session is loading
   }
 
   return (
@@ -72,8 +73,9 @@ export default function LoginPage() {
     <main className="flex min-h-full overflow-hidden pt-10">
       <div className="mx-auto flex w-full max-w-2xl flex-col px-4 sm:px-6">
         <Link href="/" aria-label="Home">
-          <img src="/images/logos/isonaranja.png" alt="logo" className="h-12 w-auto" />
+          <LogoBrixar className="h-8 w-auto" />
         </Link>
+
         <div className="relative mt-12 sm:mt-16">
           <CirclesBackground
             width="1090"
@@ -99,5 +101,5 @@ export default function LoginPage() {
         </div>
       </div>
     </main>
-  );
+  )
 }
