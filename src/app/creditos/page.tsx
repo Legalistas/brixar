@@ -7,7 +7,15 @@ import { PhoneFrame } from '@/components/PhoneFrame'
 import Link from 'next/link'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
-import { MessageCircle, Home, FileText, Key, Coins, Calendar, CheckCircle } from 'lucide-react'
+import {
+  MessageCircle,
+  Home,
+  FileText,
+  Key,
+  Coins,
+  Calendar,
+  CheckCircle,
+} from 'lucide-react'
 
 function BackgroundIllustration(props: React.HTMLAttributes<HTMLDivElement>) {
   const id = useState(() => Math.random().toString(36).substr(2, 9))[0]
@@ -219,4 +227,3 @@ export default function PrestamosHipotecariosPage() {
     </>
   )
 }
-

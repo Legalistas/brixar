@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import SocialRegister from '../login/modules/SocialLogin/registerLogin'
+import SocialRegister from '../login/modules/SocialLogin/RegisterLogin'
 
 export default function RegisterPage() {
   const [name, setName] = useState('')
