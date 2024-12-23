@@ -11,7 +11,7 @@ const Sidebar = ({ onFilterChange }: SidebarProps) => {
   const [bedrooms, setBedrooms] = useState('')
   const [bathrooms, setBathrooms] = useState('')
   const [propertyType, setPropertyType] = useState('')
-  const [isOpen, setIsOpen] = useState(true)
+  const [isOpen, setIsOpen] = useState(false)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   const handleFilterChange = () => {
@@ -41,7 +41,7 @@ const Sidebar = ({ onFilterChange }: SidebarProps) => {
 
   return (
     <>
-      <div className={`fixed top-0 left-0 h-full bg-white shadow-lg transition-transform transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} hidden lg:block z-30`}>
+      <div className={`fixed top-0 left-0 h-full bg-white shadow-lg transition-transform transform z-[100] ${isOpen ? 'translate-x-0' : '-translate-x-full'} hidden lg:block z-30`}>
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <h2 className="text-xl font-semibold">Filtros</h2>
           <button onClick={toggleSidebar} className="text-gray-500 hover:text-gray-700">
