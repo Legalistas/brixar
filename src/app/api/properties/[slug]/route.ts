@@ -105,15 +105,25 @@ export async function PUT(
 
       // Update address if provided
       if (data.address && existingProperty.address.length > 0) {
+        // Validate and prepare countryId
+        const countryId = typeof data.address.countryId === 'number' && data.address.countryId > 0 
+          ? data.address.countryId 
+          : null;
+        
+        // Validate and prepare stateId
+        const stateId = typeof data.address.stateId === 'number' && data.address.stateId > 0 
+          ? data.address.stateId 
+          : null;
+          
         await prisma.address.update({
           where: { id: existingProperty.address[0].id },
           data: {
-            countryId: data.address.countryId,
-            stateId: data.address.stateId,
-            city: data.address.city,
-            postalCode: data.address.postalCode,
-            streetName: data.address.streetName,
-            description: data.address.description,
+            countryId,
+            stateId,
+            city: data.address.city || null,
+            postalCode: data.address.postalCode || null,
+            streetName: data.address.streetName || null,
+            description: data.address.description || null,
           }
         })
 
@@ -128,11 +138,11 @@ export async function PUT(
             await prisma.positions.update({
               where: { id: positions.id },
               data: {
-                latitude: data.address.positions.latitude,
-                longitude: data.address.positions.longitude
+                latitude: data.address.positions.latitude || null,
+                longitude: data.address.positions.longitude || null
               }
             })
-          } else {
+          } else if (data.address.positions.latitude && data.address.positions.longitude) {
             await prisma.positions.create({
               data: {
                 addressId,
@@ -143,17 +153,27 @@ export async function PUT(
           }
         }
       } else if (data.address) {
+        // Validate and prepare countryId
+        const countryId = typeof data.address.countryId === 'number' && data.address.countryId > 0 
+          ? data.address.countryId 
+          : null;
+        
+        // Validate and prepare stateId
+        const stateId = typeof data.address.stateId === 'number' && data.address.stateId > 0 
+          ? data.address.stateId 
+          : null;
+          
         // Create new address if it doesn't exist
         await prisma.address.create({
           data: {
             propertyId: property.id,
-            countryId: data.address.countryId,
-            stateId: data.address.stateId,
-            city: data.address.city,
-            postalCode: data.address.postalCode,
-            streetName: data.address.streetName,
-            description: data.address.description,
-            positions: data.address.positions ? {
+            countryId,
+            stateId,
+            city: data.address.city || null,
+            postalCode: data.address.postalCode || null,
+            streetName: data.address.streetName || null,
+            description: data.address.description || null,
+            positions: data.address.positions && data.address.positions.latitude && data.address.positions.longitude ? {
               create: {
                 latitude: data.address.positions.latitude,
                 longitude: data.address.positions.longitude,

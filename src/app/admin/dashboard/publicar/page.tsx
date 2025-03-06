@@ -29,7 +29,7 @@ export default function PublicarPropiedad() {
     yearBuilt: new Date().getFullYear(),
     parkingSpaces: 0,
     quantity: 1,
-    amenities: {},
+    amenities: {} as Record<string, boolean>,
     address: {
       countryId: 0,
       stateId: 0,

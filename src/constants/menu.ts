@@ -32,60 +32,68 @@ export const MENU_DATA: MenuItem[] = [
   { icon: Monitor, label: 'Escritorio', href: '/admin/dashboard' },
   { icon: Package, label: 'Publicar', href: '/admin/dashboard/publicar' },
   {
-    icon: House,
-    label: 'Productos',
-    href: '#',
-    subItems: [
-      { icon: Circle, label: 'Departamentos', href: '/admin/departamentos' },
-      { icon: Circle, label: 'Casas', href: '/admin/casas' },
-      { icon: Circle, label: 'Invertir en un Brix', href: '/admin/brix' },
-    ],
+    icon: Package,
+    label: 'Publicaciones',
+    href: '/admin/dashboard/publicaciones',
   },
-  {
-    icon: House,
-    label: 'Proyectos',
-    href: '#',
-    subItems: [
-      { icon: Circle, label: 'Abiertos', href: '/admin/abiertos' },
-      { icon: Circle, label: 'Finalizados', href: '/admin/finalizados' },
-    ],
-  },
-  {
-    icon: House,
-    label: 'Créditos',
-    href: '#',
-    subItems: [
-      { icon: Circle, label: 'Créditos hipotecarios', href: '/admin/creditos' },
-      {
-        icon: Circle,
-        label: 'Solicitar financiación',
-        href: '/admin/financiacion',
-      },
-    ],
-  },
-  {
-    icon: ShoppingCart,
-    label: 'Mis inversiones',
-    href: '#',
-    badge: '0',
-    subItems: [
-      { icon: Circle, label: 'Nueva', href: '/orders/new' },
-      { icon: Circle, label: 'Listado', href: '/orders' },
-    ],
-  },
-  {
-    icon: Store,
-    label: 'Ventas',
-    href: '#',
-    subItems: [
-      { icon: Circle, label: 'Nueva Venta', href: '/admin/sales/create' },
-      { icon: Circle, label: 'Listado', href: '/admin/sales/list' },
-      { icon: Circle, label: 'Clientes', href: '/admin/customers' },
-    ],
-  },
-  { icon: Users, label: 'Usuarios', href: '/admin/users' },
-  { icon: Settings, label: 'Configuración', href: '/settings' },
 ]
+
+{
+  /*
+  icon: House,
+  label: 'Productos',
+  href: '#',
+  subItems: [
+    { icon: Circle, label: 'Departamentos', href: '/admin/departamentos' },
+    { icon: Circle, label: 'Casas', href: '/admin/casas' },
+    { icon: Circle, label: 'Invertir en un Brix', href: '/admin/brix' },
+  ],
+},
+{
+  icon: House,
+  label: 'Proyectos',
+  href: '#',
+  subItems: [
+    { icon: Circle, label: 'Abiertos', href: '/admin/abiertos' },
+    { icon: Circle, label: 'Finalizados', href: '/admin/finalizados' },
+  ],
+},
+{
+  icon: House,
+  label: 'Créditos',
+  href: '#',
+  subItems: [
+    { icon: Circle, label: 'Créditos hipotecarios', href: '/admin/creditos' },
+    {
+      icon: Circle,
+      label: 'Solicitar financiación',
+      href: '/admin/financiacion',
+    },
+  ],
+},
+{
+  icon: ShoppingCart,
+  label: 'Mis inversiones',
+  href: '#',
+  badge: '0',
+  subItems: [
+    { icon: Circle, label: 'Nueva', href: '/orders/new' },
+    { icon: Circle, label: 'Listado', href: '/orders' },
+  ],
+},
+{
+  icon: Store,
+  label: 'Ventas',
+  href: '#',
+  subItems: [
+    { icon: Circle, label: 'Nueva Venta', href: '/admin/sales/create' },
+    { icon: Circle, label: 'Listado', href: '/admin/sales/list' },
+    { icon: Circle, label: 'Clientes', href: '/admin/customers' },
+  ],
+},
+{ icon: Users, label: 'Usuarios', href: '/admin/users' },
+{ icon: Settings, label: 'Configuración', href: '/settings' */
+}
 
 export const REPORTS_DATA: MenuItem[] = [
   { icon: BarChart2, label: 'Gráficos', href: '/reports/charts' },

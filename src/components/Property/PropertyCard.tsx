@@ -110,7 +110,7 @@ const PropertyCard = ({ property }: PropertyProps) => {
                 {/* Address */}
                 <div className="text-xs text-gray-600 mb-2 flex-grow">
                     <p>{mainAddress.streetName}, {mainAddress.city}</p>
-                    <p>{mainAddress.state.name}, {mainAddress.country.name}</p>
+                    <p>{mainAddress?.state?.name}, {mainAddress.country.name}</p>
                 </div>
             </div>
 

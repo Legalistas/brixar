@@ -142,7 +142,7 @@ export default function ProjectDetail({ params }: { params: { slug: string } }) 
                                 {mainAddress.streetName}
                             </p>
                             <p className="text-sm text-gray-600">
-                                {mainAddress.city}, {mainAddress.state.name}
+                                {mainAddress.city}, {mainAddress?.state?.name}
                             </p>
                             <p className="text-sm text-gray-600">
                                 {mainAddress.country.name}
