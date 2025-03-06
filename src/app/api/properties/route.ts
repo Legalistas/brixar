@@ -25,3 +25,74 @@ export async function GET() {
     )
   }
 }
+
+export async function POST(request: Request) {
+  try {
+    const data = await request.json()
+    
+    // Generate slug from title
+    const slug = data.title
+      .toLowerCase()
+      .replace(/[^\w\s]/gi, '')
+      .replace(/\s+/g, '-')
+    
+    // Create property with transaction to ensure all related data is created
+    const property = await prisma.$transaction(async (prisma) => {
+      // Create property
+      const property = await prisma.property.create({
+        data: {
+          slug,
+          title: data.title,
+          description: data.description,
+          price: data.price,
+          bedrooms: data.bedrooms,
+          bathrooms: data.bathrooms,
+          squareMeters: data.squareMeters,
+          propertyType: data.propertyType,
+          listingType: data.listingType,
+          isAvailable: data.isAvailable ?? true,
+          yearBuilt: data.yearBuilt,
+          parkingSpaces: data.parkingSpaces,
+          amenities: data.amenities,
+          quantity: data.quantity || 1,
+          images: {
+            create: data.images?.map((url: string) => ({
+              url,
+            })) || [],
+          },
+        },
+      })
+
+      // Create address if provided
+      if (data.address) {
+        await prisma.address.create({
+          data: {
+            propertyId: property.id,
+            countryId: data.address.countryId,
+            stateId: data.address.stateId,
+            city: data.address.city,
+            postalCode: data.address.postalCode,
+            streetName: data.address.streetName,
+            description: data.address.description,
+            positions: data.address.positions ? {
+              create: {
+                latitude: data.address.positions.latitude,
+                longitude: data.address.positions.longitude,
+              }
+            } : undefined
+          },
+        })
+      }
+
+      return property
+    })
+
+    return NextResponse.json(property, { status: 201 })
+  } catch (error) {
+    console.error('Error creating property:', error)
+    return NextResponse.json(
+      { error: 'An error occurred while creating the property' },
+      { status: 500 }
+    )
+  }
+}

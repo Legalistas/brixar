@@ -30,6 +30,7 @@ export interface MenuItem {
 
 export const MENU_DATA: MenuItem[] = [
   { icon: Monitor, label: 'Escritorio', href: '/admin/dashboard' },
+  { icon: Package, label: 'Publicar', href: '/admin/dashboard/publicar' },
   {
     icon: House,
     label: 'Productos',

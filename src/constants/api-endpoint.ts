@@ -25,9 +25,16 @@ export const API_ENDPOINTS = {
   // ENDPOINTS
   PROPERTIES_INDEX: `${API_BASE_URL}/properties`,
   PROPERTY_BY_SLUG: (slug: string) => `${API_BASE_URL}/properties/${slug}`,
+  PROPERTY_CREATE: `${API_BASE_URL}/properties`,
+  PROPERTY_EDIT: (slug: string) => `${API_BASE_URL}/properties/${slug}`,
+  PROPERTY_DELETE: (slug: string) => `${API_BASE_URL}/properties/${slug}`,
 
   // Proyects
   PROYECTS_INDEX: `${API_BASE_URL}/proyects`,
+  PROYECT_CREATE: `${API_BASE_URL}/proyects`,
+  PROYECT_BY_SLUG: (slug: string) => `${API_BASE_URL}/proyects/${slug}`,
+  PROYECT_EDIT: (slug: string) => `${API_BASE_URL}/proyects/${slug}`,
+  PROYECT_DELETE: (slug: string) => `${API_BASE_URL}/proyects/${slug}`,
 
   SCHEDULE_VISIT: `${API_BASE_URL}/visits/schedule`,
   VISITS_INDEX: `${API_BASE_URL}/visits/user`,
