@@ -11,32 +11,17 @@ const SocialLogin = () => {
       setIsLoading(true);
       setError(null);
       
-      const response = await signIn("google", { 
+      await signIn("google", { 
         callbackUrl: "/customer",
-        redirect: false
+        redirect: true
       });
       
-      if (response?.error) {
-        console.error("Error de autenticación:", response.error);
-        if (response.error === "OAuthAccountNotLinked") {
-          setError("Esta cuenta de Google usa el mismo correo que ya tienes registrado. Estamos intentando vincular ambas cuentas.");
-          
-          // Intentar iniciar sesión de nuevo, esta vez forzando la vinculación
-          // Esto funcionará solo si modificaste la configuración de NextAuth como se indicó arriba
-          await signIn("google", {
-            callbackUrl: "/customer",
-            redirect: true
-          });
-        } else {
-          setError(`Error al iniciar sesión: ${response.error}`);
-        }
-      } else if (response?.url) {
-        window.location.href = response.url;
-      }
+      // No necesitamos manejar la respuesta aquí ya que estamos usando redirect: true
+      // El usuario será redirigido automáticamente al callbackUrl o a la página de error
+      
     } catch (error) {
       console.error("Error al iniciar sesión con Google:", error);
       setError("Ocurrió un error inesperado. Por favor intenta nuevamente.");
-    } finally {
       setIsLoading(false);
     }
   };
