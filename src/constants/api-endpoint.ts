@@ -40,4 +40,19 @@ export const API_ENDPOINTS = {
   VISITS_INDEX: `${API_BASE_URL}/visits/user`,
   CHECK_EXISTING_VISIT: (propertyId: number, userId: string) =>
     `${API_BASE_URL}/visits/check?propertyId=${propertyId}&userId=${userId}`,
+
+  // Inquiries (Consultas)
+  INQUIRIES_INDEX: `${API_BASE_URL}/inquiries`,
+  INQUIRY_CREATE: `${API_BASE_URL}/inquiries`,
+  INQUIRY_BY_ID: (id: number) => `${API_BASE_URL}/inquiries/${id}`,
+  INQUIRY_UPDATE: (id: number) => `${API_BASE_URL}/inquiries/${id}`,
+  INQUIRY_DELETE: (id: number) => `${API_BASE_URL}/inquiries/${id}`,
+  
+  // Inquiry Messages
+  INQUIRY_MESSAGES: (inquiryId: number) => `${API_BASE_URL}/inquiries/${inquiryId}/messages`,
+  INQUIRY_MESSAGE_CREATE: (inquiryId: number) => `${API_BASE_URL}/inquiries/${inquiryId}/messages`,
+  
+  // User Inquiries
+  USER_INQUIRIES: `${API_BASE_URL}/inquiries/user`,
+  PROPERTY_INQUIRIES: (propertyId: number) => `${API_BASE_URL}/inquiries/property/${propertyId}`,
 }

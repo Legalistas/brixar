@@ -8,6 +8,21 @@ import { getAllProperties } from '@/services/properties-service'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { useSession } from 'next-auth/react'
+import { useInquiryStore } from '@/store/inquiryStore'
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger,
+  DialogFooter,
+  DialogClose
+} from '@/components/ui/dialog'
+import { Textarea } from '@/components/ui/textarea'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { toast } from 'sonner'
 
 type Property = {
   id: number
@@ -47,8 +62,14 @@ const listingTypeLabels = {
 export default function PropertyPage() {
   const params = useParams()
   const slug = params.id as string
+  const { data: session } = useSession()
+  const { createInquiry, isLoading } = useInquiryStore()
 
   const [property, setProperty] = useState<Property | null>(null)
+  const [isOpen, setIsOpen] = useState(false)
+  const [title, setTitle] = useState('')
+  const [message, setMessage] = useState('')
+  const [offeredPrice, setOfferedPrice] = useState('')
 
   console.log('prop:', property)
 
@@ -65,6 +86,34 @@ export default function PropertyPage() {
 
     fetchProperties()
   }, [slug])
+
+  const handleSubmitInquiry = async () => {
+    if (!title || !message) {
+      toast.error('Por favor complete todos los campos obligatorios')
+      return
+    }
+
+    try {
+      if (property) {
+        const inquiry = await createInquiry({
+          propertyId: property.id,
+          title,
+          message,
+          offeredPrice: offeredPrice ? parseFloat(offeredPrice) : undefined
+        })
+
+        if (inquiry) {
+          toast.success('Tu consulta ha sido enviada correctamente')
+          setIsOpen(false)
+          setTitle('')
+          setMessage('')
+          setOfferedPrice('')
+        }
+      }
+    } catch (error) {
+      toast.error('Error al enviar tu consulta. Inténtalo de nuevo más tarde.')
+    }
+  }
 
   if (!property) {
     return (
@@ -129,12 +178,83 @@ export default function PropertyPage() {
         </div>
         <div className="mt-8 bg-gray-100 p-6 rounded-lg">
           <h2 className="text-2xl font-semibold mb-4">¿Estás interesado en esta propiedad?</h2>
-          <p className="mb-4">Entra en tu cuenta para comprar</p>
-          <Link href="/login">
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-              Iniciar sesión
-            </Button>
-          </Link>
+          
+          {session ? (
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                  Realizar consulta
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Consulta sobre esta propiedad</DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="title" className="text-right">
+                      Asunto
+                    </Label>
+                    <Input
+                      id="title"
+                      className="col-span-3"
+                      placeholder="Asunto de tu consulta"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="message" className="text-right">
+                      Mensaje
+                    </Label>
+                    <Textarea
+                      id="message"
+                      className="col-span-3"
+                      placeholder="Describe tu consulta aquí"
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="price" className="text-right">
+                      Oferta (USD)
+                    </Label>
+                    <Input
+                      id="price"
+                      className="col-span-3"
+                      type="number"
+                      placeholder="Precio ofrecido (opcional)"
+                      value={offeredPrice}
+                      onChange={(e) => setOfferedPrice(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button variant="outline">Cancelar</Button>
+                  </DialogClose>
+                  <Button 
+                    onClick={handleSubmitInquiry} 
+                    disabled={isLoading}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    {isLoading ? 'Enviando...' : 'Enviar consulta'}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          ) : (
+            <>
+              <p className="mb-4">Entra en tu cuenta para consultar sobre esta propiedad</p>
+              <Link href="/login">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                  Iniciar sesión
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
       </main>
       <Footer />
