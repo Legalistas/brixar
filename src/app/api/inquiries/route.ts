@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
       data: {
         title,
         propertyId,
-        userId: session.user.id,
+        userId: Number(session.user.id),
         offeredPrice: offeredPrice ? parseFloat(offeredPrice) : undefined,
       },
     })
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
       await prisma.inquiryMessage.create({
         data: {
           inquiryId: inquiry.id,
-          userId: session.user.id,
+          userId: Number(session.user.id),
           message,
           isAdmin: session.user.role === 'ADMIN',
         },
