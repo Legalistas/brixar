@@ -51,7 +51,7 @@ export async function GET(
     }
 
     // Verificar que el usuario sea el propietario o un administrador
-    if (inquiry.userId !== session.user.id && session.user.role !== 'ADMIN') {
+    if (inquiry.userId !== parseInt(session.user.id) && session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
 
@@ -97,7 +97,7 @@ export async function PUT(
       return NextResponse.json(updatedInquiry)
     } 
     // Usuario solo puede actualizar offeredPrice
-    else if (inquiry.userId === session.user.id) {
+    else if (inquiry.userId === parseInt(session.user.id)) {
       const updatedInquiry = await prisma.inquiry.update({
         where: { id: inquiryId },
         data: {
