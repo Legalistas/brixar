@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
 
     const inquiries = await prisma.inquiry.findMany({
       where: {
-        userId: session.user.id,
+        userId: Number(session.user.id),
       },
       include: {
         property: {

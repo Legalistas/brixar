@@ -26,7 +26,7 @@ export async function GET(
     }
 
     // Verificar que el usuario sea el propietario o un administrador
-    if (inquiry.userId !== session.user.id && session.user.role !== 'ADMIN') {
+    if (inquiry.userId !== parseInt(session.user.id) && session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
 
@@ -78,7 +78,7 @@ export async function POST(
     }
 
     // Verificar que el usuario sea el propietario o un administrador
-    if (inquiry.userId !== session.user.id && session.user.role !== 'ADMIN') {
+    if (inquiry.userId !== parseInt(session.user.id) && session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
 
@@ -94,7 +94,7 @@ export async function POST(
     const newMessage = await prisma.inquiryMessage.create({
       data: {
         inquiryId,
-        userId: session.user.id,
+        userId: parseInt(session.user.id),
         message,
         isAdmin: session.user.role === 'ADMIN',
       },
