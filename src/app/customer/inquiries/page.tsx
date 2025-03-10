@@ -4,7 +4,6 @@ import { useInquiryStore } from '@/store/inquiryStore'
 import { useEffect } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { DashboardShell } from '@/components/dashboard/DashboardShell'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 import { es } from 'date-fns/locale'
@@ -33,7 +32,6 @@ export default function InquiriesPage() {
   }, [fetchUserInquiries])
 
   return (
-    <DashboardShell>
       <div className="flex flex-col space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold tracking-tight">Mis consultas</h2>
@@ -88,9 +86,6 @@ export default function InquiriesPage() {
                         <h4 className="font-medium line-clamp-1">{inquiry.property.title}</h4>
                         <div className="flex items-center gap-2 mt-2 text-sm text-gray-600">
                           <span>{formatDistanceToNow(new Date(inquiry.updatedAt), { locale: es, addSuffix: true })}</span>
-                          {inquiry._count && (
-                            <span>• {inquiry._count.messages} mensaje{inquiry._count.messages !== 1 ? 's' : ''}</span>
-                          )}
                         </div>
                       </div>
                     </div>
@@ -101,6 +96,5 @@ export default function InquiriesPage() {
           </div>
         )}
       </div>
-    </DashboardShell>
   )
 }

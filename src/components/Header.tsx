@@ -140,7 +140,7 @@ const ProfileDropdown: React.FC<{ user: any; onClose: () => void; handleLogout: 
                             onClick={handleProfileClick}
                         >
                             <User className="h-6 w-6 mr-2" />
-                            Datos personales
+                            Panel de Control
                         </button>
                         <button className="flex w-full items-center px-4 py-2 text-md text-gray-700 hover:bg-gray-100">
                             <FileText className="h-6 w-6 mr-2" />

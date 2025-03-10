@@ -6,7 +6,8 @@ import {
   Monitor,
   Settings,
   Circle,
-  MessageSquare
+  MessageSquare,
+  MessageCircle
 } from 'lucide-react'
 
 export type MenuItem = {
