@@ -1,9 +1,9 @@
-import React from "react"
-import { useCurrency } from "@/context/CurrencyContext"
-import { formatCurrency } from "@/utils/formatUtils"
-import { Bath, BedDouble, Building2, Home, Maximize } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
+import React from 'react'
+import { useCurrency } from '@/context/CurrencyContext'
+import { formatCurrency } from '@/utils/formatUtils'
+import { Bath, BedDouble, Building2, Home, Maximize } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
 
 interface PropertyImage {
   id: number
@@ -31,9 +31,9 @@ interface PropertyProps {
     bedrooms: number
     bathrooms: number
     squareMeters: number
-    propertyType: "HOUSE" | "APARTMENT"
-    listingType: "SALE" | "RENT"
-    status: "EN_VENTA" | "RESERVADA" | "VENDIDA"
+    propertyType: 'HOUSE' | 'APARTMENT'
+    listingType: 'SALE' | 'RENT'
+    status: 'EN_VENTA' | 'RESERVADA' | 'VENDIDA'
     images: PropertyImage[]
     address: PropertyAddress[]
   }
@@ -48,23 +48,25 @@ const PropertyCard = ({ property }: PropertyProps) => {
   const { convertPrice } = useCurrency()
   const mainAddress = property.address[0]
   const formatPropertyType = (type: string) => {
-    return type === "HOUSE" ? "Casa" : "Departamento"
+    return type === 'HOUSE' ? 'Casa' : 'Departamento'
   }
 
   const formatListingType = (type: string) => {
-    return type === "SALE" ? "Venta" : "Alquiler"
+    return type === 'SALE' ? 'Venta' : 'Alquiler'
   }
 
   const listingTypeColors = {
-    SALE: "from-red-500 to-yellow-500",
-    RENT: "from-blue-500 to-green-500",
+    SALE: 'from-red-500 to-yellow-500',
+    RENT: 'from-blue-500 to-green-500',
   }
 
-  const isUnavailable = property.status === "RESERVADA" || property.status === "VENDIDA"
+  const isUnavailable =
+    property.status === 'RESERVADA' || property.status === 'VENDIDA'
 
   const statusLabels = {
-    RESERVADA: "Reservada",
-    VENDIDA: "Vendida",
+    EN_VENTA: 'En Venta',
+    RESERVADA: 'Reservada',
+    VENDIDA: 'Vendida',
   }
 
   return (
@@ -85,11 +87,15 @@ const PropertyCard = ({ property }: PropertyProps) => {
         {/* Property Image */}
         <div className="relative h-full w-full">
           <Image
-            src={process.env.NEXT_PUBLIC_BASE_URL + "/uploads/" + property.images[0]?.url || "/placeholder.svg"}
+            src={
+              process.env.NEXT_PUBLIC_BASE_URL +
+                '/uploads/' +
+                property.images[0]?.url || '/placeholder.svg'
+            }
             alt={`Imagen de ${property.title}`}
             fill
             className={`object-cover transition-transform duration-300 ease-in-out hover:scale-110 ${
-              isUnavailable ? "grayscale" : ""
+              isUnavailable ? 'grayscale' : ''
             }`}
           />
 
@@ -111,7 +117,9 @@ const PropertyCard = ({ property }: PropertyProps) => {
 
       {/* Content */}
       <div className="p-4 flex-grow flex flex-col">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 min-h-[3.5rem]">{property.title}</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 min-h-[3.5rem]">
+          {property.title}
+        </h3>
 
         {/* Property Details Grid */}
         <div className="grid grid-cols-2 gap-2 mb-2">
@@ -121,21 +129,26 @@ const PropertyCard = ({ property }: PropertyProps) => {
           </div>
 
           <div className="flex items-center gap-1 text-gray-600">
-            {React.createElement(propertyTypeIcons[property.propertyType] || Home, { className: "h-4 w-4" })}
-            <span className="text-xs">{formatPropertyType(property.propertyType)}</span>
+            {React.createElement(
+              propertyTypeIcons[property.propertyType] || Home,
+              { className: 'h-4 w-4' }
+            )}
+            <span className="text-xs">
+              {formatPropertyType(property.propertyType)}
+            </span>
           </div>
 
           <div className="flex items-center gap-1 text-gray-600">
             <Bath className="h-4 w-4" />
             <span className="text-xs">
-              {property.bathrooms} Baño{property.bathrooms > 1 ? "s" : ""}
+              {property.bathrooms} Baño{property.bathrooms > 1 ? 's' : ''}
             </span>
           </div>
 
           <div className="flex items-center gap-1 text-gray-600">
             <BedDouble className="h-4 w-4" />
             <span className="text-xs">
-              {property.bedrooms} Dormitorio{property.bedrooms > 1 ? "s" : ""}
+              {property.bedrooms} Dormitorio{property.bedrooms > 1 ? 's' : ''}
             </span>
           </div>
         </div>
@@ -165,4 +178,3 @@ const PropertyCard = ({ property }: PropertyProps) => {
 }
 
 export default PropertyCard
-
