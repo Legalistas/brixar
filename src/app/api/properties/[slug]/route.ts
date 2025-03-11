@@ -1,229 +1,129 @@
-import { NextResponse } from 'next/server'
+import { NextResponse } from "next/server";
 import { prisma } from '@/libs/prisma'
 
-// GET a property by slug
+// GET - Obtener una propiedad por su slug
 export async function GET(
   request: Request,
   { params }: { params: { slug: string } }
 ) {
   try {
-    const { slug } = params
-    
+    const { slug } = params;
+
     const property = await prisma.property.findUnique({
-      where: { slug },
+      where: {
+        slug,
+      },
       include: {
         images: true,
         address: {
           include: {
-            state: true,
             country: true,
+            state: true,
             positions: true,
           },
         },
       },
-    })
+    });
 
     if (!property) {
-      return NextResponse.json({ error: 'Property not found' }, { status: 404 })
+      return NextResponse.json(
+        { error: "Propiedad no encontrada" },
+        { status: 404 }
+      );
     }
 
-    return NextResponse.json(property)
+    return NextResponse.json(property);
   } catch (error) {
-    console.error('Error fetching property:', error)
+    console.error("Error al buscar la propiedad:", error);
     return NextResponse.json(
-      { error: 'An error occurred while fetching the property' },
+      { error: "Error al buscar la propiedad" },
       { status: 500 }
-    )
+    );
   }
 }
 
-// UPDATE a property by slug
-export async function PUT(
+// PATCH - Actualizar una propiedad por su slug
+export async function PATCH(
   request: Request,
   { params }: { params: { slug: string } }
 ) {
   try {
-    const { slug } = params
-    const data = await request.json()
-    
-    // Find the property first
+    const { slug } = params;
+    const data = await request.json();
+
+    // Verificar si la propiedad existe
     const existingProperty = await prisma.property.findUnique({
       where: { slug },
-      include: {
-        images: true,
-        address: true,
-      },
-    })
+    });
 
     if (!existingProperty) {
-      return NextResponse.json({ error: 'Property not found' }, { status: 404 })
+      return NextResponse.json(
+        { error: "Propiedad no encontrada" },
+        { status: 404 }
+      );
     }
 
-    // Generate new slug if title changes
-    const newSlug = data.title
-      ? data.title.toLowerCase().replace(/[^\w\s]/gi, '').replace(/\s+/g, '-')
-      : slug
-    
-    // Update property with transaction
-    const updatedProperty = await prisma.$transaction(async (prisma) => {
-      // Update property
-      const property = await prisma.property.update({
-        where: { slug },
-        data: {
-          slug: newSlug,
-          title: data.title ?? existingProperty.title,
-          description: data.description ?? existingProperty.description,
-          price: data.price ?? existingProperty.price,
-          bedrooms: data.bedrooms ?? existingProperty.bedrooms,
-          bathrooms: data.bathrooms ?? existingProperty.bathrooms,
-          squareMeters: data.squareMeters ?? existingProperty.squareMeters,
-          propertyType: data.propertyType ?? existingProperty.propertyType,
-          listingType: data.listingType ?? existingProperty.listingType,
-          isAvailable: data.isAvailable ?? existingProperty.isAvailable,
-          yearBuilt: data.yearBuilt ?? existingProperty.yearBuilt,
-          parkingSpaces: data.parkingSpaces ?? existingProperty.parkingSpaces,
-          amenities: data.amenities ?? existingProperty.amenities,
-          quantity: data.quantity ?? existingProperty.quantity,
-        },
-      })
-
-      // Update images if provided
-      if (data.images) {
-        // Delete existing images
-        await prisma.propertyImage.deleteMany({
-          where: { propertyId: property.id },
-        })
-
-        // Create new images
-        await prisma.propertyImage.createMany({
-          data: data.images.map((url: string) => ({
-            propertyId: property.id,
-            url,
-          })),
-        })
+    // Validar el estado si se proporciona
+    if (data.status) {
+      const validStatuses = ['EN_VENTA', 'RESERVADA', 'VENDIDA'];
+      if (!validStatuses.includes(data.status)) {
+        return NextResponse.json(
+          { error: "Estado de propiedad no válido" },
+          { status: 400 }
+        );
       }
+    }
 
-      // Update address if provided
-      if (data.address && existingProperty.address.length > 0) {
-        // Validate and prepare countryId
-        const countryId = typeof data.address.countryId === 'number' && data.address.countryId > 0 
-          ? data.address.countryId 
-          : null;
-        
-        // Validate and prepare stateId
-        const stateId = typeof data.address.stateId === 'number' && data.address.stateId > 0 
-          ? data.address.stateId 
-          : null;
-          
-        await prisma.address.update({
-          where: { id: existingProperty.address[0].id },
-          data: {
-            countryId,
-            stateId,
-            city: data.address.city || null,
-            postalCode: data.address.postalCode || null,
-            streetName: data.address.streetName || null,
-            description: data.address.description || null,
-          }
-        })
+    // Actualizar la propiedad
+    const updatedProperty = await prisma.property.update({
+      where: { slug },
+      data: {
+        ...data,
+        updatedAt: new Date(),
+      },
+    });
 
-        // Update positions if provided
-        if (data.address.positions) {
-          const addressId = existingProperty.address[0].id
-          const positions = await prisma.positions.findFirst({
-            where: { addressId }
-          })
-
-          if (positions) {
-            await prisma.positions.update({
-              where: { id: positions.id },
-              data: {
-                latitude: data.address.positions.latitude || null,
-                longitude: data.address.positions.longitude || null
-              }
-            })
-          } else if (data.address.positions.latitude && data.address.positions.longitude) {
-            await prisma.positions.create({
-              data: {
-                addressId,
-                latitude: data.address.positions.latitude,
-                longitude: data.address.positions.longitude
-              }
-            })
-          }
-        }
-      } else if (data.address) {
-        // Validate and prepare countryId
-        const countryId = typeof data.address.countryId === 'number' && data.address.countryId > 0 
-          ? data.address.countryId 
-          : null;
-        
-        // Validate and prepare stateId
-        const stateId = typeof data.address.stateId === 'number' && data.address.stateId > 0 
-          ? data.address.stateId 
-          : null;
-          
-        // Create new address if it doesn't exist
-        await prisma.address.create({
-          data: {
-            propertyId: property.id,
-            countryId,
-            stateId,
-            city: data.address.city || null,
-            postalCode: data.address.postalCode || null,
-            streetName: data.address.streetName || null,
-            description: data.address.description || null,
-            positions: data.address.positions && data.address.positions.latitude && data.address.positions.longitude ? {
-              create: {
-                latitude: data.address.positions.latitude,
-                longitude: data.address.positions.longitude,
-              }
-            } : undefined
-          },
-        })
-      }
-
-      return property
-    })
-
-    return NextResponse.json(updatedProperty)
+    return NextResponse.json(updatedProperty);
   } catch (error) {
-    console.error('Error updating property:', error)
+    console.error("Error al actualizar la propiedad:", error);
     return NextResponse.json(
-      { error: 'An error occurred while updating the property' },
+      { error: "Error al actualizar la propiedad" },
       { status: 500 }
-    )
+    );
   }
 }
 
-// DELETE a property by slug
+// DELETE - Eliminar una propiedad por su slug
 export async function DELETE(
   request: Request,
   { params }: { params: { slug: string } }
 ) {
   try {
-    const { slug } = params
-    
-    // Find the property first
-    const property = await prisma.property.findUnique({
-      where: { slug },
-    })
+    const { slug } = params;
 
-    if (!property) {
-      return NextResponse.json({ error: 'Property not found' }, { status: 404 })
+    // Verificar si la propiedad existe
+    const existingProperty = await prisma.property.findUnique({
+      where: { slug },
+    });
+
+    if (!existingProperty) {
+      return NextResponse.json(
+        { error: "Propiedad no encontrada" },
+        { status: 404 }
+      );
     }
 
-    // Delete the property (cascade will handle related entities)
+    // Eliminar la propiedad
     await prisma.property.delete({
       where: { slug },
-    })
+    });
 
-    return NextResponse.json({ message: 'Property deleted successfully' })
+    return NextResponse.json({ message: "Propiedad eliminada correctamente" });
   } catch (error) {
-    console.error('Error deleting property:', error)
+    console.error("Error al eliminar la propiedad:", error);
     return NextResponse.json(
-      { error: 'An error occurred while deleting the property' },
+      { error: "Error al eliminar la propiedad" },
       { status: 500 }
-    )
+    );
   }
 }

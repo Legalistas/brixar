@@ -23,11 +23,10 @@ export const API_ENDPOINTS = {
     `${API_BASE_URL}/settings/states/${countryId}`,
 
   // ENDPOINTS
-  PROPERTIES_INDEX: `${API_BASE_URL}/properties`,
-  PROPERTY_BY_SLUG: (slug: string) => `${API_BASE_URL}/properties/${slug}`,
-  PROPERTY_CREATE: `${API_BASE_URL}/properties`,
-  PROPERTY_EDIT: (slug: string) => `${API_BASE_URL}/properties/${slug}`,
-  PROPERTY_DELETE: (slug: string) => `${API_BASE_URL}/properties/${slug}`,
+  PROPERTIES_INDEX: "/api/properties",
+  PROPERTY_GET: (slug: string) => `/api/properties/${slug}`,
+  PROPERTY_UPDATE: (slug: string) => `/api/properties/${slug}`,
+  PROPERTY_DELETE: (slug: string) => `/api/properties/${slug}`,
 
   // Proyects
   PROYECTS_INDEX: `${API_BASE_URL}/proyects`,

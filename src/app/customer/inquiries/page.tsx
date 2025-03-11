@@ -70,7 +70,7 @@ export default function InquiriesPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="flex gap-4">
-                      {inquiry.property.images && inquiry.property.images.length > 0 ? (
+                      {inquiry?.property?.images && inquiry?.property?.images?.length > 0 ? (
                         <div className="relative w-20 h-20 shrink-0">
                           <Image
                             src={"/uploads" + inquiry.property.images[0].url}

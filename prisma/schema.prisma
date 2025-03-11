@@ -93,6 +93,7 @@ model Property {
   parkingSpaces Int?
   amenities     Json?
   quantity      Int             @default(1)
+  status        PropertyStatus  @default(EN_VENTA)
   images        PropertyImage[]
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
@@ -130,7 +131,7 @@ model Proyect {
   priority       Int?
   daysToStart    Int?
   createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  updatedAt      DateTime        @default(now())
   address        Address[]
   // Relación opcional con User
   promotor       User?           @relation(fields: [promotorId], references: [id], onDelete: Cascade)
@@ -383,4 +384,10 @@ enum BusinessModel {
   SOLD
   RENT
   LEADING
+}
+
+enum PropertyStatus {
+  EN_VENTA
+  RESERVADA
+  VENDIDA
 }
