@@ -27,7 +27,8 @@ export const API_ENDPOINTS = {
   PROPERTY_GET: (slug: string) => `/api/properties/${slug}`,
   PROPERTY_UPDATE: (slug: string) => `/api/properties/${slug}`,
   PROPERTY_DELETE: (slug: string) => `/api/properties/${slug}`,
-
+  PROPERTY_CREATE: "/api/properties",
+  
   // Proyects
   PROYECTS_INDEX: `${API_BASE_URL}/proyects`,
   PROYECT_CREATE: `${API_BASE_URL}/proyects`,
