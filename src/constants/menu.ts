@@ -18,6 +18,9 @@ import {
   Home,
   ChartNoAxesCombined,
   MessageSquare,
+  LayoutDashboard,
+  PlusCircle,
+  Building2,
 } from 'lucide-react'
 
 export interface MenuItem {
@@ -30,12 +33,17 @@ export interface MenuItem {
 }
 
 export const MENU_DATA: MenuItem[] = [
-  { icon: Monitor, label: 'Escritorio', href: '/admin/dashboard' },
-  { icon: Package, label: 'Publicar', href: '/admin/dashboard/publicar' },
+  { icon: LayoutDashboard, label: 'Escritorio', href: '/admin/dashboard' },
+  { icon: PlusCircle, label: 'Publicar', href: '/admin/dashboard/publicar' },
   {
-    icon: Package,
+    icon: Building2,
     label: 'Publicaciones',
     href: '/admin/dashboard/publicaciones',
+  },
+  {
+    icon: MessageSquare,
+    label: 'Consultas',
+    href: '/admin/dashboard/consultas',
   },
 ]
 

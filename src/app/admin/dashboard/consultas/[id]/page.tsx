@@ -1,0 +1,326 @@
+'use client'
+
+import { useState, useEffect, useRef } from 'react'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import { Loader2, ArrowLeft, Send } from 'lucide-react'
+import { format } from 'date-fns'
+import Link from 'next/link'
+import { useSession } from 'next-auth/react'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { toast } from 'sonner'
+import { API_ENDPOINTS } from '@/constants/api-endpoint'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+const statusColors = {
+  OPEN: 'bg-blue-500 hover:bg-blue-600',
+  IN_PROGRESS: 'bg-yellow-500 hover:bg-yellow-600',
+  CLOSED: 'bg-gray-500 hover:bg-gray-600',
+  RESOLVED: 'bg-green-500 hover:bg-green-600'
+}
+
+const statusLabels = {
+  OPEN: 'Abierta',
+  IN_PROGRESS: 'En progreso',
+  CLOSED: 'Cerrada',
+  RESOLVED: 'Resuelta'
+}
+
+interface Message {
+  id: number
+  message: string
+  createdAt: string
+  isAdmin: boolean
+  user: {
+    id: string
+    name: string
+    image?: string
+  }
+}
+
+interface Inquiry {
+  id: number
+  title: string
+  status: 'OPEN' | 'IN_PROGRESS' | 'CLOSED' | 'RESOLVED'
+  createdAt: string
+  updatedAt: string
+  property: {
+    id: number
+    title: string
+  }
+  user: {
+    id: string
+    name: string
+    email: string
+  }
+}
+
+export default function AdminInquiryDetailPage({ params }: { params: { id: string } }) {
+  const inquiryId = parseInt(params.id)
+  const { data: session } = useSession()
+  const [currentInquiry, setCurrentInquiry] = useState<Inquiry | null>(null)
+  const [messages, setMessages] = useState<Message[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [newMessage, setNewMessage] = useState('')
+  const [isSending, setIsSending] = useState(false)
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    fetchInquiryData()
+  }, [inquiryId])
+
+  useEffect(() => {
+    // Scroll to bottom when messages change
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  const fetchInquiryData = async () => {
+    setIsLoading(true)
+    try {
+      // Fetch inquiry details
+      const inquiryResponse = await fetch(API_ENDPOINTS.INQUIRY_BY_ID(inquiryId))
+      if (!inquiryResponse.ok) throw new Error('Error al cargar la consulta')
+      const inquiryData = await inquiryResponse.json()
+      setCurrentInquiry(inquiryData)
+      
+      // Fetch inquiry messages
+      const messagesResponse = await fetch(API_ENDPOINTS.INQUIRY_MESSAGES(inquiryId))
+      if (!messagesResponse.ok) throw new Error('Error al cargar los mensajes')
+      const messagesData = await messagesResponse.json()
+      setMessages(messagesData)
+    } catch (error) {
+      console.error('Error fetching inquiry data:', error)
+      toast.error('Error al cargar la información de la consulta')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleSendMessage = async () => {
+    if (!newMessage.trim()) return
+    
+    setIsSending(true)
+    try {
+      const response = await fetch(API_ENDPOINTS.INQUIRY_MESSAGE_CREATE(inquiryId), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: newMessage.trim(),
+          isAdmin: true
+        }),
+      })
+      
+      if (!response.ok) throw new Error('Error al enviar el mensaje')
+      
+      // Refresh messages
+      const messagesResponse = await fetch(API_ENDPOINTS.INQUIRY_MESSAGES(inquiryId))
+      const messagesData = await messagesResponse.json()
+      setMessages(messagesData)
+      setNewMessage('')
+      
+    } catch (error) {
+      toast.error('Error al enviar el mensaje')
+    } finally {
+      setIsSending(false)
+    }
+  }
+
+  const updateInquiryStatus = async (newStatus: string) => {
+    setIsUpdatingStatus(true)
+    try {
+      const response = await fetch(API_ENDPOINTS.INQUIRY_UPDATE(inquiryId), {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: newStatus
+        }),
+      })
+      
+      if (!response.ok) throw new Error('Error al actualizar el estado')
+      
+      // Update local state
+      if (currentInquiry) {
+        setCurrentInquiry({
+          ...currentInquiry,
+          status: newStatus as 'OPEN' | 'IN_PROGRESS' | 'CLOSED' | 'RESOLVED'
+        })
+      }
+      
+      toast.success('Estado actualizado correctamente')
+    } catch (error) {
+      toast.error('Error al actualizar el estado')
+    } finally {
+      setIsUpdatingStatus(false)
+    }
+  }
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(part => part[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2)
+  }
+
+  return (
+    <div className="flex flex-col h-[calc(100vh-180px)]">
+      {/* Header */}
+      <div className="flex items-center justify-between pb-4 border-b">
+        <div className="flex items-center gap-3">
+          <Link href="/admin/dashboard/consultas">
+            <Button variant="outline" size="icon" className="h-9 w-9">
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          </Link>
+          <div>
+            <h2 className="text-xl font-bold tracking-tight">
+              {isLoading ? 'Cargando...' : currentInquiry?.title}
+            </h2>
+            {currentInquiry && (
+              <p className="text-sm text-gray-600 mt-1">
+                Propiedad: {currentInquiry.property.title} | 
+                Cliente: {currentInquiry.user.name} ({currentInquiry.user.email})
+              </p>
+            )}
+          </div>
+        </div>
+        
+        {currentInquiry && (
+          <div className="flex items-center gap-4">
+            <Badge 
+              variant="secondary"
+              className={statusColors[currentInquiry.status] + " text-white"}
+            >
+              {statusLabels[currentInquiry.status]}
+            </Badge>
+            
+            <div className="w-44">
+              <Select 
+                value={currentInquiry.status} 
+                onValueChange={updateInquiryStatus}
+                disabled={isUpdatingStatus}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Cambiar estado" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="OPEN">Abierta</SelectItem>
+                  <SelectItem value="IN_PROGRESS">En progreso</SelectItem>
+                  <SelectItem value="RESOLVED">Resuelta</SelectItem>
+                  <SelectItem value="CLOSED">Cerrada</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {isLoading ? (
+        <div className="flex-1 flex justify-center items-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      ) : (
+        <>
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto py-4 px-1">
+            {messages.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                No hay mensajes en esta consulta.
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {messages.map((message) => {
+                  const isCurrentUser = message.user.id === session?.user.id
+                  return (
+                    <div 
+                      key={message.id}
+                      className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div className={`flex gap-2 max-w-[80%] ${isCurrentUser ? 'flex-row-reverse' : ''}`}>
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={message.user.image || ''} />
+                          <AvatarFallback>{getInitials(message.user.name)}</AvatarFallback>
+                        </Avatar>
+                        
+                        <div>
+                          <div 
+                            className={`
+                              px-4 py-3 rounded-lg 
+                              ${isCurrentUser || message.isAdmin
+                                ? 'bg-blue-500 text-white' 
+                                : 'bg-gray-100 text-gray-800'
+                              }
+                            `}
+                          >
+                            <p>{message.message}</p>
+                          </div>
+                          <div className={`text-xs text-gray-500 mt-1 ${isCurrentUser ? 'text-right' : ''}`}>
+                            {message.isAdmin && <span className="font-semibold mr-1">Admin</span>}
+                            <span>{message.user.name} - {format(new Date(message.createdAt), 'dd/MM/yyyy HH:mm')}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+                <div ref={messagesEndRef} />
+              </div>
+            )}
+          </div>
+
+          {/* Message Input */}
+          {currentInquiry?.status !== 'CLOSED' && currentInquiry?.status !== 'RESOLVED' && (
+            <div className="pt-4 border-t">
+              <div className="flex gap-2">
+                <Textarea
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder="Escribe un mensaje..."
+                  rows={2}
+                  className="min-h-[80px]"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault()
+                      handleSendMessage()
+                    }
+                  }}
+                  disabled={isSending}
+                />
+                <Button 
+                  onClick={handleSendMessage}
+                  disabled={!newMessage.trim() || isSending}
+                  className="h-auto"
+                >
+                  {isSending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </div>
+          )}
+          
+          {(currentInquiry?.status === 'CLOSED' || currentInquiry?.status === 'RESOLVED') && (
+            <div className="bg-gray-100 rounded-md p-4 mt-4 text-center text-gray-600">
+              Esta consulta está {currentInquiry?.status === 'CLOSED' ? 'cerrada' : 'resuelta'} y no puede recibir más mensajes.
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
