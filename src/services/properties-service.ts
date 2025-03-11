@@ -13,7 +13,7 @@ export const getAllProperties = async () => {
 
 export const getPorpertiesBySlug = async (slug: string) => {
   try {
-    const response = await axios.get(API_ENDPOINTS.PROPERTY_BY_SLUG(slug))
+    const response = await axios.get(API_ENDPOINTS.PROPERTY_GET(slug))
     return response.data // Handle the response data from the Next.js API route
   } catch (error) {
     console.error('Error fetching statistics:', error)
