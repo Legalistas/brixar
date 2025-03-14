@@ -83,7 +83,7 @@ export default function InquiriesPage() {
                         <div className="bg-gray-200 w-20 h-20 rounded-md shrink-0" />
                       )}
                       <div>
-                        <h4 className="font-medium line-clamp-1">{inquiry.property.title}</h4>
+                        <h4 className="font-medium line-clamp-1">{inquiry?.property?.title}</h4>
                         <div className="flex items-center gap-2 mt-2 text-sm text-gray-600">
                           <span>{formatDistanceToNow(new Date(inquiry.updatedAt), { locale: es, addSuffix: true })}</span>
                         </div>

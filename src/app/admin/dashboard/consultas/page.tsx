@@ -2,11 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 import { es } from 'date-fns/locale'
-import Image from 'next/image'
 import { Loader2 } from 'lucide-react'
 import { API_ENDPOINTS } from '@/constants/api-endpoint'
 import { Input } from '@/components/ui/input'
@@ -18,6 +16,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 
 const statusColors = {
   OPEN: 'bg-blue-500 hover:bg-blue-600',
@@ -136,51 +142,42 @@ export default function AdminConsultasPage() {
           </p>
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {filteredInquiries.map((inquiry) => (
-            <Link 
-              key={inquiry.id} 
-              href={`/admin/dashboard/consultas/${inquiry.id}`}
-              className="no-underline text-inherit"
-            >
-              <Card className="hover:shadow-md transition-shadow duration-200">
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{inquiry.title}</CardTitle>
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Título</TableHead>
+                <TableHead>Estado</TableHead>
+                <TableHead>Propiedad</TableHead>
+                <TableHead>Cliente</TableHead>
+                <TableHead>Última actualización</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredInquiries.map((inquiry) => (
+                <TableRow 
+                  key={inquiry.id} 
+                  className="cursor-pointer hover:bg-gray-50"
+                  onClick={() => window.location.href = `/admin/dashboard/consultas/${inquiry.id}`}
+                >
+                  <TableCell className="font-medium">{inquiry.title}</TableCell>
+                  <TableCell>
                     <Badge 
                       variant="secondary"
                       className={statusColors[inquiry.status] + " text-white"}
                     >
                       {statusLabels[inquiry.status]}
                     </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex gap-4">
-                    {inquiry?.property?.images && inquiry?.property?.images?.length > 0 ? (
-                      <div className="relative w-20 h-20 shrink-0">
-                        <Image
-                          src={"/uploads" + inquiry.property.images[0].url}
-                          alt={inquiry.property.title}
-                          fill
-                          className="object-cover rounded-md"
-                        />
-                      </div>
-                    ) : (
-                      <div className="bg-gray-200 w-20 h-20 rounded-md shrink-0" />
-                    )}
-                    <div>
-                      <h4 className="font-medium line-clamp-1">{inquiry.property.title}</h4>
-                      <p className="text-sm text-gray-600">Cliente: {inquiry.user.name}</p>
-                      <div className="flex items-center gap-2 mt-2 text-sm text-gray-600">
-                        <span>{formatDistanceToNow(new Date(inquiry.updatedAt), { locale: es, addSuffix: true })}</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
+                  </TableCell>
+                  <TableCell>{inquiry.property.title}</TableCell>
+                  <TableCell>{inquiry.user.name}</TableCell>
+                  <TableCell>
+                    {formatDistanceToNow(new Date(inquiry.updatedAt), { locale: es, addSuffix: true })}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       )}
     </div>

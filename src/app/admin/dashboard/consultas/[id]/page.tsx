@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { Loader2, ArrowLeft, Send } from 'lucide-react'
+import { Loader2, ArrowLeft, Send, Check, DollarSign } from 'lucide-react'
 import { format } from 'date-fns'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
@@ -18,6 +18,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Input } from '@/components/ui/input'
 
 const statusColors = {
   OPEN: 'bg-blue-500 hover:bg-blue-600',
@@ -43,6 +52,9 @@ interface Message {
     name: string
     image?: string
   }
+  isOffer?: boolean
+  offerAmount?: number
+  offerStatus?: 'PENDING' | 'ACCEPTED' | 'REJECTED'
 }
 
 interface Inquiry {
@@ -72,6 +84,8 @@ export default function AdminInquiryDetailPage({ params }: { params: { id: strin
   const [isSending, setIsSending] = useState(false)
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [offerAmount, setOfferAmount] = useState('')
+  const [isOpenOfferDialog, setIsOpenOfferDialog] = useState(false)
 
   useEffect(() => {
     fetchInquiryData()
@@ -132,6 +146,63 @@ export default function AdminInquiryDetailPage({ params }: { params: { id: strin
       toast.error('Error al enviar el mensaje')
     } finally {
       setIsSending(false)
+    }
+  }
+
+  const handleSendOffer = async () => {
+    if (!offerAmount.trim()) return
+    
+    setIsSending(true)
+    try {
+      // Por ahora usaremos la misma API de mensajes pero con un campo adicional
+      const response = await fetch(API_ENDPOINTS.INQUIRY_MESSAGE_CREATE(inquiryId), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: `Oferta por $${offerAmount}`,
+          isAdmin: true,
+          isOffer: true,
+          offerAmount: parseFloat(offerAmount),
+          offerStatus: 'PENDING'
+        }),
+      })
+      
+      if (!response.ok) throw new Error('Error al enviar la oferta')
+      
+      // Refresh messages
+      const messagesResponse = await fetch(API_ENDPOINTS.INQUIRY_MESSAGES(inquiryId))
+      const messagesData = await messagesResponse.json()
+      setMessages(messagesData)
+      setOfferAmount('')
+      setIsOpenOfferDialog(false)
+      
+      toast.success('Oferta enviada correctamente')
+    } catch (error) {
+      toast.error('Error al enviar la oferta')
+    } finally {
+      setIsSending(false)
+    }
+  }
+
+  const handleAcceptOffer = async (offerId: number) => {
+    console.log(`Aceptando oferta con ID: ${offerId}`)
+    
+    try {
+      // Aquí iría la llamada a la API para aceptar la oferta
+      // Por ahora solo actualizamos el estado localmente
+      const updatedMessages = messages.map(msg => {
+        if (msg.id === offerId && msg.isOffer) {
+          return { ...msg, offerStatus: 'ACCEPTED' }
+        }
+        return msg
+      })
+      setMessages(updatedMessages)
+      
+      toast.success('Oferta aceptada')
+    } catch (error) {
+      toast.error('Error al aceptar la oferta')
     }
   }
 
@@ -224,6 +295,46 @@ export default function AdminInquiryDetailPage({ params }: { params: { id: strin
                 </SelectContent>
               </Select>
             </div>
+            
+            <Dialog open={isOpenOfferDialog} onOpenChange={setIsOpenOfferDialog}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="flex gap-2">
+                  <DollarSign className="h-4 w-4" />
+                  Enviar Oferta
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Enviar nueva oferta</DialogTitle>
+                  <DialogDescription>
+                    Ingresa el monto de la oferta que quieres enviar al cliente.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">$</span>
+                    <Input
+                      type="number"
+                      placeholder="Monto de la oferta"
+                      value={offerAmount}
+                      onChange={(e) => setOfferAmount(e.target.value)}
+                    />
+                  </div>
+                  <Button 
+                    onClick={handleSendOffer} 
+                    className="w-full"
+                    disabled={!offerAmount.trim() || isSending}
+                  >
+                    {isSending ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : (
+                      <DollarSign className="h-4 w-4 mr-2" />
+                    )}
+                    Enviar Oferta
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         )}
       </div>
@@ -259,13 +370,45 @@ export default function AdminInquiryDetailPage({ params }: { params: { id: strin
                           <div 
                             className={`
                               px-4 py-3 rounded-lg 
-                              ${isCurrentUser || message.isAdmin
-                                ? 'bg-blue-500 text-white' 
-                                : 'bg-gray-100 text-gray-800'
+                              ${message.isOffer 
+                                ? 'bg-green-100 border border-green-300 text-green-800' 
+                                : isCurrentUser || message.isAdmin
+                                  ? 'bg-blue-500 text-white' 
+                                  : 'bg-gray-100 text-gray-800'
                               }
                             `}
                           >
                             <p>{message.message}</p>
+                            
+                            {message.isOffer && (
+                              <div className="mt-2 pt-2 border-t border-green-300">
+                                <div className="flex justify-between items-center">
+                                  <Badge variant="outline" className="bg-white">
+                                    Oferta: ${message.offerAmount}
+                                  </Badge>
+                                  
+                                  {/* Si es oferta del cliente y está pendiente, mostrar botón para aceptar */}
+                                  {!message.isAdmin && message.offerStatus === 'PENDING' && (
+                                    <Button 
+                                      size="sm" 
+                                      variant="outline" 
+                                      className="bg-green-500 text-white hover:bg-green-600"
+                                      onClick={() => handleAcceptOffer(message.id)}
+                                    >
+                                      <Check className="h-4 w-4 mr-1" /> Aceptar
+                                    </Button>
+                                  )}
+                                  
+                                  {message.offerStatus === 'ACCEPTED' && (
+                                    <Badge className="bg-green-500">Aceptada</Badge>
+                                  )}
+                                  
+                                  {message.offerStatus === 'REJECTED' && (
+                                    <Badge variant="destructive">Rechazada</Badge>
+                                  )}
+                                </div>
+                              </div>
+                            )}
                           </div>
                           <div className={`text-xs text-gray-500 mt-1 ${isCurrentUser ? 'text-right' : ''}`}>
                             {message.isAdmin && <span className="font-semibold mr-1">Admin</span>}
@@ -299,17 +442,26 @@ export default function AdminInquiryDetailPage({ params }: { params: { id: strin
                   }}
                   disabled={isSending}
                 />
-                <Button 
-                  onClick={handleSendMessage}
-                  disabled={!newMessage.trim() || isSending}
-                  className="h-auto"
-                >
-                  {isSending ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Send className="h-4 w-4" />
-                  )}
-                </Button>
+                <div className="flex flex-col gap-2">
+                  <Button 
+                    onClick={handleSendMessage}
+                    disabled={!newMessage.trim() || isSending}
+                    className="h-1/2"
+                  >
+                    {isSending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Send className="h-4 w-4" />
+                    )}
+                  </Button>
+                  <Button 
+                    onClick={() => setIsOpenOfferDialog(true)}
+                    variant="outline"
+                    className="h-1/2"
+                  >
+                    <DollarSign className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           )}
