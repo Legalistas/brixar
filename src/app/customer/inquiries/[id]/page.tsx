@@ -12,6 +12,7 @@ import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { toast } from 'sonner'
+import { OfferAcceptancePanel } from '@/components/inquiry/OfferAcceptancePanel'
 
 const statusColors = {
   OPEN: 'bg-blue-500 hover:bg-blue-600',
@@ -76,32 +77,41 @@ export default function InquiryDetailPage({
   return (
     <div className="flex flex-col h-[calc(100vh-180px)]">
       {/* Header */}
-      <div className="flex items-center justify-between pb-4 border-b">
-        <div className="flex items-center gap-3">
-          <Link href="/customer/inquiries">
-            <Button variant="outline" size="icon" className="h-9 w-9">
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-          </Link>
-          <div>
-            <h2 className="text-xl font-bold tracking-tight">
-              {isLoading ? 'Cargando...' : currentInquiry?.title}
-            </h2>
-            {currentInquiry && (
-              <p className="text-sm text-gray-600 mt-1">
-                Propiedad: {currentInquiry.property.title}
-              </p>
-            )}
+      <div className="flex flex-col pb-4 border-b">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <Link href="/customer/inquiries">
+              <Button variant="outline" size="icon" className="h-9 w-9">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            </Link>
+            <div>
+              <h2 className="text-xl font-bold tracking-tight">
+                {isLoading ? 'Cargando...' : currentInquiry?.title}
+              </h2>
+              {currentInquiry && (
+                <p className="text-sm text-gray-600 mt-1">
+                  Propiedad: {currentInquiry.property.title}
+                </p>
+              )}
+            </div>
           </div>
+
+          {currentInquiry && (
+            <Badge
+              variant="secondary"
+              className={statusColors[currentInquiry.status] + ' text-white'}
+            >
+              {statusLabels[currentInquiry.status]}
+            </Badge>
+          )}
         </div>
 
-        {currentInquiry && (
-          <Badge
-            variant="secondary"
-            className={statusColors[currentInquiry.status] + ' text-white'}
-          >
-            {statusLabels[currentInquiry.status]}
-          </Badge>
+        {/* Panel de aceptación de oferta en una posición más destacada */}
+        {currentInquiry?.negotiatedPrice && (
+          <div className="mb-2 w-full">
+            <OfferAcceptancePanel inquiryId={inquiryId} isAdmin={false} />
+          </div>
         )}
       </div>
 

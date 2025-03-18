@@ -43,16 +43,24 @@ export const API_ENDPOINTS = {
 
   // Inquiries (Consultas)
   INQUIRIES_INDEX: `${API_BASE_URL}/inquiries`,
-  INQUIRY_CREATE: '/api/inquiries',
-  INQUIRY_BY_ID: (id: number) => `/api/inquiries/${id}`,
-  INQUIRY_UPDATE: (id: number) => `/api/inquiries/${id}`,
-  INQUIRY_DELETE: (id: number) => `/api/inquiries/${id}`,
+  INQUIRY_CREATE: `${API_BASE_URL}/inquiries`,
+  INQUIRY_BY_ID: (id: number) => `${API_BASE_URL}/inquiries/${id}`,
+  INQUIRY_UPDATE: (id: number) => `${API_BASE_URL}/inquiries/${id}`,
+  INQUIRY_DELETE: (id: number) => `${API_BASE_URL}/inquiries/${id}`,
   
   // Inquiry Messages
-  INQUIRY_MESSAGES: (inquiryId: number) => `/api/inquiries/${inquiryId}/messages`,
-  INQUIRY_MESSAGE_CREATE: (inquiryId: number) => `/api/inquiries/${inquiryId}/messages`,
+  INQUIRY_MESSAGES: (inquiryId: number) => `${API_BASE_URL}/inquiries/${inquiryId}/messages`,
+  INQUIRY_MESSAGE_CREATE: (inquiryId: number) => `${API_BASE_URL}/inquiries/${inquiryId}/messages`,
   
   // User Inquiries
-  USER_INQUIRIES: '/api/inquiries/user',
+  USER_INQUIRIES: `${API_BASE_URL}/inquiries/user`,
   PROPERTY_INQUIRIES: (propertyId: number) => `${API_BASE_URL}/inquiries/property/${propertyId}`,
+  
+  // Offer acceptance endpoints
+  INQUIRY_CLIENT_ACCEPT: (id: number) => `${API_BASE_URL}/inquiries/${id}/accept/client`,
+  INQUIRY_ADMIN_ACCEPT: (id: number) => `${API_BASE_URL}/inquiries/${id}/accept/admin`,
+  INQUIRY_COMPLETE_TRANSACTION: (id: number) => `${API_BASE_URL}/inquiries/${id}/complete-transaction`,
+  
+  // Sales endpoints
+  SALE_CREATE: `${API_BASE_URL}/sales`,
 }

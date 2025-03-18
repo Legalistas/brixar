@@ -20,6 +20,8 @@ interface Inquiry {
   status: 'OPEN' | 'IN_PROGRESS' | 'CLOSED' | 'RESOLVED'
   offeredPrice: number | null
   negotiatedPrice: number | null
+  clientAccepted: boolean
+  adminAccepted: boolean
   createdAt: string
   updatedAt: string
   property: {
@@ -42,7 +44,7 @@ interface InquiryStore {
   error: string | null
   currentInquiry: Inquiry | null
   messages: InquiryMessage[]
-  
+
   // Métodos para gestionar consultas
   fetchUserInquiries: () => Promise<void>
   fetchInquiryById: (inquiryId: number) => Promise<void>
@@ -52,16 +54,27 @@ interface InquiryStore {
     message?: string
     offeredPrice?: number
   }) => Promise<Inquiry | null>
-  updateInquiry: (inquiryId: number, data: {
-    status?: 'OPEN' | 'IN_PROGRESS' | 'CLOSED' | 'RESOLVED'
-    offeredPrice?: number
-    negotiatedPrice?: number
-  }) => Promise<void>
-  
+  updateInquiry: (
+    inquiryId: number,
+    data: {
+      status?: 'OPEN' | 'IN_PROGRESS' | 'CLOSED' | 'RESOLVED'
+      offeredPrice?: number
+      negotiatedPrice?: number
+    }
+  ) => Promise<void>
+
   // Métodos para mensajes
   fetchInquiryMessages: (inquiryId: number) => Promise<void>
-  sendMessage: (inquiryId: number, message: string) => Promise<InquiryMessage | null>
+  sendMessage: (
+    inquiryId: number,
+    message: string
+  ) => Promise<InquiryMessage | null>
   resetState: () => void
+
+  // Nuevos métodos para la gestión de ofertas
+  acceptOfferAsAdmin: (inquiryId: number) => Promise<void>
+  acceptOfferAsClient: (inquiryId: number) => Promise<void>
+  completeTransaction: (inquiryId: number) => Promise<void>
 }
 
 export const useInquiryStore = create<InquiryStore>((set, get) => ({
@@ -70,51 +83,55 @@ export const useInquiryStore = create<InquiryStore>((set, get) => ({
   error: null,
   currentInquiry: null,
   messages: [],
-  
+
   // Obtener todas las consultas del usuario
   fetchUserInquiries: async () => {
     try {
       set({ isLoading: true, error: null })
       const response = await fetch(API_ENDPOINTS.USER_INQUIRIES)
-      
+
       if (!response.ok) {
+        console.error(
+          'Error al cargar las consultas del usuario',
+          response.statusText
+        )
         throw new Error('Error al cargar las consultas')
       }
-      
+
       const data = await response.json()
       set({ inquiries: data, isLoading: false })
     } catch (error) {
-      set({ 
-        error: error instanceof Error ? error.message : 'Error desconocido', 
-        isLoading: false 
+      set({
+        error: error instanceof Error ? error.message : 'Error desconocido',
+        isLoading: false,
       })
     }
   },
-  
+
   // Obtener una consulta por ID
   fetchInquiryById: async (inquiryId: number) => {
     try {
       set({ isLoading: true, error: null })
       const response = await fetch(API_ENDPOINTS.INQUIRY_BY_ID(inquiryId))
-      
+
       if (!response.ok) {
         throw new Error('Error al cargar la consulta')
       }
-      
+
       const data = await response.json()
-      set({ 
+      set({
         currentInquiry: data,
         messages: data.messages || [],
-        isLoading: false 
+        isLoading: false,
       })
     } catch (error) {
-      set({ 
-        error: error instanceof Error ? error.message : 'Error desconocido', 
-        isLoading: false 
+      set({
+        error: error instanceof Error ? error.message : 'Error desconocido',
+        isLoading: false,
       })
     }
   },
-  
+
   // Crear una nueva consulta
   createInquiry: async (data) => {
     try {
@@ -126,27 +143,27 @@ export const useInquiryStore = create<InquiryStore>((set, get) => ({
         },
         body: JSON.stringify(data),
       })
-      
+
       if (!response.ok) {
         throw new Error('Error al crear la consulta')
       }
-      
+
       const newInquiry = await response.json()
-      set((state) => ({ 
+      set((state) => ({
         inquiries: [newInquiry, ...state.inquiries],
-        isLoading: false 
+        isLoading: false,
       }))
-      
+
       return newInquiry
     } catch (error) {
-      set({ 
-        error: error instanceof Error ? error.message : 'Error desconocido', 
-        isLoading: false 
+      set({
+        error: error instanceof Error ? error.message : 'Error desconocido',
+        isLoading: false,
       })
       return null
     }
   },
-  
+
   // Actualizar una consulta
   updateInquiry: async (inquiryId, data) => {
     try {
@@ -158,87 +175,213 @@ export const useInquiryStore = create<InquiryStore>((set, get) => ({
         },
         body: JSON.stringify(data),
       })
-      
+
       if (!response.ok) {
         throw new Error('Error al actualizar la consulta')
       }
-      
+
       const updatedInquiry = await response.json()
-      
+
       set((state) => ({
-        inquiries: state.inquiries.map(inquiry => 
+        inquiries: state.inquiries.map((inquiry) =>
           inquiry.id === inquiryId ? updatedInquiry : inquiry
         ),
         currentInquiry: updatedInquiry,
-        isLoading: false
+        isLoading: false,
       }))
     } catch (error) {
-      set({ 
-        error: error instanceof Error ? error.message : 'Error desconocido', 
-        isLoading: false 
+      set({
+        error: error instanceof Error ? error.message : 'Error desconocido',
+        isLoading: false,
       })
     }
   },
-  
+
   // Obtener mensajes de una consulta
   fetchInquiryMessages: async (inquiryId: number) => {
     try {
       set({ isLoading: true, error: null })
       const response = await fetch(API_ENDPOINTS.INQUIRY_MESSAGES(inquiryId))
-      
+
       if (!response.ok) {
         throw new Error('Error al cargar los mensajes')
       }
-      
+
       const data = await response.json()
       set({ messages: data, isLoading: false })
     } catch (error) {
-      set({ 
-        error: error instanceof Error ? error.message : 'Error desconocido', 
-        isLoading: false 
+      set({
+        error: error instanceof Error ? error.message : 'Error desconocido',
+        isLoading: false,
       })
     }
   },
-  
+
   // Enviar un nuevo mensaje
   sendMessage: async (inquiryId: number, message: string) => {
     try {
       set({ isLoading: true, error: null })
-      const response = await fetch(API_ENDPOINTS.INQUIRY_MESSAGE_CREATE(inquiryId), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message }),
-      })
-      
+      const response = await fetch(
+        API_ENDPOINTS.INQUIRY_MESSAGE_CREATE(inquiryId),
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ message }),
+        }
+      )
+
       if (!response.ok) {
         throw new Error('Error al enviar el mensaje')
       }
-      
+
       const newMessage = await response.json()
-      
+
       set((state) => ({
         messages: [...state.messages, newMessage],
-        isLoading: false
+        isLoading: false,
       }))
-      
+
       return newMessage
     } catch (error) {
-      set({ 
-        error: error instanceof Error ? error.message : 'Error desconocido', 
-        isLoading: false 
+      set({
+        error: error instanceof Error ? error.message : 'Error desconocido',
+        isLoading: false,
       })
       return null
     }
   },
-  
+
   // Resetear el estado
   resetState: () => {
     set({
       currentInquiry: null,
       messages: [],
-      error: null
+      error: null,
     })
-  }
+  },
+
+  // Aceptar la oferta como administrador
+  acceptOfferAsAdmin: async (inquiryId: number) => {
+    try {
+      set({ isLoading: true, error: null })
+      const response = await fetch(
+        API_ENDPOINTS.INQUIRY_ADMIN_ACCEPT(inquiryId),
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error('Error al aceptar la oferta como administrador')
+      }
+
+      const updatedInquiry = await response.json()
+
+      set((state) => ({
+        inquiries: state.inquiries.map((inquiry) =>
+          inquiry.id === inquiryId ? updatedInquiry : inquiry
+        ),
+        currentInquiry: updatedInquiry,
+        isLoading: false,
+      }))
+
+      // Si ambos han aceptado, completar la transacción automáticamente
+      if (updatedInquiry.adminAccepted && updatedInquiry.clientAccepted) {
+        await get().completeTransaction(inquiryId)
+      }
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Error desconocido',
+        isLoading: false,
+      })
+    }
+  },
+
+  // Aceptar la oferta como cliente
+  acceptOfferAsClient: async (inquiryId: number) => {
+    try {
+      set({ isLoading: true, error: null })
+      const response = await fetch(
+        API_ENDPOINTS.INQUIRY_CLIENT_ACCEPT(inquiryId),
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error('Error al aceptar la oferta como cliente')
+      }
+
+      const updatedInquiry = await response.json()
+
+      set((state) => ({
+        inquiries: state.inquiries.map((inquiry) =>
+          inquiry.id === inquiryId ? updatedInquiry : inquiry
+        ),
+        currentInquiry: updatedInquiry,
+        isLoading: false,
+      }))
+
+      // Si ambos han aceptado, completar la transacción automáticamente
+      if (updatedInquiry.adminAccepted && updatedInquiry.clientAccepted) {
+        await get().completeTransaction(inquiryId)
+      }
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Error desconocido',
+        isLoading: false,
+      })
+    }
+  },
+
+  // Completar la transacción y crear la venta
+  completeTransaction: async (inquiryId: number) => {
+    try {
+      set({ isLoading: true, error: null })
+      const response = await fetch(
+        API_ENDPOINTS.INQUIRY_COMPLETE_TRANSACTION(inquiryId),
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error('Error al completar la transacción')
+      }
+
+      const result = await response.json()
+
+      // Actualizar el estado de la consulta a RESOLVED
+      const updatedInquiry = {
+        ...get().currentInquiry!,
+        status: 'RESOLVED' as const,
+      }
+
+      set((state) => ({
+        inquiries: state.inquiries.map((inquiry) =>
+          inquiry.id === inquiryId ? updatedInquiry : inquiry
+        ),
+        currentInquiry: updatedInquiry,
+        isLoading: false,
+      }))
+
+      // Podemos agregar aquí alguna notificación de éxito o redirección
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Error desconocido',
+        isLoading: false,
+      })
+    }
+  },
 }))

@@ -96,7 +96,7 @@ model Property {
   status        PropertyStatus  @default(EN_VENTA)
   images        PropertyImage[]
   createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  updatedAt     DateTime        @default(now())
   address       Address[]
   Visit         Visit[]
   inquiries     Inquiry[]       // Relación con consultas
@@ -205,6 +205,52 @@ model Positions {
   @@map("positions")
 }
 
+model Sale {
+  id               Int        @id @default(autoincrement())
+  propertyId       Int
+  buyerId          Int        // Usuario que compra
+  sellerId         Int?       // Usuario admin/vendedor
+  inquiryId        Int?       // Consulta relacionada (opcional)
+  price            Decimal    @db.Decimal(12, 2)
+  status           SaleStatus @default(PENDING)
+  paymentMethod    String?
+  paymentReference String?
+  documents        Json?      // Para almacenar referencias a documentos
+  notes            String?    @db.Text
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  
+  property         Property   @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  buyer            User       @relation("BuyerSales", fields: [buyerId], references: [id])
+  seller           User?      @relation("SellerSales", fields: [sellerId], references: [id])
+  inquiry          Inquiry?   @relation(fields: [inquiryId], references: [id])
+  transactions     SaleTransaction[]
+
+  @@index([propertyId])
+  @@index([buyerId]) 
+  @@index([sellerId])
+  @@index([inquiryId])
+  @@map("sales")
+}
+
+model SaleTransaction {
+  id              Int      @id @default(autoincrement())
+  saleId          Int
+  amount          Decimal  @db.Decimal(12, 2)
+  type            String   // PAYMENT, REFUND, etc.
+  status          String   // COMPLETED, PENDING, FAILED
+  paymentMethod   String?
+  reference       String?
+  notes           String?  @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now())
+  
+  sale            Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+
+  @@index([saleId])
+  @@map("sale_transactions")
+}
+
 model Session {
   id           Int      @id @default(autoincrement())
   sessionToken String   @unique
@@ -236,6 +282,8 @@ model User {
   ProyectFound  ProyectFound[]
   inquiries     Inquiry[]       // Relación con consultas
   messages      InquiryMessage[] // Relación con mensajes
+  buyerSales    Sale[]          @relation("BuyerSales")  // Ventas donde es comprador
+  sellerSales   Sale[]          @relation("SellerSales") // Ventas donde es vendedor
 
   @@map("users")
 }
@@ -281,7 +329,7 @@ model State {
   name        String
   status      Boolean       @default(true)
   createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  updatedAt   DateTime      @default(now())
   userProfile UserProfile[]
   address     Address[]
 
@@ -326,6 +374,7 @@ model Inquiry {
   property         Property         @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages         InquiryMessage[]
+  sale             Sale?            // Relación con la venta generada
 
   @@index([propertyId])
   @@index([userId])
@@ -390,4 +439,11 @@ enum PropertyStatus {
   EN_VENTA
   RESERVADA
   VENDIDA
+}
+
+enum SaleStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  CANCELLED
 }
