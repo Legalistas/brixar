@@ -35,12 +35,6 @@ export async function POST(req: Request) {
         email,
         password: hashedPassword,
         role: 'CUSTOMER',
-        profile: {
-          create: {
-            countryId: 9, // Valor por defecto, ajusta según tus necesidades
-            stateId: 129, // Valor por defecto, ajusta según tus necesidades
-          },
-        },
         activity: {
           create: {
             registerIp:
