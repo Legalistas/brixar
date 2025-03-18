@@ -154,7 +154,20 @@ export default function AdminInquiryDetailPage({ params }: { params: { id: strin
     
     setIsSending(true)
     try {
-      // Por ahora usaremos la misma API de mensajes pero con un campo adicional
+      // Primero actualizamos el inquiry con el precio ofertado
+      const updateInquiryResponse = await fetch(API_ENDPOINTS.INQUIRY_UPDATE(inquiryId), {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          offeredPrice: parseFloat(offerAmount)
+        }),
+      });
+      
+      if (!updateInquiryResponse.ok) throw new Error('Error al actualizar la oferta')
+      
+      // Luego enviamos el mensaje con la oferta
       const response = await fetch(API_ENDPOINTS.INQUIRY_MESSAGE_CREATE(inquiryId), {
         method: 'POST',
         headers: {
@@ -171,7 +184,14 @@ export default function AdminInquiryDetailPage({ params }: { params: { id: strin
       
       if (!response.ok) throw new Error('Error al enviar la oferta')
       
-      // Refresh messages
+      // Refrescamos inquiry para obtener el precio actualizado
+      const inquiryResponse = await fetch(API_ENDPOINTS.INQUIRY_BY_ID(inquiryId))
+      if (inquiryResponse.ok) {
+        const inquiryData = await inquiryResponse.json()
+        setCurrentInquiry(inquiryData)
+      }
+      
+      // Refrescamos los mensajes
       const messagesResponse = await fetch(API_ENDPOINTS.INQUIRY_MESSAGES(inquiryId))
       const messagesData = await messagesResponse.json()
       setMessages(messagesData)
@@ -187,22 +207,48 @@ export default function AdminInquiryDetailPage({ params }: { params: { id: strin
   }
 
   const handleAcceptOffer = async (offerId: number) => {
-    console.log(`Aceptando oferta con ID: ${offerId}`)
+    const offerMessage = messages.find(msg => msg.id === offerId && msg.isOffer);
+    if (!offerMessage || !offerMessage.offerAmount) {
+      toast.error('No se encontró la información de la oferta');
+      return;
+    }
     
     try {
-      // Aquí iría la llamada a la API para aceptar la oferta
-      // Por ahora solo actualizamos el estado localmente
+      // Actualizamos el inquiry con el precio negociado
+      const updateInquiryResponse = await fetch(API_ENDPOINTS.INQUIRY_UPDATE(inquiryId), {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          negotiatedPrice: offerMessage.offerAmount,
+          status: 'IN_PROGRESS' // Opcionalmente cambiamos el estado a en progreso
+        }),
+      });
+      
+      if (!updateInquiryResponse.ok) throw new Error('Error al aceptar la oferta');
+      
+      // Actualizamos el mensaje de oferta (esto dependerá de tu API)
+      // Por ahora actualizamos el estado local
       const updatedMessages = messages.map(msg => {
         if (msg.id === offerId && msg.isOffer) {
-          return { ...msg, offerStatus: 'ACCEPTED' }
+          return { ...msg, offerStatus: 'ACCEPTED' };
         }
-        return msg
-      })
-      setMessages(updatedMessages)
+        return msg;
+      });
+      setMessages(updatedMessages);
       
-      toast.success('Oferta aceptada')
+      // Refrescamos el inquiry para obtener datos actualizados
+      const inquiryResponse = await fetch(API_ENDPOINTS.INQUIRY_BY_ID(inquiryId));
+      if (inquiryResponse.ok) {
+        const inquiryData = await inquiryResponse.json();
+        setCurrentInquiry(inquiryData);
+      }
+      
+      toast.success('Oferta aceptada correctamente');
     } catch (error) {
-      toast.error('Error al aceptar la oferta')
+      console.error('Error al aceptar la oferta:', error);
+      toast.error('Error al aceptar la oferta');
     }
   }
 

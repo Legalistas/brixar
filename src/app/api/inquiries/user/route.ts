@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next'
 import { prisma } from '@/libs/prisma'
 import { authOptions } from '@/auth'
 
+// GET consultas del usuario actual
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
@@ -12,9 +13,7 @@ export async function GET(req: NextRequest) {
     }
 
     const inquiries = await prisma.inquiry.findMany({
-      where: {
-        userId: Number(session.user.id),
-      },
+      where: { userId: parseInt(session.user.id) },
       include: {
         property: {
           select: {
@@ -22,21 +21,16 @@ export async function GET(req: NextRequest) {
             slug: true,
             title: true,
             images: {
-              select: {
-                url: true,
-              },
               take: 1,
-            },
-          },
-        },
-        _count: {
-          select: {
-            messages: true,
+              select: {
+                url: true
+              }
+            }
           },
         },
       },
       orderBy: {
-        updatedAt: 'desc',
+        createdAt: 'desc',
       },
     })
 

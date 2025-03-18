@@ -95,13 +95,26 @@ export default function PropertyPage() {
 
     try {
       if (property) {
-        const inquiry = await createInquiry({
-          propertyId: property.id,
-          title,
-          message,
-          offeredPrice: offeredPrice ? parseFloat(offeredPrice) : undefined
-        })
+        // Usar el API_ENDPOINTS.INQUIRY_CREATE directamente
+        const response = await fetch('/api/inquiries', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            propertyId: property.id,
+            title,
+            message,
+            offeredPrice: offeredPrice ? parseFloat(offeredPrice) : undefined
+          }),
+        });
 
+        if (!response.ok) {
+          throw new Error('Error al crear la consulta');
+        }
+
+        const inquiry = await response.json();
+        
         if (inquiry) {
           toast.success('Tu consulta ha sido enviada correctamente')
           setIsOpen(false)
@@ -111,6 +124,7 @@ export default function PropertyPage() {
         }
       }
     } catch (error) {
+      console.error('Error al enviar consulta:', error);
       toast.error('Error al enviar tu consulta. Inténtalo de nuevo más tarde.')
     }
   }

@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth/next'
 import { prisma } from '@/libs/prisma'
 import { authOptions } from '@/auth'
 
-// GET mensajes de una consulta
+// GET mensajes de consulta
 export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
@@ -54,7 +54,7 @@ export async function GET(
   }
 }
 
-// POST nuevo mensaje en una consulta
+// POST crear nuevo mensaje
 export async function POST(
   req: NextRequest,
   { params }: { params: { id: string } }
@@ -67,7 +67,7 @@ export async function POST(
     }
 
     const inquiryId = parseInt(params.id)
-    const { message } = await req.json()
+    const data = await req.json()
     
     const inquiry = await prisma.inquiry.findUnique({
       where: { id: inquiryId },
@@ -82,21 +82,14 @@ export async function POST(
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
 
-    // Si la consulta estaba cerrada y llega un mensaje nuevo, la pasamos a en progreso
-    if (inquiry.status === 'CLOSED' || inquiry.status === 'RESOLVED') {
-      await prisma.inquiry.update({
-        where: { id: inquiryId },
-        data: { status: 'IN_PROGRESS' },
-      })
-    }
-
-    // Crear mensaje
+    const isAdmin = session.user.role === 'ADMIN';
+    
     const newMessage = await prisma.inquiryMessage.create({
       data: {
         inquiryId,
         userId: parseInt(session.user.id),
-        message,
-        isAdmin: session.user.role === 'ADMIN',
+        message: data.message,
+        isAdmin: isAdmin || data.isAdmin || false,
       },
       include: {
         user: {
@@ -107,10 +100,35 @@ export async function POST(
             image: true,
           },
         },
-      }
+      },
     })
 
-    return NextResponse.json(newMessage)
+    // Si el mensaje es una oferta del administrador, actualizamos el campo offeredPrice en la consulta
+    if (data.isOffer && data.offerAmount && isAdmin) {
+      await prisma.inquiry.update({
+        where: { id: inquiryId },
+        data: {
+          offeredPrice: parseFloat(data.offerAmount)
+        }
+      });
+    }
+    
+    // Si el mensaje es una oferta del cliente, actualizamos el campo offeredPrice en la consulta
+    else if (data.isOffer && data.offerAmount && !isAdmin) {
+      await prisma.inquiry.update({
+        where: { id: inquiryId },
+        data: {
+          offeredPrice: parseFloat(data.offerAmount)
+        }
+      });
+    }
+
+    return NextResponse.json({
+      ...newMessage,
+      isOffer: data.isOffer,
+      offerAmount: data.offerAmount,
+      offerStatus: data.offerStatus
+    })
   } catch (error) {
     console.error('Error al crear mensaje:', error)
     return NextResponse.json({ error: 'Error al crear mensaje' }, { status: 500 })
