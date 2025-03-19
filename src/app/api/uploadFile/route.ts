@@ -62,10 +62,3 @@ export async function POST(request: Request) {
     );
   }
 }
-
-// Configurar el tamaño máximo de carga si es necesario
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
