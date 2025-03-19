@@ -169,8 +169,8 @@ export default function PropertyPage() {
             <div className="mb-6">
               <h2 className="text-2xl font-semibold mb-2">Ubicación</h2>
               <p>{property.address[0].streetName}</p>
-              <p>{property.address[0].city}, {property.address[0].state.name} {property.address[0].postalCode}</p>
-              <p>{property.address[0].country.name}</p>
+              <p>{property.address[0].city}, {property?.address[0]?.state?.name} {property.address[0].postalCode}</p>
+              <p>{property?.address[0]?.country?.name}</p>
             </div>
           </div>
           <div>
@@ -179,7 +179,7 @@ export default function PropertyPage() {
               {property.images.map((image) => (
                 <div key={image.id} className="relative h-48">
                   <Image
-                    src={"/uploads" + image.url}
+                    src={image.url}
                     alt={`Imagen de la propiedad ${image.id}`}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

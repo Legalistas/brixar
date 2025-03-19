@@ -159,7 +159,7 @@ const PropertyCard = ({ property }: PropertyProps) => {
             {mainAddress.streetName}, {mainAddress.city}
           </p>
           <p>
-            {mainAddress?.state?.name}, {mainAddress.country.name}
+            {mainAddress?.state?.name}, {mainAddress?.country?.name}
           </p>
         </div>
       </div>
