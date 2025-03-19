@@ -22,7 +22,7 @@ export default function ImageCarousel({ images }: { images: Image[] }) {
     return (
         <div className="relative w-full h-96 mb-8">
             <Image
-                src={process.env.NEXT_PUBLIC_BASE_URL + '/uploads/' + images[currentIndex].url}
+                src={images[currentIndex].url}
                 alt={`Property image ${currentIndex + 1}`}
                 fill
                 className="object-cover rounded-lg"

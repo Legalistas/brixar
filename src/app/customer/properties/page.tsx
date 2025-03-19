@@ -181,7 +181,7 @@ export default function PropertiesPage() {
                                             {formatListingType(property.listingType)}
                                         </div>
                                         <Image
-                                            src={process.env.NEXT_PUBLIC_BASE_URL + '/uploads/' + property.images[0]?.url || "/placeholder.svg"}
+                                            src={property.images[0]?.url || "/placeholder.svg"}
                                             alt={`Imagen de ${property.title}`}
                                             fill
                                             className="object-cover transition-transform duration-300 ease-in-out hover:scale-110"

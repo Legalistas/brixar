@@ -34,7 +34,7 @@ export default function PropertyCard({ property, visitDate }: { property: Proper
             {/* Image Container */}
             <div className="relative h-48 w-full">
                 <Image
-                    src={process.env.NEXT_PUBLIC_BASE_URL + '/uploads/' + property.images[0]?.url || "/placeholder.svg"}
+                    src={property.images[0]?.url || "/placeholder.svg"}
                     alt={`Imagen de ${property.title}`}
                     fill
                     className="object-cover"
