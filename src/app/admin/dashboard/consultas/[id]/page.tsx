@@ -73,6 +73,8 @@ interface Inquiry {
     name: string
     email: string
   }
+  negotiatedPrice?: number
+  offeredPrice?: number
 }
 
 export default function AdminInquiryDetailPage({
@@ -283,7 +285,7 @@ export default function AdminInquiryDetailPage({
       // 3. Actualizamos el mensaje de oferta en el estado
       const updatedMessages = messages.map((msg) => {
         if (msg.id === offerId && msg.isOffer) {
-          return { ...msg, offerStatus: 'ACCEPTED' }
+          return { ...msg, offerStatus: 'ACCEPTED' as const }
         }
         return msg
       })
@@ -411,52 +413,55 @@ export default function AdminInquiryDetailPage({
         )}
 
         {/* Botón de enviar oferta */}
-        {currentInquiry && currentInquiry.status !== 'CLOSED' && currentInquiry.status !== 'RESOLVED' && (
-          <div className="flex justify-end mt-2">
-            <Dialog
-              open={isOpenOfferDialog}
-              onOpenChange={setIsOpenOfferDialog}
-            >
-              <DialogTrigger asChild>
-                <Button variant="outline" className="flex gap-2">
-                  <DollarSign className="h-4 w-4" />
-                  Enviar Oferta
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Enviar nueva oferta</DialogTitle>
-                  <DialogDescription>
-                    Ingresa el monto de la oferta que quieres enviar al cliente.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">$</span>
-                    <Input
-                      type="number"
-                      placeholder="Monto de la oferta"
-                      value={offerAmount}
-                      onChange={(e) => setOfferAmount(e.target.value)}
-                    />
-                  </div>
-                  <Button
-                    onClick={handleSendOffer}
-                    className="w-full"
-                    disabled={!offerAmount.trim() || isSending}
-                  >
-                    {isSending ? (
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    ) : (
-                      <DollarSign className="h-4 w-4 mr-2" />
-                    )}
+        {currentInquiry &&
+          currentInquiry.status !== 'CLOSED' &&
+          currentInquiry.status !== 'RESOLVED' && (
+            <div className="flex justify-end mt-2">
+              <Dialog
+                open={isOpenOfferDialog}
+                onOpenChange={setIsOpenOfferDialog}
+              >
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="flex gap-2">
+                    <DollarSign className="h-4 w-4" />
                     Enviar Oferta
                   </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-        )}
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Enviar nueva oferta</DialogTitle>
+                    <DialogDescription>
+                      Ingresa el monto de la oferta que quieres enviar al
+                      cliente.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">$</span>
+                      <Input
+                        type="number"
+                        placeholder="Monto de la oferta"
+                        value={offerAmount}
+                        onChange={(e) => setOfferAmount(e.target.value)}
+                      />
+                    </div>
+                    <Button
+                      onClick={handleSendOffer}
+                      className="w-full"
+                      disabled={!offerAmount.trim() || isSending}
+                    >
+                      {isSending ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      ) : (
+                        <DollarSign className="h-4 w-4 mr-2" />
+                      )}
+                      Enviar Oferta
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+          )}
       </div>
 
       {isLoading ? (
