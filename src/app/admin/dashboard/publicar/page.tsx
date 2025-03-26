@@ -1,17 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { API_ENDPOINTS } from '@/constants/api-endpoint'
 import { PropertyState, ListingType } from '@prisma/client'
+import CountryStateSelector from '@/components/common/CountryStateSelector'
 
 export default function PublicarPropiedad() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
-  const [countries, setCountries] = useState([])
-  const [states, setStates] = useState([])
   const [imageUrls, setImageUrls] = useState<string[]>([])
   const [imageFiles, setImageFiles] = useState<File[]>([])
   const [uploadingImages, setUploadingImages] = useState(false)
@@ -46,42 +45,26 @@ export default function PublicarPropiedad() {
     },
   })
 
-  const fetchCountries = async () => {
-    try {
-      const res = await fetch(API_ENDPOINTS.COUNTRIES_INDEX)
-      const data = await res.json()
-      setCountries(data)
-    } catch (error) {
-      console.error('Error fetching countries:', error)
-    }
-  }
-
-  // Cargar países al montar el componente
-  useState(() => {
-    fetchCountries()
-  })
-
-  const fetchStates = async (countryId: number) => {
-    try {
-      const res = await fetch(API_ENDPOINTS.STATES_INDEX(countryId))
-      const data = await res.json()
-      setStates(data)
-    } catch (error) {
-      console.error('Error fetching states:', error)
-    }
-  }
-
-  const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const countryId = Number(e.target.value)
+  // Manejadores para el cambio de país y estado
+  const handleCountryChange = (countryId: number) => {
     setFormData({
       ...formData,
       address: {
         ...formData.address,
         countryId,
-        stateId: 0, // Reset state when country changes
+        stateId: 0, // Reseteamos el estado cuando cambia el país
       },
     })
-    fetchStates(countryId)
+  }
+
+  const handleStateChange = (stateId: number) => {
+    setFormData({
+      ...formData,
+      address: {
+        ...formData.address,
+        stateId,
+      },
+    })
   }
 
   const handleInputChange = (
@@ -554,50 +537,14 @@ export default function PublicarPropiedad() {
             <h2 className="text-xl font-semibold mb-4">Ubicación</h2>
           </div>
 
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="address.countryId"
-            >
-              País
-            </label>
-            <select
-              id="address.countryId"
-              name="address.countryId"
-              value={formData.address.countryId}
-              onChange={handleCountryChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight"
-            >
-              <option value="0">Seleccione un país</option>
-              {countries.map((country: any) => (
-                <option key={country.id} value={country.id}>
-                  {country.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="address.stateId"
-            >
-              Estado/Provincia
-            </label>
-            <select
-              id="address.stateId"
-              name="address.stateId"
-              value={formData.address.stateId}
-              onChange={handleInputChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight"
-            >
-              <option value="0">Seleccione un estado</option>
-              {states.map((state: any) => (
-                <option key={state.id} value={state.id}>
-                  {state.name}
-                </option>
-              ))}
-            </select>
+          {/* Reemplazamos los selectores de país y estado con nuestro componente */}
+          <div className="col-span-2">
+            <CountryStateSelector
+              selectedCountryId={formData.address.countryId}
+              selectedStateId={formData.address.stateId}
+              onCountryChange={handleCountryChange}
+              onStateChange={handleStateChange}
+            />
           </div>
 
           <div className="mb-4">
