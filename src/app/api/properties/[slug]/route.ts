@@ -104,6 +104,25 @@ export async function DELETE(
     // Verificar si la propiedad existe
     const existingProperty = await prisma.property.findUnique({
       where: { slug },
+      include: {
+        images: true,
+        address: {
+          include: {
+            positions: true
+          }
+        },
+        inquiries: {
+          include: {
+            messages: true
+          }
+        },
+        sales: {
+          include: {
+            transactions: true
+          }
+        },
+        Visit: true
+      }
     });
 
     if (!existingProperty) {
@@ -113,9 +132,68 @@ export async function DELETE(
       );
     }
 
-    // Eliminar la propiedad
-    await prisma.property.delete({
-      where: { slug },
+    // Usar transacción para eliminar todo en cascada manualmente
+    await prisma.$transaction(async (tx) => {
+      // 1. Eliminar transacciones de ventas relacionadas con la propiedad
+      if (existingProperty.sales?.length > 0) {
+        for (const sale of existingProperty.sales) {
+          if (sale.transactions?.length > 0) {
+            await tx.saleTransaction.deleteMany({
+              where: { saleId: sale.id }
+            });
+          }
+        }
+      }
+
+      // 2. Eliminar ventas relacionadas con la propiedad
+      await tx.sale.deleteMany({
+        where: { propertyId: existingProperty.id }
+      });
+
+      // 3. Eliminar mensajes de consultas relacionadas con la propiedad
+      if (existingProperty.inquiries?.length > 0) {
+        for (const inquiry of existingProperty.inquiries) {
+          await tx.inquiryMessage.deleteMany({
+            where: { inquiryId: inquiry.id }
+          });
+        }
+      }
+
+      // 4. Eliminar consultas relacionadas con la propiedad
+      await tx.inquiry.deleteMany({
+        where: { propertyId: existingProperty.id }
+      });
+
+      // 5. Eliminar visitas relacionadas con la propiedad
+      await tx.visit.deleteMany({
+        where: { propertyId: existingProperty.id }
+      });
+
+      // 6. Eliminar posiciones geográficas relacionadas con las direcciones
+      if (existingProperty.address?.length > 0) {
+        for (const addr of existingProperty.address) {
+          if (addr.positions?.length > 0) {
+            await tx.positions.deleteMany({
+              where: { addressId: addr.id }
+            });
+          }
+        }
+      }
+
+      // 7. Eliminar direcciones relacionadas con la propiedad
+      await tx.address.deleteMany({
+        where: { propertyId: existingProperty.id }
+      });
+
+      // 8. Eliminar imágenes relacionadas con la propiedad
+      await tx.propertyImage.deleteMany({
+        where: { propertyId: existingProperty.id }
+      });
+
+      // 9. Finalmente eliminar la propiedad
+      await tx.property.delete({
+        where: { id: existingProperty.id }
+      });
     });
 
     return NextResponse.json({ message: "Propiedad eliminada correctamente" });
