@@ -231,7 +231,7 @@ export default function PublicarPropiedad() {
 
       // Redireccionar después de 2 segundos
       setTimeout(() => {
-        router.push('/admin/propiedades')
+        router.push('/admin/dashboard/publicaciones')
       }, 2000)
     } catch (err: any) {
       setError(err.message || 'Ocurrió un error al publicar la propiedad')

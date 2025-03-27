@@ -64,22 +64,10 @@ export async function POST(request: Request) {
       })
 
       // Create address if provided
-      if (data.address) {
-        // Validate and prepare countryId
-        const countryId = typeof data.address.countryId === 'number' && data.address.countryId > 0 
-          ? data.address.countryId 
-          : null;
-        
-        // Validate and prepare stateId
-        const stateId = typeof data.address.stateId === 'number' && data.address.stateId > 0 
-          ? data.address.stateId 
-          : null;
-        
+      if (data.address) {        
         await prisma.address.create({
           data: {
             propertyId: property.id,
-            countryId,
-            stateId,
             city: data.address.city || null,
             postalCode: data.address.postalCode || null,
             streetName: data.address.streetName || null,
