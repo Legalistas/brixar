@@ -10,7 +10,6 @@ import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { toast } from 'sonner'
-import { API_ENDPOINTS } from '@/constants/api-endpoint'
 import {
   Select,
   SelectContent,
@@ -27,7 +26,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { OfferAcceptancePanel } from '@/components/inquiry/OfferAcceptancePanel'
+import { useInquiryStore } from '@/store/inquiryStore'
 
 const statusColors = {
   OPEN: 'bg-blue-500 hover:bg-blue-600',
@@ -43,40 +42,6 @@ const statusLabels = {
   RESOLVED: 'Resuelta',
 }
 
-interface Message {
-  id: number
-  message: string
-  createdAt: string
-  isAdmin: boolean
-  user: {
-    id: string
-    name: string
-    image?: string
-  }
-  isOffer?: boolean
-  offerAmount?: number
-  offerStatus?: 'PENDING' | 'ACCEPTED' | 'REJECTED'
-}
-
-interface Inquiry {
-  id: number
-  title: string
-  status: 'OPEN' | 'IN_PROGRESS' | 'CLOSED' | 'RESOLVED'
-  createdAt: string
-  updatedAt: string
-  property: {
-    id: number
-    title: string
-  }
-  user: {
-    id: string
-    name: string
-    email: string
-  }
-  negotiatedPrice?: number
-  offeredPrice?: number
-}
-
 export default function AdminInquiryDetailPage({
   params,
 }: {
@@ -84,78 +49,42 @@ export default function AdminInquiryDetailPage({
 }) {
   const inquiryId = parseInt(params.id)
   const { data: session } = useSession()
-  const [currentInquiry, setCurrentInquiry] = useState<Inquiry | null>(null)
-  const [messages, setMessages] = useState<Message[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [newMessage, setNewMessage] = useState('')
-  const [isSending, setIsSending] = useState(false)
-  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const [offerAmount, setOfferAmount] = useState('')
   const [isOpenOfferDialog, setIsOpenOfferDialog] = useState(false)
+  const [newMessage, setNewMessage] = useState('')
+  const [isSending, setIsSending] = useState(false)
+
+  const {
+    currentInquiry,
+    messages,
+    isLoading,
+    fetchInquiryById,
+    fetchInquiryMessages,
+    sendMessage,
+    updateInquiry,
+    acceptOfferAsAdmin,
+  } = useInquiryStore()
 
   useEffect(() => {
-    fetchInquiryData()
+    fetchInquiryById(inquiryId)
+    fetchInquiryMessages(inquiryId)
+
+    return () => {
+      useInquiryStore.getState().resetState()
+    }
   }, [inquiryId])
 
   useEffect(() => {
-    // Scroll to bottom when messages change
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
-
-  const fetchInquiryData = async () => {
-    setIsLoading(true)
-    try {
-      // Fetch inquiry details
-      const inquiryResponse = await fetch(
-        API_ENDPOINTS.INQUIRY_BY_ID(inquiryId)
-      )
-      if (!inquiryResponse.ok) throw new Error('Error al cargar la consulta')
-      const inquiryData = await inquiryResponse.json()
-      setCurrentInquiry(inquiryData)
-
-      // Fetch inquiry messages
-      const messagesResponse = await fetch(
-        API_ENDPOINTS.INQUIRY_MESSAGES(inquiryId)
-      )
-      if (!messagesResponse.ok) throw new Error('Error al cargar los mensajes')
-      const messagesData = await messagesResponse.json()
-      setMessages(messagesData)
-    } catch (error) {
-      console.error('Error fetching inquiry data:', error)
-      toast.error('Error al cargar la información de la consulta')
-    } finally {
-      setIsLoading(false)
-    }
-  }
 
   const handleSendMessage = async () => {
     if (!newMessage.trim()) return
 
     setIsSending(true)
     try {
-      const response = await fetch(
-        API_ENDPOINTS.INQUIRY_MESSAGE_CREATE(inquiryId),
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            message: newMessage.trim(),
-            isAdmin: true,
-          }),
-        }
-      )
-
-      if (!response.ok) throw new Error('Error al enviar el mensaje')
-
-      // Refresh messages
-      const messagesResponse = await fetch(
-        API_ENDPOINTS.INQUIRY_MESSAGES(inquiryId)
-      )
-      const messagesData = await messagesResponse.json()
-      setMessages(messagesData)
+      await sendMessage(inquiryId, newMessage.trim())
       setNewMessage('')
     } catch (error) {
       toast.error('Error al enviar el mensaje')
@@ -169,62 +98,19 @@ export default function AdminInquiryDetailPage({
 
     setIsSending(true)
     try {
-      // Primero actualizamos el inquiry con el precio ofertado
-      const updateInquiryResponse = await fetch(
-        API_ENDPOINTS.INQUIRY_UPDATE(inquiryId),
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            offeredPrice: parseFloat(offerAmount),
-          }),
-        }
-      )
+      await updateInquiry(inquiryId, {
+        negotiatedPrice: parseFloat(offerAmount),
+        status: 'IN_PROGRESS',
+      })
 
-      if (!updateInquiryResponse.ok)
-        throw new Error('Error al actualizar la oferta')
+      await sendMessage(inquiryId, `Se ha realizado una oferta por $${offerAmount}`)
 
-      // Luego enviamos el mensaje con la oferta
-      const response = await fetch(
-        API_ENDPOINTS.INQUIRY_MESSAGE_CREATE(inquiryId),
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            message: `Oferta por $${offerAmount}`,
-            isAdmin: true,
-            isOffer: true,
-            offerAmount: parseFloat(offerAmount),
-            offerStatus: 'PENDING',
-          }),
-        }
-      )
-
-      if (!response.ok) throw new Error('Error al enviar la oferta')
-
-      // Refrescamos inquiry para obtener el precio actualizado
-      const inquiryResponse = await fetch(
-        API_ENDPOINTS.INQUIRY_BY_ID(inquiryId)
-      )
-      if (inquiryResponse.ok) {
-        const inquiryData = await inquiryResponse.json()
-        setCurrentInquiry(inquiryData)
-      }
-
-      // Refrescamos los mensajes
-      const messagesResponse = await fetch(
-        API_ENDPOINTS.INQUIRY_MESSAGES(inquiryId)
-      )
-      const messagesData = await messagesResponse.json()
-      setMessages(messagesData)
       setOfferAmount('')
       setIsOpenOfferDialog(false)
 
       toast.success('Oferta enviada correctamente')
+
+      await fetchInquiryById(inquiryId)
     } catch (error) {
       toast.error('Error al enviar la oferta')
     } finally {
@@ -232,113 +118,25 @@ export default function AdminInquiryDetailPage({
     }
   }
 
-  const handleAcceptOffer = async (offerId: number) => {
-    const offerMessage = messages.find(
-      (msg) => msg.id === offerId && msg.isOffer
-    )
-    if (!offerMessage || !offerMessage.offerAmount) {
-      toast.error('No se encontró la información de la oferta')
-      return
-    }
-
+  const handleAcceptOffer = async () => {
     try {
-      // 1. Actualizamos el inquiry con el precio negociado y cambiamos estado a CLOSED
-      const updateInquiryResponse = await fetch(
-        API_ENDPOINTS.INQUIRY_UPDATE(inquiryId),
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            negotiatedPrice: offerMessage.offerAmount,
-            status: 'CLOSED', // Cerramos la consulta al aceptar la oferta
-          }),
-        }
-      )
+      await acceptOfferAsAdmin(inquiryId)
 
-      if (!updateInquiryResponse.ok)
-        throw new Error('Error al aceptar la oferta')
-
-      // 2. Creamos la venta asociada a esta consulta
-      const createSaleResponse = await fetch(API_ENDPOINTS.SALE_CREATE, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          propertyId: currentInquiry?.property.id,
-          buyerId: currentInquiry?.user.id,
-          price: offerMessage.offerAmount,
-          inquiryId: inquiryId,
-          status: 'PENDING',
-          notes: `Venta generada automáticamente a partir de la oferta aceptada en la consulta #${inquiryId}`,
-        }),
-      })
-
-      if (!createSaleResponse.ok) {
-        throw new Error('Error al crear la venta')
-      }
-
-      const saleData = await createSaleResponse.json()
-
-      // 3. Actualizamos el mensaje de oferta en el estado
-      const updatedMessages = messages.map((msg) => {
-        if (msg.id === offerId && msg.isOffer) {
-          return { ...msg, offerStatus: 'ACCEPTED' as const }
-        }
-        return msg
-      })
-      setMessages(updatedMessages)
-
-      // 4. Refrescamos el inquiry para obtener datos actualizados
-      const inquiryResponse = await fetch(
-        API_ENDPOINTS.INQUIRY_BY_ID(inquiryId)
-      )
-      if (inquiryResponse.ok) {
-        const inquiryData = await inquiryResponse.json()
-        setCurrentInquiry(inquiryData)
-      }
-
-      toast.success('Oferta aceptada y venta creada correctamente')
-
-      // Redirigir a la página de la venta creada
-      // Puedes comentar esta línea si prefieres no redirigir automáticamente
-      // router.push(`/admin/dashboard/ventas/${saleData.id}`);
+      await fetchInquiryById(inquiryId)
+      toast.success('Oferta aceptada correctamente')
     } catch (error) {
-      console.error('Error al aceptar la oferta:', error)
       toast.error('Error al aceptar la oferta')
     }
   }
 
   const updateInquiryStatus = async (newStatus: string) => {
-    setIsUpdatingStatus(true)
     try {
-      const response = await fetch(API_ENDPOINTS.INQUIRY_UPDATE(inquiryId), {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          status: newStatus,
-        }),
+      await updateInquiry(inquiryId, {
+        status: newStatus as 'OPEN' | 'IN_PROGRESS' | 'CLOSED' | 'RESOLVED',
       })
-
-      if (!response.ok) throw new Error('Error al actualizar el estado')
-
-      // Update local state
-      if (currentInquiry) {
-        setCurrentInquiry({
-          ...currentInquiry,
-          status: newStatus as 'OPEN' | 'IN_PROGRESS' | 'CLOSED' | 'RESOLVED',
-        })
-      }
-
       toast.success('Estado actualizado correctamente')
     } catch (error) {
       toast.error('Error al actualizar el estado')
-    } finally {
-      setIsUpdatingStatus(false)
     }
   }
 
@@ -353,7 +151,6 @@ export default function AdminInquiryDetailPage({
 
   return (
     <div className="flex flex-col h-[calc(100vh-180px)]">
-      {/* Header */}
       <div className="flex flex-col pb-4 border-b">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
@@ -368,8 +165,8 @@ export default function AdminInquiryDetailPage({
               </h2>
               {currentInquiry && (
                 <p className="text-sm text-gray-600 mt-1">
-                  Propiedad: {currentInquiry.property.title} | Cliente:{' '}
-                  {currentInquiry.user.name} ({currentInquiry.user.email})
+                  Propiedad: {currentInquiry?.property?.title} | Cliente:{' '}
+                  {currentInquiry.user?.name} ({currentInquiry.user?.email})
                 </p>
               )}
             </div>
@@ -388,7 +185,7 @@ export default function AdminInquiryDetailPage({
                 <Select
                   value={currentInquiry.status}
                   onValueChange={updateInquiryStatus}
-                  disabled={isUpdatingStatus}
+                  disabled={isLoading}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Cambiar estado" />
@@ -405,14 +202,41 @@ export default function AdminInquiryDetailPage({
           )}
         </div>
 
-        {/* Panel de aceptación de oferta en una posición más destacada */}
         {currentInquiry?.negotiatedPrice && (
           <div className="mb-2 w-full">
-            <OfferAcceptancePanel inquiryId={inquiryId} isAdmin={true} />
+            <div className="bg-green-50 border border-green-200 rounded-md p-4 flex flex-col md:flex-row items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-green-800">
+                  Oferta pendiente de aceptación
+                </h3>
+                <p className="text-green-700">
+                  Precio negociado: ${currentInquiry.negotiatedPrice}
+                </p>
+                <p className="text-sm text-green-600">
+                  {currentInquiry.adminAccepted
+                    ? 'Has aceptado esta oferta.'
+                    : 'Aún no has aceptado esta oferta.'}
+                </p>
+              </div>
+
+              {!currentInquiry.adminAccepted && (
+                <Button
+                  onClick={handleAcceptOffer}
+                  className="bg-green-600 hover:bg-green-700 mt-2 md:mt-0"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Check className="mr-2 h-4 w-4" />
+                  )}
+                  Aceptar oferta
+                </Button>
+              )}
+            </div>
           </div>
         )}
 
-        {/* Botón de enviar oferta */}
         {currentInquiry &&
           currentInquiry.status !== 'CLOSED' &&
           currentInquiry.status !== 'RESOLVED' && (
@@ -470,7 +294,6 @@ export default function AdminInquiryDetailPage({
         </div>
       ) : (
         <>
-          {/* Messages */}
           <div className="flex-1 overflow-y-auto py-4 px-1">
             {messages.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
@@ -504,53 +327,13 @@ export default function AdminInquiryDetailPage({
                             className={`
                               px-4 py-3 rounded-lg 
                               ${
-                                message.isOffer
-                                  ? 'bg-green-100 border border-green-300 text-green-800'
-                                  : isCurrentUser || message.isAdmin
+                                isCurrentUser || message.isAdmin
                                   ? 'bg-blue-500 text-white'
                                   : 'bg-gray-100 text-gray-800'
                               }
                             `}
                           >
                             <p>{message.message}</p>
-
-                            {message.isOffer && (
-                              <div className="mt-2 pt-2 border-t border-green-300">
-                                <div className="flex justify-between items-center">
-                                  <Badge variant="outline" className="bg-white">
-                                    Oferta: ${message.offerAmount}
-                                  </Badge>
-
-                                  {/* Si es oferta del cliente y está pendiente, mostrar botón para aceptar */}
-                                  {!message.isAdmin &&
-                                    message.offerStatus === 'PENDING' && (
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        className="bg-green-500 text-white hover:bg-green-600"
-                                        onClick={() =>
-                                          handleAcceptOffer(message.id)
-                                        }
-                                      >
-                                        <Check className="h-4 w-4 mr-1" />{' '}
-                                        Aceptar
-                                      </Button>
-                                    )}
-
-                                  {message.offerStatus === 'ACCEPTED' && (
-                                    <Badge className="bg-green-500">
-                                      Aceptada
-                                    </Badge>
-                                  )}
-
-                                  {message.offerStatus === 'REJECTED' && (
-                                    <Badge variant="destructive">
-                                      Rechazada
-                                    </Badge>
-                                  )}
-                                </div>
-                              </div>
-                            )}
                           </div>
                           <div
                             className={`text-xs text-gray-500 mt-1 ${
@@ -578,7 +361,6 @@ export default function AdminInquiryDetailPage({
             )}
           </div>
 
-          {/* Message Input */}
           {currentInquiry?.status !== 'CLOSED' &&
             currentInquiry?.status !== 'RESOLVED' && (
               <div className="pt-4 border-t">

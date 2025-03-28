@@ -50,6 +50,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
 
+    console.log('Session data:', session);
+
     const data = await req.json()
     const { propertyId, title, message, offeredPrice } = data
 
@@ -62,13 +64,28 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Propiedad no encontrada' }, { status: 404 })
     }
 
+    // Verificar si el usuario existe
+    const userId = typeof session.user.id === 'string' ? parseInt(session.user.id, 10) : session.user.id;
+    
+    if (isNaN(userId)) {
+      return NextResponse.json({ error: 'ID de usuario inválido' }, { status: 400 });
+    }
+    
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+    
+    if (!user) {
+      return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
+    }
+
     // Crear la consulta
     const inquiry = await prisma.inquiry.create({
       data: {
         title,
         propertyId,
-        userId: Number(session.user.id),
-        offeredPrice: offeredPrice ? parseFloat(offeredPrice) : undefined,
+        userId: userId,
+        offeredPrice: offeredPrice ? parseFloat(offeredPrice.toString()) : undefined,
       },
     })
 
@@ -77,7 +94,7 @@ export async function POST(req: NextRequest) {
       await prisma.inquiryMessage.create({
         data: {
           inquiryId: inquiry.id,
-          userId: Number(session.user.id),
+          userId: userId,
           message,
           isAdmin: session.user.role === 'ADMIN',
         },

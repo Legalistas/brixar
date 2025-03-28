@@ -22,7 +22,8 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { toast } from 'sonner'
+import { toast } from 'react-toastify'
+import { Loader2 } from 'lucide-react'
 
 type Property = {
   id: number
@@ -70,17 +71,21 @@ export default function PropertyPage() {
   const [title, setTitle] = useState('')
   const [message, setMessage] = useState('')
   const [offeredPrice, setOfferedPrice] = useState('')
-
-  console.log('prop:', property)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [loadingProperty, setLoadingProperty] = useState(true)
 
   useEffect(() => {
     const fetchProperties = async () => {
+      setLoadingProperty(true)
       try {
         const response = await getAllProperties()
         const filteredProperty: Property | undefined = response.find((p: Property) => p.slug === slug)
         setProperty(filteredProperty || null)
       } catch (error) {
         console.error('Error al cargar la propiedad:', error)
+        toast.error('Error al cargar los detalles de la propiedad')
+      } finally {
+        setLoadingProperty(false)
       }
     }
 
@@ -94,8 +99,12 @@ export default function PropertyPage() {
     }
 
     try {
+      setIsSubmitting(true)
+      
       if (property) {
-        // Usar el API_ENDPOINTS.INQUIRY_CREATE directamente
+        console.log('Enviando consulta para propiedad:', property.id);
+        console.log('Datos de sesión:', session);
+        
         const response = await fetch('/api/inquiries', {
           method: 'POST',
           headers: {
@@ -110,23 +119,41 @@ export default function PropertyPage() {
         });
 
         if (!response.ok) {
-          throw new Error('Error al crear la consulta');
+          const errorData = await response.json();
+          console.error('Error response:', errorData);
+          throw new Error(errorData.error || 'Error al crear la consulta');
         }
 
         const inquiry = await response.json();
+        console.log('Consulta creada:', inquiry);
         
-        if (inquiry) {
-          toast.success('Tu consulta ha sido enviada correctamente')
-          setIsOpen(false)
-          setTitle('')
-          setMessage('')
-          setOfferedPrice('')
-        }
+        toast.success('Tu consulta ha sido enviada correctamente');
+        setIsOpen(false);
+        setTitle('');
+        setMessage('');
+        setOfferedPrice('');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al enviar consulta:', error);
-      toast.error('Error al enviar tu consulta. Inténtalo de nuevo más tarde.')
+      toast.error(error.message || 'Error al enviar tu consulta. Inténtalo de nuevo más tarde.');
+    } finally {
+      setIsSubmitting(false);
     }
+  }
+
+  if (loadingProperty) {
+    return (
+      <>
+        <Header />
+        <main className="container mx-auto px-4 py-8">
+          <div className="flex justify-center items-center h-64">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+            <span className="ml-2 text-xl">Cargando propiedad...</span>
+          </div>
+        </main>
+        <Footer />
+      </>
+    )
   }
 
   if (!property) {
@@ -135,6 +162,10 @@ export default function PropertyPage() {
         <Header />
         <main className="container mx-auto px-4 py-8">
           <h1 className="text-2xl font-bold mb-4">Propiedad no encontrada</h1>
+          <p>La propiedad que buscas no existe o ha sido eliminada.</p>
+          <Link href="/propiedades">
+            <Button className="mt-4">Ver todas las propiedades</Button>
+          </Link>
         </main>
         <Footer />
       </>
@@ -216,6 +247,7 @@ export default function PropertyPage() {
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       required
+                      disabled={isSubmitting}
                     />
                   </div>
                   <div className="grid grid-cols-4 items-center gap-4">
@@ -229,6 +261,7 @@ export default function PropertyPage() {
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       required
+                      disabled={isSubmitting}
                     />
                   </div>
                   <div className="grid grid-cols-4 items-center gap-4">
@@ -242,19 +275,25 @@ export default function PropertyPage() {
                       placeholder="Precio ofrecido (opcional)"
                       value={offeredPrice}
                       onChange={(e) => setOfferedPrice(e.target.value)}
+                      disabled={isSubmitting}
                     />
                   </div>
                 </div>
                 <DialogFooter>
                   <DialogClose asChild>
-                    <Button variant="outline">Cancelar</Button>
+                    <Button variant="outline" disabled={isSubmitting}>Cancelar</Button>
                   </DialogClose>
                   <Button 
                     onClick={handleSubmitInquiry} 
-                    disabled={isLoading}
+                    disabled={isSubmitting}
                     className="bg-blue-600 hover:bg-blue-700"
                   >
-                    {isLoading ? 'Enviando...' : 'Enviar consulta'}
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Enviando...
+                      </>
+                    ) : 'Enviar consulta'}
                   </Button>
                 </DialogFooter>
               </DialogContent>
