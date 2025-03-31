@@ -302,7 +302,7 @@ export default function AdminInquiryDetailPage({
             ) : (
               <div className="space-y-4">
                 {messages.map((message) => {
-                  const isCurrentUser = message.user.id === session?.user.id
+                  const isCurrentUser = String(message.user.id) === session?.user.id
                   return (
                     <div
                       key={message.id}
