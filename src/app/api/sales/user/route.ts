@@ -1,19 +1,26 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { prisma } from '@/libs/prisma'
+import { NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
 import { authOptions } from '@/auth'
+import { prisma } from '@/libs/prisma'
 
-// GET ventas del usuario actual (como comprador)
-export async function GET(req: NextRequest) {
+// Obtener ventas del usuario
+export async function GET() {
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+    if (!session || !session.user) {
+      return NextResponse.json(
+        { error: 'No autorizado' },
+        { status: 401 }
+      )
     }
 
+    const userId = parseInt(session.user.id)
+
     const sales = await prisma.sale.findMany({
-      where: { buyerId: parseInt(session.user.id) },
+      where: {
+        buyerId: userId,
+      },
       include: {
         property: {
           select: {
@@ -21,11 +28,11 @@ export async function GET(req: NextRequest) {
             slug: true,
             title: true,
             images: {
-              take: 1,
               select: {
-                url: true
-              }
-            }
+                url: true,
+              },
+              take: 1,
+            },
           },
         },
         seller: {
@@ -33,8 +40,9 @@ export async function GET(req: NextRequest) {
             id: true,
             name: true,
             email: true,
+            image: true,
           },
-        }
+        },
       },
       orderBy: {
         createdAt: 'desc',
@@ -43,7 +51,10 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(sales)
   } catch (error) {
-    console.error('Error al obtener ventas del usuario:', error)
-    return NextResponse.json({ error: 'Error al obtener ventas' }, { status: 500 })
+    console.error('Error al obtener las ventas del usuario:', error)
+    return NextResponse.json(
+      { error: 'Error al obtener las ventas' },
+      { status: 500 }
+    )
   }
 }

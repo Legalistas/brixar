@@ -1,31 +1,53 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { prisma } from '@/libs/prisma'
+import { NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
 import { authOptions } from '@/auth'
+import { prisma } from '@/libs/prisma'
 
-// GET venta específica
+// Obtener una venta por ID
 export async function GET(
-  req: NextRequest,
+  request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+    if (!session || !session.user) {
+      return NextResponse.json(
+        { error: 'No autorizado' },
+        { status: 401 }
+      )
     }
 
     const saleId = parseInt(params.id)
-    
+    const userId = parseInt(session.user.id)
+
+    // Verificar si el usuario es admin o vendedor
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    })
+
     const sale = await prisma.sale.findUnique({
       where: { id: saleId },
       include: {
-        property: true,
+        property: {
+          select: {
+            id: true,
+            slug: true,
+            title: true,
+            price: true,
+            images: {
+              select: {
+                url: true,
+              },
+            },
+          },
+        },
         buyer: {
           select: {
             id: true,
             name: true,
             email: true,
+            image: true,
           },
         },
         seller: {
@@ -33,86 +55,133 @@ export async function GET(
             id: true,
             name: true,
             email: true,
+            image: true,
           },
         },
+        transactions: true,
         inquiry: {
           include: {
             messages: {
-              orderBy: { createdAt: 'asc' },
+              orderBy: {
+                createdAt: 'asc',
+              },
               include: {
                 user: {
                   select: {
                     id: true,
                     name: true,
-                    image: true
-                  }
-                }
-              }
-            }
-          }
+                    email: true,
+                    image: true,
+                  },
+                },
+              },
+            },
+          },
         },
-        transactions: true
       },
     })
 
     if (!sale) {
-      return NextResponse.json({ error: 'Venta no encontrada' }, { status: 404 })
+      return NextResponse.json(
+        { error: 'Venta no encontrada' },
+        { status: 404 }
+      )
     }
 
-    // Verificar que el usuario sea el comprador, vendedor o un administrador
-    const isAuthorized = 
-      sale.buyerId === parseInt(session.user.id) ||
-      sale.sellerId === parseInt(session.user.id) ||
-      session.user.role === 'ADMIN'
-
-    if (!isAuthorized) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+    // Verificar permisos: solo admin/vendedor o el comprador pueden ver la venta
+    if (user?.role !== 'ADMIN' && user?.role !== 'SELLER' && sale.buyerId !== userId) {
+      return NextResponse.json(
+        { error: 'No tiene permisos para ver esta venta' },
+        { status: 403 }
+      )
     }
 
     return NextResponse.json(sale)
   } catch (error) {
-    console.error('Error al obtener venta:', error)
-    return NextResponse.json({ error: 'Error al obtener venta' }, { status: 500 })
+    console.error('Error al obtener la venta:', error)
+    return NextResponse.json(
+      { error: 'Error al obtener la venta' },
+      { status: 500 }
+    )
   }
 }
 
-// PUT actualizar venta (admin)
-export async function PUT(
-  req: NextRequest,
+// Actualizar una venta
+export async function PATCH(
+  request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session || session.user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+    if (!session || !session.user) {
+      return NextResponse.json(
+        { error: 'No autorizado' },
+        { status: 401 }
+      )
+    }
+
+    // Verificar si es admin o vendedor
+    const user = await prisma.user.findUnique({
+      where: { id: parseInt(session.user.id) },
+    })
+
+    if (!user || (user.role !== 'ADMIN' && user.role !== 'SELLER')) {
+      return NextResponse.json(
+        { error: 'No tiene permisos para actualizar ventas' },
+        { status: 403 }
+      )
     }
 
     const saleId = parseInt(params.id)
-    const data = await req.json()
+    const body = await request.json()
     
-    const sale = await prisma.sale.findUnique({
-      where: { id: saleId },
-    })
-
-    if (!sale) {
-      return NextResponse.json({ error: 'Venta no encontrada' }, { status: 404 })
-    }
-
+    // Actualizar solo los campos proporcionados
     const updatedSale = await prisma.sale.update({
       where: { id: saleId },
       data: {
-        status: data.status || undefined,
-        paymentMethod: data.paymentMethod || undefined,
-        paymentReference: data.paymentReference || undefined,
-        notes: data.notes || undefined,
-        documents: data.documents || undefined,
+        ...body,
+      },
+      include: {
+        property: {
+          select: {
+            id: true,
+            slug: true,
+            title: true,
+            images: {
+              select: {
+                url: true,
+              },
+              take: 1,
+            },
+          },
+        },
+        buyer: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+        seller: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+        transactions: true,
       },
     })
 
     return NextResponse.json(updatedSale)
   } catch (error) {
-    console.error('Error al actualizar venta:', error)
-    return NextResponse.json({ error: 'Error al actualizar venta' }, { status: 500 })
+    console.error('Error al actualizar la venta:', error)
+    return NextResponse.json(
+      { error: 'Error al actualizar la venta' },
+      { status: 500 }
+    )
   }
 }

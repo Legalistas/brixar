@@ -1,15 +1,30 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { prisma } from '@/libs/prisma'
+import { NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
 import { authOptions } from '@/auth'
+import { prisma } from '@/libs/prisma'
 
-// GET todas las ventas (admin)
-export async function GET(req: NextRequest) {
+// Obtener todas las ventas (solo admin/vendedor)
+export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session || session.user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+    if (!session || !session.user) {
+      return NextResponse.json(
+        { error: 'No autorizado' },
+        { status: 401 }
+      )
+    }
+
+    // Verificar si es admin o vendedor
+    const user = await prisma.user.findUnique({
+      where: { id: parseInt(session.user.id) },
+    })
+
+    if (!user || (user.role !== 'ADMIN' && user.role !== 'SELLER')) {
+      return NextResponse.json(
+        { error: 'No tiene permisos para ver todas las ventas' },
+        { status: 403 }
+      )
     }
 
     const sales = await prisma.sale.findMany({
@@ -20,11 +35,11 @@ export async function GET(req: NextRequest) {
             slug: true,
             title: true,
             images: {
-              take: 1,
               select: {
-                url: true
-              }
-            }
+                url: true,
+              },
+              take: 1,
+            },
           },
         },
         buyer: {
@@ -32,6 +47,7 @@ export async function GET(req: NextRequest) {
             id: true,
             name: true,
             email: true,
+            image: true,
           },
         },
         seller: {
@@ -39,14 +55,9 @@ export async function GET(req: NextRequest) {
             id: true,
             name: true,
             email: true,
+            image: true,
           },
         },
-        inquiry: {
-          select: {
-            id: true,
-            title: true,
-          }
-        }
       },
       orderBy: {
         createdAt: 'desc',
@@ -55,57 +66,60 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(sales)
   } catch (error) {
-    console.error('Error al obtener ventas:', error)
-    return NextResponse.json({ error: 'Error al obtener ventas' }, { status: 500 })
+    console.error('Error al obtener las ventas:', error)
+    return NextResponse.json(
+      { error: 'Error al obtener las ventas' },
+      { status: 500 }
+    )
   }
 }
 
-// POST crear nueva venta (admin)
-export async function POST(req: NextRequest) {
+// Crear una nueva venta
+export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session || session.user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+    if (!session || !session.user) {
+      return NextResponse.json(
+        { error: 'No autorizado' },
+        { status: 401 }
+      )
     }
 
-    const data = await req.json()
-    const { propertyId, buyerId, price, inquiryId, status, paymentMethod, notes } = data
-
-    // Verificar si la propiedad existe
-    const property = await prisma.property.findUnique({
-      where: { id: propertyId },
+    // Verificar si es admin o vendedor
+    const user = await prisma.user.findUnique({
+      where: { id: parseInt(session.user.id) },
     })
 
-    if (!property) {
-      return NextResponse.json({ error: 'Propiedad no encontrada' }, { status: 404 })
+    if (!user || (user.role !== 'ADMIN' && user.role !== 'SELLER')) {
+      return NextResponse.json(
+        { error: 'No tiene permisos para crear ventas' },
+        { status: 403 }
+      )
     }
 
-    // Crear la venta
-    const sale = await prisma.sale.create({
+    const body = await request.json()
+    const { propertyId, buyerId, price, status, paymentMethod, paymentReference, notes } = body
+
+    const newSale = await prisma.sale.create({
       data: {
         propertyId,
         buyerId,
         sellerId: parseInt(session.user.id),
         price,
         status: status || 'PENDING',
-        inquiryId,
         paymentMethod,
+        paymentReference,
         notes,
       },
     })
 
-    // Si hay una consulta asociada, la marcamos como cerrada
-    if (inquiryId) {
-      await prisma.inquiry.update({
-        where: { id: inquiryId },
-        data: { status: 'CLOSED' }
-      })
-    }
-
-    return NextResponse.json(sale)
+    return NextResponse.json(newSale)
   } catch (error) {
-    console.error('Error al crear venta:', error)
-    return NextResponse.json({ error: 'Error al crear venta' }, { status: 500 })
+    console.error('Error al crear la venta:', error)
+    return NextResponse.json(
+      { error: 'Error al crear la venta' },
+      { status: 500 }
+    )
   }
 }

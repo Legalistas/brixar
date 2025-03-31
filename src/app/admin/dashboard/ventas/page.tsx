@@ -1,237 +1,187 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Loader2, Plus, Search } from 'lucide-react'
 import Link from 'next/link'
-import { Input } from '@/components/ui/input'
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader,
-  TableRow 
-} from '@/components/ui/table'
 import { format } from 'date-fns'
+import { useSaleStore, Sale } from '@/store/saleStore'
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { API_ENDPOINTS } from '@/constants/api-endpoint'
-import Image from 'next/image'
-import { toast } from 'sonner'
-
-interface Sale {
-  id: number
-  propertyId: number
-  buyerId: number
-  sellerId: number
-  price: number
-  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'CANCELLED'
-  paymentMethod?: string
-  createdAt: string
-  updatedAt: string
-  property: {
-    id: number
-    slug: string
-    title: string
-    images?: { url: string }[]
-  }
-  buyer: {
-    id: number
-    name: string
-    email: string
-  }
-  seller?: {
-    id: number
-    name: string
-    email: string
-  }
-  inquiry?: {
-    id: number
-    title: string
-  }
-}
+import { 
+  ExternalLink, 
+  Loader2, 
+  Search, 
+  DollarSign, 
+  Filter 
+} from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 const statusColors = {
   PENDING: 'bg-yellow-500 hover:bg-yellow-600',
   PROCESSING: 'bg-blue-500 hover:bg-blue-600',
   COMPLETED: 'bg-green-500 hover:bg-green-600',
-  CANCELLED: 'bg-gray-500 hover:bg-gray-600'
+  CANCELLED: 'bg-gray-500 hover:bg-gray-600',
 }
 
 const statusLabels = {
   PENDING: 'Pendiente',
   PROCESSING: 'En proceso',
   COMPLETED: 'Completada',
-  CANCELLED: 'Cancelada'
+  CANCELLED: 'Cancelada',
 }
 
 export default function AdminSalesPage() {
-  const [sales, setSales] = useState<Sale[]>([])
-  const [filteredSales, setFilteredSales] = useState<Sale[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const { sales, isLoading, fetchAllSales } = useSaleStore()
   const [searchTerm, setSearchTerm] = useState('')
-  
-  useEffect(() => {
-    fetchSales()
-  }, [])
-  
-  useEffect(() => {
-    if (searchTerm) {
-      const results = sales.filter(sale => 
-        sale.property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        sale.buyer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        sale.buyer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (sale.seller?.name && sale.seller.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        sale.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        sale.id.toString().includes(searchTerm)
-      )
-      setFilteredSales(results)
-    } else {
-      setFilteredSales(sales)
-    }
-  }, [searchTerm, sales])
+  const [statusFilter, setStatusFilter] = useState('ALL')
 
-  const fetchSales = async () => {
-    try {
-      setIsLoading(true)
-      const response = await fetch(API_ENDPOINTS.SALES_INDEX)
-      
-      if (!response.ok) {
-        throw new Error('Error al cargar las ventas')
-      }
-      
-      const data = await response.json()
-      setSales(data)
-      setFilteredSales(data)
-    } catch (error) {
-      console.error('Error fetching sales:', error)
-      toast.error('Error al cargar las ventas')
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  useEffect(() => {
+    fetchAllSales()
+  }, [fetchAllSales])
 
-  const getPropertyImage = (sale: Sale) => {
-    if (sale.property.images && sale.property.images.length > 0) {
-      return '/uploads' + sale.property.images[0].url
-    }
-    return '/placeholder-property.jpg'
-  }
+  // Filtrar las ventas según los criterios de búsqueda y filtro
+  const filteredSales = sales.filter((sale) => {
+    const matchesSearch =
+      searchTerm === '' ||
+      sale.property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      `${sale.id}`.includes(searchTerm) ||
+      sale.buyer.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      sale.buyer.email.toLowerCase().includes(searchTerm.toLowerCase())
+
+    const matchesStatus = statusFilter === 'ALL' || sale.status === statusFilter
+
+    return matchesSearch && matchesStatus
+  })
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold tracking-tight">Ventas</h1>
-        <Link href="/admin/dashboard/ventas/nueva">
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Nueva Venta
-          </Button>
-        </Link>
-      </div>
-      
-      <div className="mb-6 flex items-center">
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-          <Input
-            placeholder="Buscar ventas..."
-            className="pl-8"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+    <div className="container mx-auto p-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <h1 className="text-2xl font-bold">Ventas</h1>
+        <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              placeholder="Buscar por título, ID o cliente..."
+              className="pl-8 w-full md:w-[300px]"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <Filter className="h-4 w-4 text-gray-500" />
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full md:w-[180px]">
+                <SelectValue placeholder="Filtrar por estado" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">Todos</SelectItem>
+                <SelectItem value="PENDING">Pendiente</SelectItem>
+                <SelectItem value="PROCESSING">En proceso</SelectItem>
+                <SelectItem value="COMPLETED">Completada</SelectItem>
+                <SelectItem value="CANCELLED">Cancelada</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
-      
+
       {isLoading ? (
-        <div className="flex-1 flex justify-center items-center">
+        <div className="flex justify-center items-center h-64">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       ) : (
-        <div className="rounded-md border overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[50px]">#</TableHead>
-                <TableHead>Propiedad</TableHead>
-                <TableHead>Cliente</TableHead>
-                <TableHead>Precio</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Método de Pago</TableHead>
-                <TableHead>Fecha</TableHead>
-                <TableHead className="text-right">Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredSales.length > 0 ? (
-                filteredSales.map((sale) => (
-                  <TableRow key={sale.id}>
-                    <TableCell>{sale.id}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="relative h-10 w-10 overflow-hidden rounded">
-                          <Image
-                            src={getPropertyImage(sale)}
-                            alt={sale.property.title}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                        <div className="truncate max-w-[200px]">
-                          <Link 
-                            href={`/propiedades/${sale.property.slug}`}
-                            className="text-blue-600 hover:underline truncate block"
-                          >
-                            {sale.property.title}
-                          </Link>
-                          {sale.inquiry && (
-                            <span className="text-xs text-gray-500">
-                              Consulta #{sale.inquiry.id}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="truncate max-w-[150px]">
-                        <span className="font-medium">{sale.buyer.name}</span>
-                        <br />
-                        <span className="text-xs text-gray-500">{sale.buyer.email}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="font-semibold">${sale.price.toLocaleString()}</span>
-                    </TableCell>
-                    <TableCell>
-                      <Badge 
-                        variant="secondary"
-                        className={`${statusColors[sale.status]} text-white`}
-                      >
-                        {statusLabels[sale.status]}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {sale.paymentMethod || '-'}
-                    </TableCell>
-                    <TableCell>
-                      {format(new Date(sale.createdAt), 'dd/MM/yyyy')}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Link href={`/admin/dashboard/ventas/${sale.id}`}>
-                        <Button size="sm" variant="outline">Ver</Button>
-                      </Link>
-                    </TableCell>
+        <>
+          {filteredSales.length === 0 ? (
+            <div className="text-center py-10 border rounded-lg bg-gray-50">
+              <DollarSign className="h-12 w-12 mx-auto text-gray-400" />
+              <h3 className="mt-4 text-lg font-medium">No hay ventas</h3>
+              <p className="text-gray-500 mt-2">
+                No se encontraron ventas que coincidan con los criterios de búsqueda.
+              </p>
+            </div>
+          ) : (
+            <div className="border rounded-lg overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Propiedad</TableHead>
+                    <TableHead>Cliente</TableHead>
+                    <TableHead>Precio</TableHead>
+                    <TableHead>Estado</TableHead>
+                    <TableHead>Fecha</TableHead>
+                    <TableHead className="text-right">Acciones</TableHead>
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center py-10 text-gray-500">
-                    {searchTerm ? 'No se encontraron ventas con esa búsqueda' : 'No hay ventas registradas'}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+                </TableHeader>
+                <TableBody>
+                  {filteredSales.map((sale) => (
+                    <TableRow key={sale.id}>
+                      <TableCell className="font-medium">{sale.id}</TableCell>
+                      <TableCell>{sale.property.title}</TableCell>
+                      <TableCell>
+                        {sale.buyer.name ? (
+                          <>
+                            <div>{sale.buyer.name}</div>
+                            <div className="text-xs text-gray-500">
+                              {sale.buyer.email}
+                            </div>
+                          </>
+                        ) : (
+                          sale.buyer.email
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        ${sale.price.toLocaleString('es-ES')}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="secondary"
+                          className={`${
+                            statusColors[sale.status]
+                          } text-white`}
+                        >
+                          {statusLabels[sale.status]}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {format(
+                          new Date(sale.createdAt),
+                          'dd/MM/yyyy HH:mm'
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Link href={`/admin/dashboard/ventas/${sale.id}`}>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 gap-1"
+                          >
+                            <ExternalLink className="h-3.5 w-3.5" />
+                            Ver
+                          </Button>
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </>
       )}
     </div>
   )

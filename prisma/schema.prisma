@@ -224,7 +224,7 @@ model Sale {
   property         Property   @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   buyer            User       @relation("BuyerSales", fields: [buyerId], references: [id])
   seller           User?      @relation("SellerSales", fields: [sellerId], references: [id])
-  inquiry          Inquiry?   @relation(fields: [inquiryId], references: [id])
+  inquiry          Inquiry?   @relation(fields: [inquiryId], references: [id], onDelete: SetNull)
   transactions     SaleTransaction[]
 
   @@index([propertyId])
@@ -330,7 +330,7 @@ model State {
   name        String
   status      Boolean       @default(true)
   createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
   userProfile UserProfile[]
   address     Address[]
 

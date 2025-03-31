@@ -66,9 +66,14 @@ export const API_ENDPOINTS = {
   SALES_INDEX: `${API_BASE_URL}/sales`,
   SALE_BY_ID: (id: number) => `${API_BASE_URL}/sales/${id}`,
   SALE_UPDATE: (id: number) => `${API_BASE_URL}/sales/${id}`,
-  SALE_DELETE: (id: number) => `${API_BASE_URL}/sales/${id}`,
   SALE_CONFIRM: (id: number) => `${API_BASE_URL}/sales/${id}/confirm`,
   SALE_CANCEL: (id: number) => `${API_BASE_URL}/sales/${id}/cancel`,
   SALE_PROCESS: (id: number) => `${API_BASE_URL}/sales/${id}/process`,
   SALE_COMPLETE: (id: number) => `${API_BASE_URL}/sales/${id}/complete`,
+
+  // Rutas de ventas (sales)
+  USER_SALES: '/api/sales/user',
+  ADMIN_SALES: '/api/sales',
+  SALE_UPDATE_STATUS: (id: number) => `/api/sales/${id}/status`,
+  SALE_ADD_TRANSACTION: (id: number) => `/api/sales/${id}/transactions`,
 }

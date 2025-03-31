@@ -74,7 +74,7 @@ interface InquiryStore {
   // Nuevos métodos para la gestión de ofertas
   acceptOfferAsAdmin: (inquiryId: number) => Promise<void>
   acceptOfferAsClient: (inquiryId: number) => Promise<void>
-  completeTransaction: (inquiryId: number) => Promise<void>
+  completeTransaction: (inquiryId: number) => Promise<number | null>
 }
 
 export const useInquiryStore = create<InquiryStore>((set, get) => ({
@@ -346,6 +346,12 @@ export const useInquiryStore = create<InquiryStore>((set, get) => ({
   completeTransaction: async (inquiryId: number) => {
     try {
       set({ isLoading: true, error: null })
+      const currentInquiry = get().currentInquiry;
+      
+      if (!currentInquiry || !currentInquiry.negotiatedPrice) {
+        throw new Error('No hay precio negociado para completar la venta');
+      }
+      
       const response = await fetch(
         API_ENDPOINTS.INQUIRY_COMPLETE_TRANSACTION(inquiryId),
         {
@@ -353,6 +359,10 @@ export const useInquiryStore = create<InquiryStore>((set, get) => ({
           headers: {
             'Content-Type': 'application/json',
           },
+          body: JSON.stringify({
+            propertyId: currentInquiry.property.id,
+            price: currentInquiry.negotiatedPrice,
+          }),
         }
       )
 
@@ -371,17 +381,18 @@ export const useInquiryStore = create<InquiryStore>((set, get) => ({
       set((state) => ({
         inquiries: state.inquiries.map((inquiry) =>
           inquiry.id === inquiryId ? updatedInquiry : inquiry
-        ),
+        ).filter(inquiry => inquiry.status !== 'RESOLVED'), // Opcionalmente eliminar las resueltas de la lista
         currentInquiry: updatedInquiry,
         isLoading: false,
       }))
 
-      // Podemos agregar aquí alguna notificación de éxito o redirección
+      return result.saleId; // Devolvemos el ID de la venta creada para posible redirección
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Error desconocido',
         isLoading: false,
       })
+      return null;
     }
   },
 }))
