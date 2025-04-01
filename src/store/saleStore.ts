@@ -19,7 +19,7 @@ export interface Sale {
   propertyId: number
   buyerId: number
   sellerId?: number
-  inquiryId?: number
+  inquiryId?: number  // ID de la consulta que originó esta venta, si existe
   price: number
   status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'CANCELLED'
   paymentMethod?: string

@@ -14,12 +14,13 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { 
-  ExternalLink, 
-  Loader2, 
-  Search, 
-  DollarSign, 
-  Filter 
+import {
+  ExternalLink,
+  Loader2,
+  Search,
+  DollarSign,
+  Filter,
+  MessageSquare,
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import {
@@ -108,9 +109,12 @@ export default function AdminSalesPage() {
           {filteredSales.length === 0 ? (
             <div className="text-center py-10 border rounded-lg bg-gray-50">
               <DollarSign className="h-12 w-12 mx-auto text-gray-400" />
-              <h3 className="mt-4 text-lg font-medium">No hay ventas</h3>
+              <h3 className="mt-4 text-lg font-medium">
+                No se encontraron ventas
+              </h3>
               <p className="text-gray-500 mt-2">
-                No se encontraron ventas que coincidan con los criterios de búsqueda.
+                No se encontraron ventas que coincidan con los criterios de
+                búsqueda.
               </p>
             </div>
           ) : (
@@ -150,30 +154,47 @@ export default function AdminSalesPage() {
                       <TableCell>
                         <Badge
                           variant="secondary"
-                          className={`${
-                            statusColors[sale.status]
-                          } text-white`}
+                          className={`${statusColors[sale.status]} text-white`}
                         >
                           {statusLabels[sale.status]}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {format(
-                          new Date(sale.createdAt),
-                          'dd/MM/yyyy HH:mm'
-                        )}
+                        {format(new Date(sale.createdAt), 'dd/MM/yyyy HH:mm')}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Link href={`/admin/dashboard/ventas/${sale.id}`}>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-8 gap-1"
-                          >
-                            <ExternalLink className="h-3.5 w-3.5" />
-                            Ver
-                          </Button>
-                        </Link>
+                        <div className="flex justify-end items-center space-x-2">
+                          {/*sale.inquiryId && (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Link href={`/admin/dashboard/consultas/${sale.inquiryId}`}>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="h-8"
+                                    >
+                                      <MessageSquare className="h-3.5 w-3.5" />
+                                    </Button>
+                                  </Link>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Ver consulta asociada</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          )*/}
+                          <Link href={`/admin/dashboard/ventas/${sale.id}`}>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 gap-1"
+                            >
+                              <ExternalLink className="h-3.5 w-3.5" />
+                              Ver
+                            </Button>
+                          </Link>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

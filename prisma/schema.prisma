@@ -370,6 +370,8 @@ model Inquiry {
   status           InquiryStatus    @default(OPEN)
   offeredPrice     Decimal?         @db.Decimal(12, 2)
   negotiatedPrice  Decimal?         @db.Decimal(12, 2)
+  adminAccepted    Boolean          @default(false)
+  clientAccepted   Boolean          @default(false)
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
   property         Property         @relation(fields: [propertyId], references: [id], onDelete: Cascade)

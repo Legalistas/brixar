@@ -3,8 +3,9 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useInquiryStore } from "@/store/inquiryStore"
-import { CheckCircle2, AlertCircle, DollarSign } from "lucide-react"
-import { useEffect } from "react"
+import { CheckCircle2, AlertCircle, DollarSign, Loader2 } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
 interface OfferAcceptancePanelProps {
@@ -13,7 +14,9 @@ interface OfferAcceptancePanelProps {
 }
 
 export function OfferAcceptancePanel({ inquiryId, isAdmin }: OfferAcceptancePanelProps) {
-  const { currentInquiry, fetchInquiryById, acceptOfferAsAdmin, acceptOfferAsClient, isLoading, error } = useInquiryStore()
+  const router = useRouter()
+  const { currentInquiry, fetchInquiryById, acceptOfferAsAdmin, acceptOfferAsClient, completeTransaction, isLoading, error } = useInquiryStore()
+  const [localLoading, setLocalLoading] = useState(false)
   
   useEffect(() => {
     // Aseguramos que tengamos la información más actualizada de la consulta
@@ -32,11 +35,41 @@ export function OfferAcceptancePanel({ inquiryId, isAdmin }: OfferAcceptancePane
     return null
   }
   
-  const handleAccept = () => {
-    if (isAdmin) {
-      acceptOfferAsAdmin(inquiryId)
-    } else {
-      acceptOfferAsClient(inquiryId)
+  const handleAccept = async () => {
+    setLocalLoading(true)
+    try {
+      if (isAdmin) {
+        await acceptOfferAsAdmin(inquiryId)
+      } else {
+        await acceptOfferAsClient(inquiryId)
+      }
+      
+      // Refrescar para obtener el estado actualizado
+      await fetchInquiryById(inquiryId)
+      
+      // Verificar si ambas partes han aceptado para completar la transacción
+      const updatedInquiry = useInquiryStore.getState().currentInquiry
+      
+      if (updatedInquiry?.adminAccepted && updatedInquiry?.clientAccepted) {
+        toast.loading('Generando venta...')
+        const saleId = await completeTransaction(inquiryId)
+        
+        if (saleId) {
+          toast.success('¡Venta generada exitosamente!')
+          
+          // Redirigir al administrador a la página de la venta
+          if (isAdmin) {
+            setTimeout(() => {
+              router.push(`/admin/dashboard/ventas/${saleId}`)
+            }, 1500)
+          }
+        }
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Error al procesar la oferta'
+      toast.error(message)
+    } finally {
+      setLocalLoading(false)
     }
   }
 
@@ -64,6 +97,8 @@ export function OfferAcceptancePanel({ inquiryId, isAdmin }: OfferAcceptancePane
   const userAccepted = isAdmin ? currentInquiry.adminAccepted : currentInquiry.clientAccepted
   // Si la contraparte ya aceptó
   const counterpartAccepted = isAdmin ? currentInquiry.clientAccepted : currentInquiry.adminAccepted
+  
+  const loading = isLoading || localLoading
   
   return (
     <Card className={`mb-4 w-full ${counterpartAccepted ? 'border-green-500' : ''}`}>
@@ -96,10 +131,19 @@ export function OfferAcceptancePanel({ inquiryId, isAdmin }: OfferAcceptancePane
           <Button 
             variant={counterpartAccepted ? "default" : "outline"}
             className={`w-full ${counterpartAccepted ? "bg-green-600 hover:bg-green-700" : ""}`}
-            disabled={isLoading}
+            disabled={loading}
             onClick={handleAccept}
           >
-            {isLoading ? 'Procesando...' : counterpartAccepted ? 'Confirmar y completar venta' : 'Aceptar oferta'}
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Procesando...
+              </>
+            ) : counterpartAccepted ? (
+              'Confirmar y completar venta'
+            ) : (
+              'Aceptar oferta'
+            )}
           </Button>
         )}
       </CardFooter>

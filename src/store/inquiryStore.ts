@@ -352,6 +352,11 @@ export const useInquiryStore = create<InquiryStore>((set, get) => ({
         throw new Error('No hay precio negociado para completar la venta');
       }
       
+      // Verificar que ambas partes hayan aceptado la oferta
+      if (!currentInquiry.adminAccepted || !currentInquiry.clientAccepted) {
+        throw new Error('Ambas partes deben aceptar la oferta para completar la venta');
+      }
+      
       const response = await fetch(
         API_ENDPOINTS.INQUIRY_COMPLETE_TRANSACTION(inquiryId),
         {
@@ -362,6 +367,8 @@ export const useInquiryStore = create<InquiryStore>((set, get) => ({
           body: JSON.stringify({
             propertyId: currentInquiry.property.id,
             price: currentInquiry.negotiatedPrice,
+            buyerId: currentInquiry.user?.id,
+            inquiryId: currentInquiry.id
           }),
         }
       )
@@ -381,7 +388,7 @@ export const useInquiryStore = create<InquiryStore>((set, get) => ({
       set((state) => ({
         inquiries: state.inquiries.map((inquiry) =>
           inquiry.id === inquiryId ? updatedInquiry : inquiry
-        ).filter(inquiry => inquiry.status !== 'RESOLVED'), // Opcionalmente eliminar las resueltas de la lista
+        ),
         currentInquiry: updatedInquiry,
         isLoading: false,
       }))
