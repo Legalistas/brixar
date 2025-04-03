@@ -42,7 +42,7 @@ export async function POST(
       data: {
         propertyId: propertyId,
         buyerId: inquiry.userId,
-        sellerId: session.user.id !== inquiry.userId ? parseInt(session.user.id) : null,
+        sellerId: parseInt(session.user.id) !== inquiry.userId ? parseInt(session.user.id) : null,
         inquiryId: inquiryId,
         price: price,
         status: 'PENDING',
