@@ -66,7 +66,7 @@ export async function POST(
         propertyId,
         price,
         buyerId: buyerId || inquiry.userId,
-        sellerId: session.user.role === 'ADMIN' ? session.user.id : undefined,
+        sellerId: session.user.role === 'ADMIN' ? Number(session.user.id) : undefined,
         inquiryId,
         status: 'PENDING',
         notes: `Venta generada automáticamente a partir de la consulta #${inquiryId}`,
@@ -111,7 +111,7 @@ export async function POST(
     await prisma.inquiryMessage.create({
       data: {
         inquiryId,
-        userId: session.user.id,
+        userId: Number(session.user.id),
         message: `Se ha completado la transacción y creado la venta #${sale.id}`,
         isAdmin: session.user.role === 'ADMIN',
       },

@@ -42,7 +42,7 @@ export async function POST(
     }
 
     // Verificar que la consulta pertenezca al usuario
-    if (inquiry.userId !== session.user.id) {
+    if (inquiry.userId !== Number(session.user.id)) {
       return NextResponse.json(
         { error: 'No tienes permiso para aceptar esta oferta' },
         { status: 403 }
@@ -79,7 +79,7 @@ export async function POST(
     await prisma.inquiryMessage.create({
       data: {
         inquiryId,
-        userId: session.user.id,
+        userId: Number(session.user.id),
         message: 'El cliente ha aceptado la oferta',
         isAdmin: false,
       },

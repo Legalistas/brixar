@@ -68,7 +68,7 @@ export async function POST(
     await prisma.inquiryMessage.create({
       data: {
         inquiryId,
-        userId: session.user.id,
+        userId: parseInt(session.user.id, 10),
         message: 'El administrador ha aceptado la oferta',
         isAdmin: true,
       },
