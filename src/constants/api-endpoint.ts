@@ -23,12 +23,12 @@ export const API_ENDPOINTS = {
     `${API_BASE_URL}/settings/states/${countryId}`,
 
   // ENDPOINTS
-  PROPERTIES_INDEX: "/api/properties",
+  PROPERTIES_INDEX: '/api/properties',
   PROPERTY_GET: (slug: string) => `/api/properties/${slug}`,
   PROPERTY_UPDATE: (slug: string) => `/api/properties/${slug}`,
   PROPERTY_DELETE: (slug: string) => `/api/properties/${slug}`,
-  PROPERTY_CREATE: "/api/properties",
-  
+  PROPERTY_CREATE: '/api/properties',
+
   // Proyects
   PROYECTS_INDEX: `${API_BASE_URL}/proyects`,
   PROYECT_CREATE: `${API_BASE_URL}/proyects`,
@@ -42,21 +42,25 @@ export const API_ENDPOINTS = {
     `${API_BASE_URL}/visits/check?propertyId=${propertyId}&userId=${userId}`,
 
   // Inquiries (Consultas)
+  INQUIRIES_INDEX: '/api/inquiries',
   USER_INQUIRIES: '/api/inquiries/user',
   INQUIRY_CREATE: '/api/inquiries',
   INQUIRY_BY_ID: (id: number) => `/api/inquiries/${id}`,
   INQUIRY_UPDATE: (id: number) => `/api/inquiries/${id}`,
   INQUIRY_DELETE: (id: number) => `${API_BASE_URL}/inquiries/${id}`,
-  
+
   // Inquiry Messages
-  INQUIRY_MESSAGES: (inquiryId: number) => `/api/inquiries/${inquiryId}/messages`,
-  INQUIRY_MESSAGE_CREATE: (inquiryId: number) => `/api/inquiries/${inquiryId}/messages`,
-  
+  INQUIRY_MESSAGES: (inquiryId: number) =>
+    `/api/inquiries/${inquiryId}/messages`,
+  INQUIRY_MESSAGE_CREATE: (inquiryId: number) =>
+    `/api/inquiries/${inquiryId}/messages`,
+
   // Offer acceptance endpoints
   INQUIRY_CLIENT_ACCEPT: (id: number) => `/api/inquiries/${id}/accept/client`,
   INQUIRY_ADMIN_ACCEPT: (id: number) => `/api/inquiries/${id}/accept/admin`,
-  INQUIRY_COMPLETE_TRANSACTION: (id: number) => `/api/inquiries/${id}/complete-transaction`,
-  
+  INQUIRY_COMPLETE_TRANSACTION: (id: number) =>
+    `/api/inquiries/${id}/complete-transaction`,
+
   // Sales endpoints
   SALE_CREATE: `${API_BASE_URL}/sales`,
   SALES_INDEX: `${API_BASE_URL}/sales`,
