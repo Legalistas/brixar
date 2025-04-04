@@ -8,11 +8,20 @@ import { SecondaryFeatures } from '@/components/SecondaryFeatures'
 import { TikTokFeed } from '@/components/TikTokFeed'
 
 export default function Home() {
-  // Videos de TikTok a mostrar
+  // Videos de TikTok a mostrar con imágenes de previsualización
   const tiktokVideos = [
-    { url: 'https://www.tiktok.com/@brixar.propiedades/video/7488112353528024326' },
-    { url: 'https://www.tiktok.com/@brixar.propiedades/video/7488373471215471927' },
-    { url: 'https://www.tiktok.com/@brixar.propiedades/video/7486511406398016774' },
+    { 
+      url: 'https://www.tiktok.com/@brixar.propiedades/video/7488112353528024326',
+      previewImage: '/images/WEB-BRIXAR_2.webp'
+    },
+    { 
+      url: 'https://www.tiktok.com/@brixar.propiedades/video/7488373471215471927',
+      previewImage: '/images/WEB-BRIXAR-_1_.webp'
+    },
+    { 
+      url: 'https://www.tiktok.com/@brixar.propiedades/video/7486511406398016774',
+      previewImage: '/images/beneficio11.png'
+    },
   ];
 
   const channelUrl = 'https://www.tiktok.com/@brixar.propiedades';
@@ -23,7 +32,11 @@ export default function Home() {
       <CardContainer />
       <PrimaryFeatures />
       <SecondaryFeatures />
-      <TikTokFeed videos={tiktokVideos} channelUrl={channelUrl} />
+      <TikTokFeed 
+        videos={tiktokVideos} 
+        channelUrl={channelUrl} 
+        previewImages={true} 
+      />
       <CallToAction />
       <Reviews />
       <Faqs />
