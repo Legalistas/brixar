@@ -25,8 +25,8 @@ export function CallToAction(): JSX.Element {
                     </p>
                     <div className="mt-8 flex justify-center">
                         <Link href="https://wa.me/5493492282324">
-                            <button className="inline-flex items-center justify-center rounded-md border border-transparent bg-white px-5 py-3 text-base font-medium text-indigo-700 hover:bg-gray-50 sm:px-8">
-                                <WhatsappIcon className='w-6 h-6 mr-1' /> Contactanos
+                            <button className="inline-flex items-center justify-center rounded-md border border-transparent bg-white px-5 py-3 text-base font-medium text-black hover:bg-gray-50 sm:px-8">
+                                <WhatsappIcon className='w-6 h-6 mr-1 text-[#25D366]' /> Contactanos
                             </button>
                         </Link>
                     </div>

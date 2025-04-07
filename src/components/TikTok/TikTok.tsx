@@ -77,7 +77,7 @@ export function TikTok() {
           <div className="flex items-center gap-4">
             <div className="relative h-12 w-12 overflow-hidden rounded-full bg-gray-100">
               <Image
-                src="/images/avatar-tiktok.webp"
+                src="/logoLegalistas.webp"
                 alt="Abogados Legalistas"
                 width={48}
                 height={48}
