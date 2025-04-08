@@ -43,8 +43,12 @@ const nextConfig = {
         hostname: 'lh3.googleusercontent.com',
       },
       {
-        protocol: "http",
-        hostname: "localhost",
+        protocol: 'https',
+        hostname: 'blog.sembrar.ar',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
       },
     ],
   },

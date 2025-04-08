@@ -4,7 +4,7 @@ import { cache } from 'react'
 async function getPostImage(mediaId: number) {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL_WP}/wp/v2/media/${mediaId}`,
+      `${process.env.NEXT_PUBLIC_WP_URL}wp-json/wp/v2/media/${mediaId}`,
       {
         headers: {
           Accept: 'application/json',
@@ -39,7 +39,7 @@ async function getPostImage(mediaId: number) {
 export const getPosts = cache(async () => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL_WP}/wp/v2/posts?_embed`,
+      `${process.env.NEXT_PUBLIC_WP_URL}wp-json/wp/v2/posts?_embed`,
       {
         headers: {
           Accept: 'application/json',
@@ -103,7 +103,7 @@ export const getPosts = cache(async () => {
 export const getPostBySlug = cache(async (slug: string) => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL_WP}/wp/v2/posts?slug=${slug}&_embed`,
+      `${process.env.NEXT_PUBLIC_WP_URL}wp-json/wp/v2/posts?slug=${slug}&_embed`,
       {
         headers: {
           Accept: 'application/json',
@@ -157,7 +157,7 @@ export const getPostBySlug = cache(async (slug: string) => {
 export const getCategories = cache(async () => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL_WP}/wp/v2/categories`,
+      `${process.env.NEXT_PUBLIC_WP_URL}wp-json/wp/v2/categories`,
       {
         headers: {
           Accept: 'application/json',
@@ -189,7 +189,7 @@ export const getCategories = cache(async () => {
 export const getRecentPosts = cache(async (limit = 5) => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL_WP}/wp/v2/posts?per_page=${limit}&_embed`,
+      `${process.env.NEXT_PUBLIC_WP_URL}wp-json/wp/v2/posts?per_page=${limit}&_embed`,
       {
         headers: {
           Accept: 'application/json',
@@ -224,7 +224,7 @@ export const getRelatedPosts = cache(async (postId: number, limit = 3) => {
     // Esto podría implicar obtener posts de la misma categoría o con tags similares.
     // Por ahora, simplemente obtendremos los posts más recientes excluyendo el post actual.
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL_WP}/wp/v2/posts?per_page=${limit + 1}&exclude=${postId}&_embed`,
+      `${process.env.NEXT_PUBLIC_WP_URL}wp-json/wp/v2/posts?per_page=${limit + 1}&exclude=${postId}&_embed`,
       {
         headers: {
           Accept: 'application/json',
@@ -260,7 +260,7 @@ export const getRelatedPosts = cache(async (postId: number, limit = 3) => {
 export const getAuthor = cache(async (authorId: number) => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL_WP}/wp/v2/users/${authorId}`,
+      `${process.env.NEXT_PUBLIC_WP_URL}wp-json/wp/v2/users/${authorId}`,
       {
         headers: {
           Accept: 'application/json',
