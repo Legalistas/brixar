@@ -18,7 +18,7 @@ export default function Home() {
       <Header />
       <div className="flex">
         <Sidebar onFilterChange={handleFilterChange} />
-        <Properties filters={filters} />
+        <Properties filters={filters} separateByStatus={true} />
       </div>
       <Footer />
     </>
