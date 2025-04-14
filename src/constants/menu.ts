@@ -49,6 +49,11 @@ export const MENU_DATA: MenuItem[] = [
     icon: ShoppingCart,
     label: 'Ventas',
     href: '/admin/dashboard/ventas',
+  },
+  {
+    icon: ClipboardList,
+    label: 'Proyectos',
+    href: '/admin/dashboard/proyectos',
   }
 ]
 
