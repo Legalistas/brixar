@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useProyectStore } from '@/store/proyectStore'
 import { ProyectPhase, BusinessModel } from '@prisma/client'
-import { AlertCircle, Loader2, ArrowLeft, Upload, Plus, Trash2 } from 'lucide-react'
+import { AlertCircle, Loader2, ArrowLeft, Upload, Trash2 } from 'lucide-react'
 import { slugify } from '@/utils/slugify'
 
 export default function CrearProyectoPage() {
