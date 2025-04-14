@@ -34,7 +34,6 @@ const PropertyContainer = ({ filters = {} as Filters, separateByStatus = false }
       try {
         const response = await getAllProperties()
         setProperties(response)
-        setFilteredProperties(response)
       } catch (error) {
         console.error('Error fetching properties:', error)
       } finally {
@@ -96,7 +95,7 @@ const PropertyContainer = ({ filters = {} as Filters, separateByStatus = false }
       setReservadasProperties(filtered.filter(property => property.status === 'RESERVADA'))
       setVendidasProperties(filtered.filter(property => property.status === 'VENDIDA'))
     }
-  }, [filters, properties, separateByStatus])
+  }, [properties])
 
   // Crear array de esqueletos
   const skeletonArray = Array(8).fill(0)
