@@ -278,7 +278,7 @@ export default function EditarProyectoPage({ params }: { params: { slug: string 
         
         // Incluir dirección si hay datos de dirección
         address: city || postalCode || streetName || countryId || stateId ? {
-          id: addressId, // Incluir el ID si estamos actualizando una dirección existente
+          id: addressId ?? undefined, // Convert null to undefined for compatibility
           city,
           postalCode,
           streetName,
