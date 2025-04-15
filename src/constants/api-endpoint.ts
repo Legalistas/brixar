@@ -76,4 +76,9 @@ export const API_ENDPOINTS = {
   ADMIN_SALES: '/api/sales/admin',
   SALE_UPDATE_STATUS: (id: number) => `/api/sales/${id}/status`,
   SALE_ADD_TRANSACTION: (id: number) => `/api/sales/${id}/transactions`,
+
+  // Proyect
+  PROYECT_SHOW: (slug: string) => `${API_BASE_URL}/proyects/${slug}`,
+  PROYECTS_CREATE: `${API_BASE_URL}/proyects`,
+  PROYECT_UPDATE: (slug: string) => `${API_BASE_URL}/proyects/${slug}`,
 }

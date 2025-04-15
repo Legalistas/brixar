@@ -4,8 +4,16 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useProyectStore } from '@/store/proyectStore'
 import { ProyectPhase, BusinessModel } from '@prisma/client'
-import { AlertCircle, Loader2, ArrowLeft, Upload, Trash2 } from 'lucide-react'
+import { AlertCircle, ArrowLeft } from 'lucide-react'
 import { slugify } from '@/utils/slugify'
+
+// Importar componentes del formulario
+import InformacionBasica from './components/InformacionBasica'
+import Ubicacion from './components/Ubicacion'
+import DetallesTecnicos from './components/DetallesTecnicos'
+import Financiacion from './components/Financiacion'
+import MediaItems from './components/MediaItems'
+import BotonesAcciones from './components/BotonesAcciones'
 
 export default function CrearProyectoPage() {
   const router = useRouter()
@@ -123,27 +131,6 @@ export default function CrearProyectoPage() {
     }
   }, [storeError])
   
-  // Añadir medio al proyecto
-  const handleAddMedia = () => {
-    if (tempMedia.link && tempMedia.title) {
-      setMediaItems([...mediaItems, { ...tempMedia }])
-      setTempMedia({
-        link: '',
-        type: 'image',
-        title: '',
-        description: ''
-      })
-      setShowMediaForm(false)
-    }
-  }
-  
-  // Eliminar medio del proyecto
-  const handleRemoveMedia = (index: number) => {
-    const updatedMedia = [...mediaItems]
-    updatedMedia.splice(index, 1)
-    setMediaItems(updatedMedia)
-  }
-  
   // Manejar envío del formulario
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -253,624 +240,112 @@ export default function CrearProyectoPage() {
       
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Información básica del proyecto */}
-        <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
-          <div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
-            <h2 className="text-lg font-medium text-slate-800">Información del Proyecto</h2>
-            <p className="text-sm text-slate-500">Datos básicos del proyecto</p>
-          </div>
-          
-          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="col-span-1 md:col-span-2">
-              <label htmlFor="title" className="block text-sm font-medium text-slate-700 mb-1">
-                Título <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="title"
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-                required
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="slug" className="block text-sm font-medium text-slate-700 mb-1">
-                Slug <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="slug"
-                type="text"
-                value={slug}
-                onChange={(e) => setSlug(e.target.value)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-                required
-              />
-              <p className="mt-1 text-xs text-slate-500">
-                URL amigable para el proyecto (sin espacios ni caracteres especiales)
-              </p>
-            </div>
-            
-            <div>
-              <label htmlFor="businessModel" className="block text-sm font-medium text-slate-700 mb-1">
-                Modelo de Negocio <span className="text-red-500">*</span>
-              </label>
-              <select
-                id="businessModel"
-                value={businessModel}
-                onChange={(e) => setBusinessModel(e.target.value as BusinessModel)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-                required
-              >
-                <option value="SOLD">Venta</option>
-                <option value="RENT">Alquiler</option>
-                <option value="LEADING">Leasing</option>
-              </select>
-            </div>
-            
-            <div>
-              <label htmlFor="phase" className="block text-sm font-medium text-slate-700 mb-1">
-                Fase del Proyecto <span className="text-red-500">*</span>
-              </label>
-              <select
-                id="phase"
-                value={phase}
-                onChange={(e) => setPhase(e.target.value as ProyectPhase)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-                required
-              >
-                <option value="IN_STUDY">En Estudio</option>
-                <option value="FUNDING">Financiación</option>
-                <option value="CONSTRUCTION">Construcción</option>
-                <option value="COMPLETED">Completado</option>
-              </select>
-            </div>
-            
-            <div>
-              <label htmlFor="openingPhase" className="block text-sm font-medium text-slate-700 mb-1">
-                Fase de Apertura
-              </label>
-              <input
-                id="openingPhase"
-                type="number"
-                value={openingPhase}
-                onChange={(e) => setOpeningPhase(parseInt(e.target.value) || 0)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="priority" className="block text-sm font-medium text-slate-700 mb-1">
-                Prioridad
-              </label>
-              <input
-                id="priority"
-                type="number"
-                value={priority}
-                onChange={(e) => setPriority(parseInt(e.target.value) || 0)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-              />
-              <p className="mt-1 text-xs text-slate-500">
-                Valor numérico que determina la prioridad de visualización (mayor número = mayor prioridad)
-              </p>
-            </div>
-            
-            <div>
-              <label htmlFor="daysToEnd" className="block text-sm font-medium text-slate-700 mb-1">
-                Días para finalizar
-              </label>
-              <input
-                id="daysToEnd"
-                type="number"
-                value={daysToEnd}
-                onChange={(e) => setDaysToEnd(parseInt(e.target.value) || 0)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="daysToStart" className="block text-sm font-medium text-slate-700 mb-1">
-                Días para comenzar
-              </label>
-              <input
-                id="daysToStart"
-                type="number"
-                value={daysToStart}
-                onChange={(e) => setDaysToStart(parseInt(e.target.value) || 0)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-              />
-            </div>
-            
-            <div className="col-span-1 md:col-span-2">
-              <label htmlFor="openingLine" className="block text-sm font-medium text-slate-700 mb-1">
-                Línea de Apertura
-              </label>
-              <input
-                id="openingLine"
-                type="text"
-                value={openingLine}
-                onChange={(e) => setOpeningLine(e.target.value)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-              />
-              <p className="mt-1 text-xs text-slate-500">
-                Una breve introducción o eslogan para el proyecto
-              </p>
-            </div>
-            
-            <div className="col-span-1 md:col-span-2">
-              <label htmlFor="description" className="block text-sm font-medium text-slate-700 mb-1">
-                Descripción
-              </label>
-              <textarea
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-              />
-            </div>
-          </div>
-        </div>
+        <InformacionBasica 
+          title={title}
+          setTitle={setTitle}
+          slug={slug}
+          setSlug={setSlug}
+          openingLine={openingLine}
+          setOpeningLine={setOpeningLine}
+          description={description}
+          setDescription={setDescription}
+          phase={phase}
+          setPhase={setPhase}
+          businessModel={businessModel}
+          setBusinessModel={setBusinessModel}
+          openingPhase={openingPhase}
+          setOpeningPhase={setOpeningPhase}
+          priority={priority}
+          setPriority={setPriority}
+          daysToEnd={daysToEnd}
+          setDaysToEnd={setDaysToEnd}
+          daysToStart={daysToStart}
+          setDaysToStart={setDaysToStart}
+        />
         
         {/* Ubicación del proyecto */}
-        <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
-          <div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
-            <h2 className="text-lg font-medium text-slate-800">Ubicación</h2>
-            <p className="text-sm text-slate-500">Dirección y ubicación geográfica del proyecto</p>
-          </div>
-          
-          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="country" className="block text-sm font-medium text-slate-700 mb-1">
-                País
-              </label>
-              <select
-                id="country"
-                value={countryId || ''}
-                onChange={(e) => setCountryId(e.target.value ? parseInt(e.target.value) : null)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-              >
-                <option value="">Seleccionar país</option>
-                {countries.map((country) => (
-                  <option key={country.id} value={country.id}>
-                    {country.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            
-            <div>
-              <label htmlFor="state" className="block text-sm font-medium text-slate-700 mb-1">
-                Provincia/Estado
-              </label>
-              <select
-                id="state"
-                value={stateId || ''}
-                onChange={(e) => setStateId(e.target.value ? parseInt(e.target.value) : null)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-                disabled={!countryId || states.length === 0}
-              >
-                <option value="">Seleccionar provincia/estado</option>
-                {states.map((state) => (
-                  <option key={state.id} value={state.id}>
-                    {state.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            
-            <div>
-              <label htmlFor="city" className="block text-sm font-medium text-slate-700 mb-1">
-                Ciudad
-              </label>
-              <input
-                id="city"
-                type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="postalCode" className="block text-sm font-medium text-slate-700 mb-1">
-                Código Postal
-              </label>
-              <input
-                id="postalCode"
-                type="text"
-                value={postalCode}
-                onChange={(e) => setPostalCode(e.target.value)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-              />
-            </div>
-            
-            <div className="col-span-1 md:col-span-2">
-              <label htmlFor="streetName" className="block text-sm font-medium text-slate-700 mb-1">
-                Dirección
-              </label>
-              <input
-                id="streetName"
-                type="text"
-                value={streetName}
-                onChange={(e) => setStreetName(e.target.value)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-              />
-            </div>
-            
-            <div className="col-span-1 md:col-span-2">
-              <label htmlFor="addressDescription" className="block text-sm font-medium text-slate-700 mb-1">
-                Descripción de la ubicación
-              </label>
-              <textarea
-                id="addressDescription"
-                value={addressDescription}
-                onChange={(e) => setAddressDescription(e.target.value)}
-                rows={2}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-              />
-              <p className="mt-1 text-xs text-slate-500">
-                Información adicional sobre la ubicación (puntos de referencia, etc.)
-              </p>
-            </div>
-            
-            <div>
-              <label htmlFor="latitude" className="block text-sm font-medium text-slate-700 mb-1">
-                Latitud
-              </label>
-              <input
-                id="latitude"
-                type="text"
-                value={latitude}
-                onChange={(e) => setLatitude(e.target.value)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="longitude" className="block text-sm font-medium text-slate-700 mb-1">
-                Longitud
-              </label>
-              <input
-                id="longitude"
-                type="text"
-                value={longitude}
-                onChange={(e) => setLongitude(e.target.value)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-              />
-            </div>
-          </div>
-        </div>
+        <Ubicacion 
+          city={city}
+          setCity={setCity}
+          postalCode={postalCode}
+          setPostalCode={setPostalCode}
+          streetName={streetName}
+          setStreetName={setStreetName}
+          countryId={countryId}
+          setCountryId={setCountryId}
+          stateId={stateId}
+          setStateId={setStateId}
+          addressDescription={addressDescription}
+          setAddressDescription={setAddressDescription}
+          latitude={latitude}
+          setLatitude={setLatitude}
+          longitude={longitude}
+          setLongitude={setLongitude}
+          countries={countries}
+          states={states}
+        />
         
-        {/* Detalles del proyecto */}
-        <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
-          <div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
-            <h2 className="text-lg font-medium text-slate-800">Detalles Técnicos</h2>
-            <p className="text-sm text-slate-500">Características técnicas del proyecto</p>
-          </div>
-          
-          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="proyectType" className="block text-sm font-medium text-slate-700 mb-1">
-                Tipo de Proyecto
-              </label>
-              <input
-                id="proyectType"
-                type="text"
-                value={proyectType}
-                onChange={(e) => setProyectType(e.target.value)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-              />
-              <p className="mt-1 text-xs text-slate-500">
-                Ej: Residencial, Comercial, Industrial, etc.
-              </p>
-            </div>
-            
-            <div>
-              <label htmlFor="investmentPeriod" className="block text-sm font-medium text-slate-700 mb-1">
-                Período de Inversión (meses)
-              </label>
-              <input
-                id="investmentPeriod"
-                type="number"
-                value={investmentPeriod}
-                onChange={(e) => setInvestmentPeriod(parseInt(e.target.value) || 0)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="surface" className="block text-sm font-medium text-slate-700 mb-1">
-                Superficie (m²)
-              </label>
-              <input
-                id="surface"
-                type="number"
-                value={surface}
-                onChange={(e) => setSurface(parseInt(e.target.value) || 0)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="buildingYear" className="block text-sm font-medium text-slate-700 mb-1">
-                Año de Construcción
-              </label>
-              <input
-                id="buildingYear"
-                type="number"
-                value={buildingYear || ''}
-                onChange={(e) => setBuildingYear(e.target.value ? parseInt(e.target.value) : null)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="rooms" className="block text-sm font-medium text-slate-700 mb-1">
-                Número de Habitaciones
-              </label>
-              <input
-                id="rooms"
-                type="number"
-                value={rooms}
-                onChange={(e) => setRooms(parseInt(e.target.value) || 0)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="floors" className="block text-sm font-medium text-slate-700 mb-1">
-                Número de Plantas
-              </label>
-              <input
-                id="floors"
-                type="number"
-                value={floors}
-                onChange={(e) => setFloors(parseInt(e.target.value) || 0)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="riskScore" className="block text-sm font-medium text-slate-700 mb-1">
-                Puntuación de Riesgo (1-10)
-              </label>
-              <input
-                id="riskScore"
-                type="number"
-                min="1"
-                max="10"
-                value={riskScore}
-                onChange={(e) => setRiskScore(parseInt(e.target.value) || 0)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="profitabilityScore" className="block text-sm font-medium text-slate-700 mb-1">
-                Puntuación de Rentabilidad (1-10)
-              </label>
-              <input
-                id="profitabilityScore"
-                type="number"
-                min="1"
-                max="10"
-                value={profitabilityScore}
-                onChange={(e) => setProfitabilityScore(parseInt(e.target.value) || 0)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-              />
-            </div>
-          </div>
-        </div>
+        {/* Detalles técnicos del proyecto */}
+        <DetallesTecnicos 
+          proyectType={proyectType}
+          setProyectType={setProyectType}
+          investmentPeriod={investmentPeriod}
+          setInvestmentPeriod={setInvestmentPeriod}
+          surface={surface}
+          setSurface={setSurface}
+          rooms={rooms}
+          setRooms={setRooms}
+          floors={floors}
+          setFloors={setFloors}
+          features={features}
+          setFeatures={setFeatures}
+          buildingYear={buildingYear}
+          setBuildingYear={setBuildingYear}
+          riskScore={riskScore}
+          setRiskScore={setRiskScore}
+          profitabilityScore={profitabilityScore}
+          setProfitabilityScore={setProfitabilityScore}
+        />
+        
+        {/* Medios del proyecto */}
+        <MediaItems 
+          mediaItems={mediaItems}
+          setMediaItems={setMediaItems}
+          showMediaForm={showMediaForm}
+          setShowMediaForm={setShowMediaForm}
+          tempMedia={tempMedia}
+          setTempMedia={setTempMedia}
+        />
         
         {/* Información de financiación */}
-        <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
-          <div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
-            <h2 className="text-lg font-medium text-slate-800">Financiación</h2>
-            <p className="text-sm text-slate-500">Datos financieros y de inversión</p>
-          </div>
-          
-          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="startInvestDate" className="block text-sm font-medium text-slate-700 mb-1">
-                Fecha de Inicio de Inversión
-              </label>
-              <input
-                id="startInvestDate"
-                type="date"
-                value={startInvestDate}
-                onChange={(e) => setStartInvestDate(e.target.value)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="endInvestDate" className="block text-sm font-medium text-slate-700 mb-1">
-                Fecha Fin de Inversión
-              </label>
-              <input
-                id="endInvestDate"
-                type="date"
-                value={endInvestDate}
-                onChange={(e) => setEndInvestDate(e.target.value)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="companyCapital" className="block text-sm font-medium text-slate-700 mb-1">
-                Capital de la Empresa
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span className="text-slate-500">€</span>
-                </div>
-                <input
-                  id="companyCapital"
-                  type="number"
-                  value={companyCapital}
-                  onChange={(e) => setCompanyCapital(parseFloat(e.target.value) || 0)}
-                  className="w-full rounded-md border border-slate-300 pl-8 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-                />
-              </div>
-            </div>
-            
-            <div>
-              <label htmlFor="quantityFunded" className="block text-sm font-medium text-slate-700 mb-1">
-                Cantidad Financiada
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span className="text-slate-500">€</span>
-                </div>
-                <input
-                  id="quantityFunded"
-                  type="number"
-                  value={quantityFunded}
-                  onChange={(e) => setQuantityFunded(parseFloat(e.target.value) || 0)}
-                  className="w-full rounded-md border border-slate-300 pl-8 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-                />
-              </div>
-            </div>
-            
-            <div>
-              <label htmlFor="quantityToFund" className="block text-sm font-medium text-slate-700 mb-1">
-                Cantidad a Financiar
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span className="text-slate-500">€</span>
-                </div>
-                <input
-                  id="quantityToFund"
-                  type="number"
-                  value={quantityToFund}
-                  onChange={(e) => setQuantityToFund(parseFloat(e.target.value) || 0)}
-                  className="w-full rounded-md border border-slate-300 pl-8 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-                />
-              </div>
-            </div>
-            
-            <div>
-              <label htmlFor="maxOverfunding" className="block text-sm font-medium text-slate-700 mb-1">
-                Sobrefinanciación Máxima
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span className="text-slate-500">€</span>
-                </div>
-                <input
-                  id="maxOverfunding"
-                  type="number"
-                  value={maxOverfunding}
-                  onChange={(e) => setMaxOverfunding(parseFloat(e.target.value) || 0)}
-                  className="w-full rounded-md border border-slate-300 pl-8 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-                />
-              </div>
-            </div>
-            
-            <div>
-              <label htmlFor="rentProfitability" className="block text-sm font-medium text-slate-700 mb-1">
-                Rentabilidad por Alquiler (%)
-              </label>
-              <div className="relative">
-                <input
-                  id="rentProfitability"
-                  type="number"
-                  step="0.01"
-                  value={rentProfitability}
-                  onChange={(e) => setRentProfitability(parseFloat(e.target.value) || 0)}
-                  className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-                />
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <span className="text-slate-500">%</span>
-                </div>
-              </div>
-            </div>
-            
-            <div>
-              <label htmlFor="totalNetProfitability" className="block text-sm font-medium text-slate-700 mb-1">
-                Rentabilidad Neta Total (%)
-              </label>
-              <div className="relative">
-                <input
-                  id="totalNetProfitability"
-                  type="number"
-                  step="0.01"
-                  value={totalNetProfitability}
-                  onChange={(e) => setTotalNetProfitability(parseFloat(e.target.value) || 0)}
-                  className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-                />
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <span className="text-slate-500">%</span>
-                </div>
-              </div>
-            </div>
-            
-            <div>
-              <label htmlFor="totalNetProfitabilityToShow" className="block text-sm font-medium text-slate-700 mb-1">
-                Rentabilidad Neta Total a Mostrar (%)
-              </label>
-              <div className="relative">
-                <input
-                  id="totalNetProfitabilityToShow"
-                  type="number"
-                  step="0.01"
-                  value={totalNetProfitabilityToShow}
-                  onChange={(e) => setTotalNetProfitabilityToShow(parseFloat(e.target.value) || 0)}
-                  className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-                />
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <span className="text-slate-500">%</span>
-                </div>
-              </div>
-            </div>
-            
-            <div>
-              <label htmlFor="apreciationProfitability" className="block text-sm font-medium text-slate-700 mb-1">
-                Rentabilidad por Apreciación (%)
-              </label>
-              <div className="relative">
-                <input
-                  id="apreciationProfitability"
-                  type="number"
-                  step="0.01"
-                  value={apreciationProfitability}
-                  onChange={(e) => setApreciationProfitability(parseFloat(e.target.value) || 0)}
-                  className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-                />
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <span className="text-slate-500">%</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Financiacion 
+          startInvestDate={startInvestDate}
+          setStartInvestDate={setStartInvestDate}
+          endInvestDate={endInvestDate}
+          setEndInvestDate={setEndInvestDate}
+          companyCapital={companyCapital}
+          setCompanyCapital={setCompanyCapital}
+          quantityFunded={quantityFunded}
+          setQuantityFunded={setQuantityFunded}
+          quantityToFund={quantityToFund}
+          setQuantityToFund={setQuantityToFund}
+          maxOverfunding={maxOverfunding}
+          setMaxOverfunding={setMaxOverfunding}
+          rentProfitability={rentProfitability}
+          setRentProfitability={setRentProfitability}
+          totalNetProfitability={totalNetProfitability}
+          setTotalNetProfitability={setTotalNetProfitability}
+          totalNetProfitabilityToShow={totalNetProfitabilityToShow}
+          setTotalNetProfitabilityToShow={setTotalNetProfitabilityToShow}
+          apreciationProfitability={apreciationProfitability}
+          setApreciationProfitability={setApreciationProfitability}
+        />
         
         {/* Botones de acción */}
-        <div className="flex justify-end space-x-4">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="px-6 py-2 border border-slate-300 rounded-md text-slate-700 bg-white hover:bg-slate-50 transition-colors"
-          >
-            Cancelar
-          </button>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="px-6 py-2 bg-slate-800 text-white rounded-md hover:bg-slate-900 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
-          >
-            {isLoading ? (
-              <span className="flex items-center">
-                <Loader2 className="animate-spin h-4 w-4 mr-2" />
-                Guardando...
-              </span>
-            ) : (
-              'Crear Proyecto'
-            )}
-          </button>
-        </div>
+        <BotonesAcciones 
+          isLoading={isLoading}
+          onCancel={() => router.back()}
+        />
       </form>
     </div>
   )
