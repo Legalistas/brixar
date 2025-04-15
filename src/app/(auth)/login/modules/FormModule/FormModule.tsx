@@ -1,29 +1,58 @@
-"use client";
+'use client'
 
-import React, { FormEvent, useState } from "react";
-import { signIn, getSession } from "next-auth/react";
-import { InputElement } from "@/components/InputElement";
-import { Asterisk, Lock, Mail } from "lucide-react";
+import React, { FormEvent, useState } from 'react'
+import { signIn, getSession } from 'next-auth/react'
+import { InputElement } from '@/components/InputElement'
+import { Asterisk, Lock, Mail } from 'lucide-react'
 
 const FormModule = ({ redirectBasedOnRole }: { redirectBasedOnRole: any }) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    const result = await signIn("credentials", {
+    e.preventDefault()
+    const result = await signIn('credentials', {
       email,
       password,
       redirect: false,
-    });
+    })
 
     if (result?.error) {
-      console.error(result.error);
+      if (result.error === 'CredentialsSignin') {
+        setError(
+          'Credenciales inválidas. Por favor, verifica tu correo y contraseña.'
+        )
+      } else if (result.error === 'EmailNotVerified') {
+        setError(
+          'Por favor, verifica tu correo electrónico antes de iniciar sesión.'
+        )
+      } else if (result.error === 'UserNotFound') {
+        setError(
+          'Usuario no encontrado. Por favor, verifica tu correo electrónico.'
+        )
+      } else if (result.error === 'PasswordIncorrect') {
+        setError('Contraseña incorrecta. Por favor, verifica tu contraseña.')
+      } else if (result.error === 'AccountInactive') {
+        setError('Tu cuenta está inactiva. Por favor, contacta al soporte.')
+      } else if (result.error === 'AccountLocked') {
+        setError('Tu cuenta está bloqueada. Por favor, contacta al soporte.')
+      } else if (result.error === 'AccountExpired') {
+        setError('Tu cuenta ha expirado. Por favor, contacta al soporte.')
+      } else if (result.error === 'AccountSuspended') {
+        setError(
+          'Tu cuenta ha sido suspendida. Por favor, contacta al soporte.'
+        )
+      } else {
+        setError('Error desconocido. Por favor, intenta de nuevo más tarde.')
+      }
+
+      console.error(result.error)
     } else {
-      const session = await getSession();
-      redirectBasedOnRole(session?.user?.role);
+      const session = await getSession()
+      redirectBasedOnRole(session?.user?.role)
     }
-  };
+  }
 
   return (
     <form className="w-full" onSubmit={handleSubmit}>
@@ -75,6 +104,14 @@ const FormModule = ({ redirectBasedOnRole }: { redirectBasedOnRole: any }) => {
           </label>
         </div>
       </div>
+
+      {error && (
+        <div className="mb-3 text-red-600 text-sm font-semibold">
+          <Asterisk className="inline mr-1" size={16} />
+          {error}
+        </div>
+      )}
+      
       <div className="mb-3">
         <button
           type="submit"
@@ -84,7 +121,7 @@ const FormModule = ({ redirectBasedOnRole }: { redirectBasedOnRole: any }) => {
         </button>
       </div>
     </form>
-  );
-};
+  )
+}
 
-export default FormModule;
+export default FormModule
