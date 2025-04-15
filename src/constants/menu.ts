@@ -33,7 +33,6 @@ export interface MenuItem {
 }
 
 export const MENU_DATA: MenuItem[] = [
-  { icon: LayoutDashboard, label: 'Escritorio', href: '/admin/dashboard' },
   { icon: PlusCircle, label: 'Publicar', href: '/admin/dashboard/publicar' },
   {
     icon: Building2,
