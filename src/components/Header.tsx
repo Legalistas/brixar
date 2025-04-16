@@ -150,14 +150,6 @@ const ProfileDropdown: React.FC<{
               <User className="h-6 w-6 mr-2" />
               Panel de Control
             </button>
-            <button className="flex w-full items-center px-4 py-2 text-md text-gray-700 hover:bg-gray-100">
-              <FileText className="h-6 w-6 mr-2" />
-              Documentos personales
-            </button>
-            <button className="flex w-full items-center px-4 py-2 text-md text-gray-700 hover:bg-gray-100">
-              <Gift className="h-6 w-6 mr-2" />
-              Invitar
-            </button>
             <button
               className="flex w-full items-center px-4 py-2 text-md text-gray-700 hover:bg-gray-100"
               onClick={handleLogout}
