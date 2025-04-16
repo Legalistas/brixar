@@ -462,9 +462,6 @@ export default function ProyectosPage() {
                     )}
                   </td>
                   <td className="py-3 px-4 text-slate-700">
-                    {project.proyectFound?.investors || 0}
-                  </td>
-                  <td className="py-3 px-4 text-slate-700">
                     {formatDate(project.createdAt)}
                   </td>
                   <td className="py-3 px-4">
