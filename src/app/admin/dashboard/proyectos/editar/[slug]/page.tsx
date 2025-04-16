@@ -447,19 +447,6 @@ export default function EditarProyectoPage({ params }: { params: { slug: string 
             </div>
             
             <div>
-              <label htmlFor="openingPhase" className="block text-sm font-medium text-slate-700 mb-1">
-                Fase de Apertura
-              </label>
-              <input
-                id="openingPhase"
-                type="number"
-                value={openingPhase}
-                onChange={(e) => setOpeningPhase(parseInt(e.target.value) || 0)}
-                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-              />
-            </div>
-            
-            <div>
               <label htmlFor="priority" className="block text-sm font-medium text-slate-700 mb-1">
                 Prioridad
               </label>
@@ -959,24 +946,6 @@ export default function EditarProyectoPage({ params }: { params: { slug: string 
                 onChange={(e) => setEndInvestDate(e.target.value)}
                 className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
               />
-            </div>
-            
-            <div>
-              <label htmlFor="companyCapital" className="block text-sm font-medium text-slate-700 mb-1">
-                Capital de la Empresa
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span className="text-slate-500">€</span>
-                </div>
-                <input
-                  id="companyCapital"
-                  type="number"
-                  value={companyCapital}
-                  onChange={(e) => setCompanyCapital(parseFloat(e.target.value) || 0)}
-                  className="w-full rounded-md border border-slate-300 pl-8 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-                />
-              </div>
             </div>
             
             <div>

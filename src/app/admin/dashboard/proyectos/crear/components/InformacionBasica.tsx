@@ -122,19 +122,6 @@ export default function InformacionBasica({
         </div>
         
         <div>
-          <label htmlFor="openingPhase" className="block text-sm font-medium text-slate-700 mb-1">
-            Fase de Apertura
-          </label>
-          <input
-            id="openingPhase"
-            type="number"
-            value={openingPhase}
-            onChange={(e) => setOpeningPhase(parseInt(e.target.value) || 0)}
-            className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-          />
-        </div>
-        
-        <div>
           <label htmlFor="priority" className="block text-sm font-medium text-slate-700 mb-1">
             Prioridad
           </label>
