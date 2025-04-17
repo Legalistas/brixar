@@ -1,5 +1,7 @@
 'use client'
 
+import CountryStateSelector from '@/components/common/CountryStateSelector'
+
 interface UbicacionProps {
   city: string
   setCity: (value: string) => void
@@ -49,43 +51,13 @@ export default function Ubicacion({
       </div>
       
       <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label htmlFor="country" className="block text-sm font-medium text-slate-700 mb-1">
-            País
-          </label>
-          <select
-            id="country"
-            value={countryId || ''}
-            onChange={(e) => setCountryId(e.target.value ? parseInt(e.target.value) : null)}
-            className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-          >
-            <option value="">Seleccionar país</option>
-            {countries.map((country) => (
-              <option key={country.id} value={country.id}>
-                {country.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        
-        <div>
-          <label htmlFor="state" className="block text-sm font-medium text-slate-700 mb-1">
-            Provincia/Estado
-          </label>
-          <select
-            id="state"
-            value={stateId || ''}
-            onChange={(e) => setStateId(e.target.value ? parseInt(e.target.value) : null)}
-            className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-            disabled={!countryId || states.length === 0}
-          >
-            <option value="">Seleccionar provincia/estado</option>
-            {states.map((state) => (
-              <option key={state.id} value={state.id}>
-                {state.name}
-              </option>
-            ))}
-          </select>
+        <div className="col-span-1 md:col-span-2">
+          <CountryStateSelector 
+            selectedCountryId={countryId || 0}
+            selectedStateId={stateId || 0}
+            onCountryChange={(id) => setCountryId(id === 0 ? null : id)}
+            onStateChange={(id) => setStateId(id === 0 ? null : id)}
+          />
         </div>
         
         <div>

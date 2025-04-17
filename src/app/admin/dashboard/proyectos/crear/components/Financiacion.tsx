@@ -80,24 +80,6 @@ export default function Financiacion({
         </div>
         
         <div>
-          <label htmlFor="quantityFunded" className="block text-sm font-medium text-slate-700 mb-1">
-            Cantidad Financiada
-          </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <span className="text-slate-500">€</span>
-            </div>
-            <input
-              id="quantityFunded"
-              type="number"
-              value={quantityFunded}
-              onChange={(e) => setQuantityFunded(parseFloat(e.target.value) || 0)}
-              className="w-full rounded-md border border-slate-300 pl-8 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-            />
-          </div>
-        </div>
-        
-        <div>
           <label htmlFor="quantityToFund" className="block text-sm font-medium text-slate-700 mb-1">
             Cantidad a Financiar
           </label>
@@ -116,62 +98,6 @@ export default function Financiacion({
         </div>
         
         <div>
-          <label htmlFor="maxOverfunding" className="block text-sm font-medium text-slate-700 mb-1">
-            Sobrefinanciación Máxima
-          </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <span className="text-slate-500">€</span>
-            </div>
-            <input
-              id="maxOverfunding"
-              type="number"
-              value={maxOverfunding}
-              onChange={(e) => setMaxOverfunding(parseFloat(e.target.value) || 0)}
-              className="w-full rounded-md border border-slate-300 pl-8 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-            />
-          </div>
-        </div>
-        
-        <div>
-          <label htmlFor="rentProfitability" className="block text-sm font-medium text-slate-700 mb-1">
-            Rentabilidad por Alquiler (%)
-          </label>
-          <div className="relative">
-            <input
-              id="rentProfitability"
-              type="number"
-              step="0.01"
-              value={rentProfitability}
-              onChange={(e) => setRentProfitability(parseFloat(e.target.value) || 0)}
-              className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-            />
-            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              <span className="text-slate-500">%</span>
-            </div>
-          </div>
-        </div>
-        
-        <div>
-          <label htmlFor="totalNetProfitability" className="block text-sm font-medium text-slate-700 mb-1">
-            Rentabilidad Neta Total (%)
-          </label>
-          <div className="relative">
-            <input
-              id="totalNetProfitability"
-              type="number"
-              step="0.01"
-              value={totalNetProfitability}
-              onChange={(e) => setTotalNetProfitability(parseFloat(e.target.value) || 0)}
-              className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-            />
-            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              <span className="text-slate-500">%</span>
-            </div>
-          </div>
-        </div>
-        
-        <div>
           <label htmlFor="totalNetProfitabilityToShow" className="block text-sm font-medium text-slate-700 mb-1">
             Rentabilidad Neta Total a Mostrar (%)
           </label>
@@ -182,25 +108,6 @@ export default function Financiacion({
               step="0.01"
               value={totalNetProfitabilityToShow}
               onChange={(e) => setTotalNetProfitabilityToShow(parseFloat(e.target.value) || 0)}
-              className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-            />
-            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              <span className="text-slate-500">%</span>
-            </div>
-          </div>
-        </div>
-        
-        <div>
-          <label htmlFor="apreciationProfitability" className="block text-sm font-medium text-slate-700 mb-1">
-            Rentabilidad por Apreciación (%)
-          </label>
-          <div className="relative">
-            <input
-              id="apreciationProfitability"
-              type="number"
-              step="0.01"
-              value={apreciationProfitability}
-              onChange={(e) => setApreciationProfitability(parseFloat(e.target.value) || 0)}
               className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
             />
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
