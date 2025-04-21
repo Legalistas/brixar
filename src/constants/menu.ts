@@ -21,6 +21,7 @@ import {
   LayoutDashboard,
   PlusCircle,
   Building2,
+  Receipt,
 } from 'lucide-react'
 
 export interface MenuItem {
@@ -53,6 +54,10 @@ export const MENU_DATA: MenuItem[] = [
     icon: ClipboardList,
     label: 'Proyectos',
     href: '/admin/dashboard/proyectos',
+    subItems: [
+      { icon: Circle, label: 'Lista de Proyectos', href: '/admin/dashboard/proyectos' },
+      { icon: Receipt, label: 'Costos de Proyectos', href: '/admin/dashboard/proyectos/costos' }
+    ]
   }
 ]
 

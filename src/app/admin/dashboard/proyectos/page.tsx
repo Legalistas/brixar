@@ -13,6 +13,7 @@ import {
   AlertCircle,
   Plus,
   Loader2,
+  Receipt,
 } from 'lucide-react'
 import { useProyectStore, Proyect } from '@/store/proyectStore'
 
@@ -321,6 +322,17 @@ export default function ProyectosPage() {
             >
               <Eye className="h-4 w-4 mr-2" />
               Ver en sitio
+            </button>
+            
+            <button
+              onClick={() => {
+                setShowEditPopup(null)
+                router.push(`/admin/dashboard/proyectos/costos?slug=${slug}`)
+              }}
+              className="border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-medium py-3 px-4 rounded-md transition-colors flex items-center justify-center"
+            >
+              <Receipt className="h-4 w-4 mr-2" />
+              Gestionar costos
             </button>
 
             <button

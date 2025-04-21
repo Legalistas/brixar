@@ -138,6 +138,7 @@ model Proyect {
   promotor       User?           @relation(fields: [promotorId], references: [id], onDelete: Cascade)
   proyectDetails ProyectDetails?
   proyectFound   ProyectFound?
+  costs          ProyectCost[]   // Relación con los costos del proyecto
 
   @@map("proyects")
 }
@@ -193,6 +194,29 @@ model ProyectMedia {
   proyect     Proyect? @relation(fields: [proyectId], references: [id], onDelete: Cascade)
 
   @@map("proyect_media")
+}
+
+model ProyectCost {
+  id                Int       @id @default(autoincrement())
+  proyectId         Int
+  fecha             DateTime  // FECHA
+  mes               String    // MES (puede ser representado como un string, ej: "Enero 2024")
+  rubro             String    // RUBRO
+  proveedor         String    // PROVEEDOR
+  detalle           String?   @db.Text // DETALLE
+  importePesos      Decimal   @db.Decimal(12, 2) // IMPORTE PESOS
+  precioDolarBlue   Decimal   @db.Decimal(12, 2) // PRECIO U$S BLUE VENDEDOR
+  importeDolar      Decimal   @db.Decimal(12, 2) // IMPORTE U$D
+  usuarioId         Int       // USUARIO QUE ABONO - ID de usuario
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  proyect           Proyect   @relation(fields: [proyectId], references: [id], onDelete: Cascade)
+  usuario           User      @relation(fields: [usuarioId], references: [id])
+
+  @@index([proyectId])
+  @@index([usuarioId])
+  @@map("proyect_costs")
 }
 
 model Positions {
@@ -285,6 +309,7 @@ model User {
   messages      InquiryMessage[] // Relación con mensajes
   buyerSales    Sale[]          @relation("BuyerSales")  // Ventas donde es comprador
   sellerSales   Sale[]          @relation("SellerSales") // Ventas donde es vendedor
+  proyectCosts  ProyectCost[]   // Relación con los costos que ha abonado
 
   @@map("users")
 }
