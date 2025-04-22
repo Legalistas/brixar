@@ -12,32 +12,67 @@ import {
   Tag,
   Plus,
   AlertCircle,
-  ArrowLeft
+  ArrowLeft,
+  Edit,
+  Trash2
 } from 'lucide-react'
 import { useProyectStore } from '@/store/proyectStore'
+import { useCostStore } from '@/store/costStore'
+import type { CreateProyectCostInput, ProyectCost } from '@/store/costStore'
 
 export default function CostosProyectoPage() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const slug = searchParams?.get('slug')
   
-  const { currentProyect, isLoading, error: storeError, fetchProyectBySlug } = useProyectStore()
+  const { currentProyect, isLoading: isLoadingProyect, error: storeError, fetchProyectBySlug } = useProyectStore()
+  const { 
+    projectCosts, 
+    metrics, 
+    isLoading: isLoadingCosts, 
+    error: costError,
+    fetchCostsByProyectSlug,
+    createCost
+  } = useCostStore()
+  
   const [error, setError] = useState('')
   const [showAddCostPopup, setShowAddCostPopup] = useState(false)
+  
+  // Formulario para nuevo costo
+  const [formData, setFormData] = useState<{
+    fecha: string;
+    rubro: string;
+    proveedor: string;
+    detalle: string;
+    importePesos: string;
+    precioDolarBlue: string;
+    importeDolar: string;
+  }>({
+    fecha: new Date().toISOString().split('T')[0],
+    rubro: '',
+    proveedor: '',
+    detalle: '',
+    importePesos: '',
+    precioDolarBlue: '',
+    importeDolar: ''
+  })
 
   // Cargar el proyecto si se proporciona un slug
   useEffect(() => {
     if (slug) {
       fetchProyectBySlug(slug)
+      fetchCostsByProyectSlug(slug)
     }
-  }, [slug, fetchProyectBySlug])
+  }, [slug, fetchProyectBySlug, fetchCostsByProyectSlug])
 
   // Actualizar el error local si hay error en el store
   useEffect(() => {
     if (storeError) {
       setError(storeError)
     }
-  }, [storeError])
+    if (costError) {
+      setError(costError)
+    }
+  }, [storeError, costError])
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -64,6 +99,72 @@ export default function CostosProyectoPage() {
     }).format(amount)
   }
   
+  // Manejar cambios en el formulario
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+    
+    // Calcular automáticamente el importe en dólares cuando cambian los valores
+    if (name === 'importePesos' || name === 'precioDolarBlue') {
+      const pesos = parseFloat(name === 'importePesos' ? value : formData.importePesos) || 0
+      const cotizacion = parseFloat(name === 'precioDolarBlue' ? value : formData.precioDolarBlue) || 0
+      
+      if (pesos > 0 && cotizacion > 0) {
+        const dolares = pesos / cotizacion
+        setFormData(prev => ({ 
+          ...prev, 
+          importeDolar: dolares.toFixed(2)
+        }))
+      }
+    }
+  }
+  
+  // Guardar el costo en la base de datos
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!currentProyect) return
+    
+    try {
+      setError('')
+      const fechaObj = new Date(formData.fecha)
+      const mes = `${fechaObj.getFullYear()}-${String(fechaObj.getMonth() + 1).padStart(2, '0')}`
+      
+      const costData: CreateProyectCostInput = {
+        proyectId: currentProyect.id,
+        fecha: formData.fecha,
+        mes: mes,
+        rubro: formData.rubro,
+        proveedor: formData.proveedor,
+        detalle: formData.detalle,
+        importePesos: parseFloat(formData.importePesos),
+        precioDolarBlue: parseFloat(formData.precioDolarBlue),
+        importeDolar: parseFloat(formData.importeDolar)
+      }
+      
+      const success = await createCost(costData)
+      
+      if (success) {
+        setShowAddCostPopup(false)
+        // Recargar los costos para actualizar la vista
+        fetchCostsByProyectSlug(slug as string)
+        
+        // Limpiar el formulario
+        setFormData({
+          fecha: new Date().toISOString().split('T')[0],
+          rubro: '',
+          proveedor: '',
+          detalle: '',
+          importePesos: '',
+          precioDolarBlue: '',
+          importeDolar: ''
+        })
+      }
+    } catch (err) {
+      setError('Error al guardar el costo: ' + (err instanceof Error ? err.message : 'Error desconocido'))
+    }
+  }
+  
   // Popup para agregar un nuevo costo
   const AddCostPopup = () => {
     return (
@@ -79,7 +180,7 @@ export default function CostosProyectoPage() {
             </p>
           )}
 
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -88,7 +189,11 @@ export default function CostosProyectoPage() {
                   </label>
                   <input 
                     type="date" 
+                    name="fecha"
+                    value={formData.fecha}
+                    onChange={handleChange}
                     className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400"
+                    required
                   />
                 </div>
               </div>
@@ -98,9 +203,13 @@ export default function CostosProyectoPage() {
                   Rubro
                 </label>
                 <input 
-                  type="text" 
+                  type="text"
+                  name="rubro"
+                  value={formData.rubro} 
+                  onChange={handleChange}
                   placeholder="ej: Construcción, Materiales, Servicios..." 
                   className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400"
+                  required
                 />
               </div>
               
@@ -109,9 +218,13 @@ export default function CostosProyectoPage() {
                   Proveedor
                 </label>
                 <input 
-                  type="text" 
+                  type="text"
+                  name="proveedor"
+                  value={formData.proveedor}
+                  onChange={handleChange}
                   placeholder="Nombre del proveedor" 
                   className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400"
+                  required
                 />
               </div>
               
@@ -120,6 +233,9 @@ export default function CostosProyectoPage() {
                   Detalle
                 </label>
                 <textarea 
+                  name="detalle"
+                  value={formData.detalle}
+                  onChange={handleChange}
                   placeholder="Descripción detallada del costo" 
                   className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400"
                   rows={3}
@@ -133,9 +249,13 @@ export default function CostosProyectoPage() {
                   </label>
                   <input 
                     type="number"
-                    step="0.01" 
+                    step="0.01"
+                    name="importePesos"
+                    value={formData.importePesos}
+                    onChange={handleChange}
                     placeholder="0.00" 
                     className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400"
+                    required
                   />
                 </div>
                 <div>
@@ -144,9 +264,13 @@ export default function CostosProyectoPage() {
                   </label>
                   <input 
                     type="number"
-                    step="0.01" 
+                    step="0.01"
+                    name="precioDolarBlue"
+                    value={formData.precioDolarBlue}
+                    onChange={handleChange}
                     placeholder="0.00" 
                     className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400"
+                    required
                   />
                 </div>
               </div>
@@ -157,12 +281,14 @@ export default function CostosProyectoPage() {
                 </label>
                 <input 
                   type="number"
-                  step="0.01" 
+                  step="0.01"
+                  name="importeDolar"
+                  value={formData.importeDolar}
                   placeholder="0.00" 
-                  disabled
+                  readOnly
                   className="w-full bg-slate-50 border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400"
                 />
-                <p className="text-xs text-slate-500 mt-1">Este valor se calculará automáticamente</p>
+                <p className="text-xs text-slate-500 mt-1">Este valor se calcula automáticamente</p>
               </div>
             </div>
             
@@ -175,7 +301,7 @@ export default function CostosProyectoPage() {
                 Cancelar
               </button>
               <button
-                type="button"
+                type="submit"
                 className="bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 px-4 rounded-md transition-colors"
               >
                 Guardar
@@ -186,6 +312,8 @@ export default function CostosProyectoPage() {
       </div>
     )
   }
+
+  const isLoading = isLoadingProyect || isLoadingCosts
 
   if (isLoading) {
     return (
@@ -260,15 +388,15 @@ export default function CostosProyectoPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white p-4 rounded-lg border border-slate-200">
             <h3 className="text-sm font-medium text-slate-500 mb-1">Total en ARS</h3>
-            <p className="text-2xl font-bold text-slate-800">{formatCurrency(0)}</p>
+            <p className="text-2xl font-bold text-slate-800">{formatCurrency(metrics?.totalPesos || 0)}</p>
           </div>
           <div className="bg-white p-4 rounded-lg border border-slate-200">
             <h3 className="text-sm font-medium text-slate-500 mb-1">Total en USD</h3>
-            <p className="text-2xl font-bold text-slate-800">{formatCurrencyUSD(0)}</p>
+            <p className="text-2xl font-bold text-slate-800">{formatCurrencyUSD(metrics?.totalDolares || 0)}</p>
           </div>
           <div className="bg-white p-4 rounded-lg border border-slate-200">
             <h3 className="text-sm font-medium text-slate-500 mb-1">Cantidad de registros</h3>
-            <p className="text-2xl font-bold text-slate-800">0</p>
+            <p className="text-2xl font-bold text-slate-800">{projectCosts?.length || 0}</p>
           </div>
         </div>
       </div>
@@ -320,14 +448,48 @@ export default function CostosProyectoPage() {
                   Usuario
                 </div>
               </th>
+              <th className="py-3 px-4 border-b border-slate-200 text-center font-medium">
+                Acciones
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
-            <tr className="text-center">
-              <td colSpan={7} className="py-8 text-slate-500">
-                No hay registros de costos para este proyecto
-              </td>
-            </tr>
+            {projectCosts && projectCosts.length > 0 ? (
+              projectCosts.map((cost: ProyectCost) => (
+                <tr key={cost.id} className="hover:bg-slate-50">
+                  <td className="py-3 px-4">{formatDate(cost.fecha)}</td>
+                  <td className="py-3 px-4">
+                    <div className="font-medium text-slate-800">{cost.rubro}</div>
+                    <div className="text-sm text-slate-500">{cost.proveedor}</div>
+                  </td>
+                  <td className="py-3 px-4">
+                    <div className="max-w-xs truncate">{cost.detalle || '-'}</div>
+                  </td>
+                  <td className="py-3 px-4">{formatCurrency(cost.importePesos)}</td>
+                  <td className="py-3 px-4">{formatCurrency(cost.precioDolarBlue)}</td>
+                  <td className="py-3 px-4">{formatCurrencyUSD(cost.importeDolar)}</td>
+                  <td className="py-3 px-4">
+                    {cost.usuario?.name || cost.usuario?.email || '-'}
+                  </td>
+                  <td className="py-3 px-4 text-center">
+                    <div className="flex justify-center gap-2">
+                      <button className="text-blue-600 hover:text-blue-800">
+                        <Edit className="h-4 w-4" />
+                      </button>
+                      <button className="text-red-600 hover:text-red-800">
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr className="text-center">
+                <td colSpan={8} className="py-8 text-slate-500">
+                  No hay registros de costos para este proyecto
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

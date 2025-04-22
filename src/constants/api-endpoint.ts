@@ -81,4 +81,13 @@ export const API_ENDPOINTS = {
   PROYECT_SHOW: (slug: string) => `${API_BASE_URL}/proyects/${slug}`,
   PROYECTS_CREATE: `${API_BASE_URL}/proyects`,
   PROYECT_UPDATE: (slug: string) => `${API_BASE_URL}/proyects/${slug}`,
+  
+  // Costos de proyectos
+  COSTS_INDEX: `${API_BASE_URL}/costs`,
+  COSTS_CREATE: `${API_BASE_URL}/costs`,
+  COSTS_BY_PROJECT_ID: (proyectId: number) => `${API_BASE_URL}/costs?proyectId=${proyectId}`,
+  COSTS_BY_PROJECT_SLUG: (slug: string) => `${API_BASE_URL}/costs/proyecto/${slug}`,
+  COST_BY_ID: (id: number) => `${API_BASE_URL}/costs/${id}`,
+  COST_UPDATE: (id: number) => `${API_BASE_URL}/costs/${id}`,
+  COST_DELETE: (id: number) => `${API_BASE_URL}/costs/${id}`,
 }
