@@ -1,6 +1,5 @@
 import { create } from 'zustand'
 import { API_ENDPOINTS } from '@/constants/api-endpoint'
-import { ProyectPhase, BusinessModel } from '@prisma/client'
 
 // Interfaces para las entidades relacionadas
 interface ProyectMedia {

@@ -15,11 +15,17 @@ import {
   Loader2,
   Receipt,
 } from 'lucide-react'
-import { useProyectStore, Proyect } from '@/store/proyectStore'
+import { useProyectStore } from '@/store/proyectStore'
 
 export default function ProyectosPage() {
   const router = useRouter()
-  const { proyects, isLoading, error: storeError, fetchProyects, deleteProyect } = useProyectStore()
+  const {
+    proyects,
+    isLoading,
+    error: storeError,
+    fetchProyects,
+    deleteProyect,
+  } = useProyectStore()
   const [error, setError] = useState('')
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
@@ -81,8 +87,7 @@ export default function ProyectosPage() {
       setSelectedPhase(null)
     } catch (err: any) {
       setError(
-        err.message ||
-          'Ocurrió un error al actualizar la fase del proyecto'
+        err.message || 'Ocurrió un error al actualizar la fase del proyecto'
       )
     } finally {
       setPhaseUpdating(false)
@@ -218,7 +223,10 @@ export default function ProyectosPage() {
                   onChange={() => setSelectedPhase('CONSTRUCTION')}
                   className="mr-2"
                 />
-                <label htmlFor="construction" className="text-sm text-slate-600">
+                <label
+                  htmlFor="construction"
+                  className="text-sm text-slate-600"
+                >
                   Construcción
                 </label>
               </div>
@@ -323,7 +331,7 @@ export default function ProyectosPage() {
               <Eye className="h-4 w-4 mr-2" />
               Ver en sitio
             </button>
-            
+
             <button
               onClick={() => {
                 setShowEditPopup(null)
@@ -374,9 +382,7 @@ export default function ProyectosPage() {
   return (
     <div className="container mx-auto py-8 px-4 bg-white">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-medium text-slate-800">
-          Proyectos
-        </h1>
+        <h1 className="text-2xl font-medium text-slate-800">Proyectos</h1>
         <Link
           href="/admin/dashboard/proyectos/crear"
           className="bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 px-4 rounded-md transition-colors flex items-center"
@@ -395,8 +401,8 @@ export default function ProyectosPage() {
 
       {proyects.length === 0 ? (
         <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-md mb-4">
-          No hay proyectos creados. Puedes crear un nuevo proyecto usando
-          el botón &quot;Crear Nuevo Proyecto&quot;.
+          No hay proyectos creados. Puedes crear un nuevo proyecto usando el
+          botón &quot;Crear Nuevo Proyecto&quot;.
         </div>
       ) : (
         <div className="overflow-x-auto rounded-md border border-slate-200">
@@ -422,10 +428,10 @@ export default function ProyectosPage() {
                   Inversores
                 </th>
                 <th className="py-3 px-4 border-b border-slate-200 text-left font-medium">
-                  Fecha Creación
+                  Acciones
                 </th>
                 <th className="py-3 px-4 border-b border-slate-200 text-left font-medium">
-                  Acciones
+                  Costos
                 </th>
               </tr>
             </thead>
@@ -439,7 +445,8 @@ export default function ProyectosPage() {
                     <div className="w-16 h-16 relative">
                       <img
                         src={
-                          project.projectMedia && project.projectMedia.length > 0
+                          project.projectMedia &&
+                          project.projectMedia.length > 0
                             ? project.projectMedia[0].link
                             : '/images/placeholder.svg'
                         }
@@ -466,8 +473,13 @@ export default function ProyectosPage() {
                   <td className="py-3 px-4 text-slate-700">
                     {project.proyectFound ? (
                       <span>
-                        {formatPrice(Number(project.proyectFound.quantityFunded))}{' '}
-                        / {formatPrice(Number(project.proyectFound.quantityToFund))}
+                        {formatPrice(
+                          Number(project.proyectFound.quantityFunded)
+                        )}{' '}
+                        /{' '}
+                        {formatPrice(
+                          Number(project.proyectFound.quantityToFund)
+                        )}
                       </span>
                     ) : (
                       <span className="text-slate-400">N/A</span>
@@ -512,6 +524,14 @@ export default function ProyectosPage() {
                         </button>
                       </div>
                     )}
+                  </td>
+                  <td className="py-3 px-4">
+                    <Link
+                      href={`/admin/dashboard/proyectos/costos?slug=${project.slug}`}
+                      className="bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs py-1 px-2 rounded-md transition-colors"
+                    >
+                      Agregar Costos
+                    </Link>
                   </td>
                 </tr>
               ))}
