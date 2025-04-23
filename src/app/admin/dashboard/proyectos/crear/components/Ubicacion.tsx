@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import CountryStateSelector from '@/components/common/CountryStateSelector'
 
 interface UbicacionProps {
@@ -43,6 +44,9 @@ export default function Ubicacion({
   countries,
   states
 }: UbicacionProps) {
+  // Valores predeterminados para Argentina (1), Santa Fe (21) y Rafaela
+  const defaultCity = 'Rafaela'
+
   return (
     <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
       <div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
@@ -57,21 +61,12 @@ export default function Ubicacion({
             selectedStateId={stateId || 0}
             onCountryChange={(id) => setCountryId(id === 0 ? null : id)}
             onStateChange={(id) => setStateId(id === 0 ? null : id)}
+            defaultCity={defaultCity}
+            onCityChange={setCity}
           />
         </div>
         
-        <div>
-          <label htmlFor="city" className="block text-sm font-medium text-slate-700 mb-1">
-            Ciudad
-          </label>
-          <input
-            id="city"
-            type="text"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-          />
-        </div>
+        {/* Se elimina el campo de ciudad ya que ahora está en el componente CountryStateSelector */}
         
         <div>
           <label htmlFor="postalCode" className="block text-sm font-medium text-slate-700 mb-1">

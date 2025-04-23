@@ -121,64 +121,6 @@ export default function InformacionBasica({
           </select>
         </div>
         
-        <div>
-          <label htmlFor="priority" className="block text-sm font-medium text-slate-700 mb-1">
-            Prioridad
-          </label>
-          <input
-            id="priority"
-            type="number"
-            value={priority}
-            onChange={(e) => setPriority(parseInt(e.target.value) || 0)}
-            className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-          />
-          <p className="mt-1 text-xs text-slate-500">
-            Valor numérico que determina la prioridad de visualización (mayor número = mayor prioridad)
-          </p>
-        </div>
-        
-        <div>
-          <label htmlFor="daysToEnd" className="block text-sm font-medium text-slate-700 mb-1">
-            Días para finalizar
-          </label>
-          <input
-            id="daysToEnd"
-            type="number"
-            value={daysToEnd}
-            onChange={(e) => setDaysToEnd(parseInt(e.target.value) || 0)}
-            className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-          />
-        </div>
-        
-        <div>
-          <label htmlFor="daysToStart" className="block text-sm font-medium text-slate-700 mb-1">
-            Días para comenzar
-          </label>
-          <input
-            id="daysToStart"
-            type="number"
-            value={daysToStart}
-            onChange={(e) => setDaysToStart(parseInt(e.target.value) || 0)}
-            className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-          />
-        </div>
-        
-        <div className="col-span-1 md:col-span-2">
-          <label htmlFor="openingLine" className="block text-sm font-medium text-slate-700 mb-1">
-            Línea de Apertura
-          </label>
-          <input
-            id="openingLine"
-            type="text"
-            value={openingLine}
-            onChange={(e) => setOpeningLine(e.target.value)}
-            className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
-          />
-          <p className="mt-1 text-xs text-slate-500">
-            Una breve introducción o eslogan para el proyecto
-          </p>
-        </div>
-        
         <div className="col-span-1 md:col-span-2">
           <label htmlFor="description" className="block text-sm font-medium text-slate-700 mb-1">
             Descripción

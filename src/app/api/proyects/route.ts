@@ -43,6 +43,29 @@ export async function POST(request: Request) {
 
     const data = await request.json()
     
+    // Preprocesar datos de la dirección para asegurarse que countryId y stateId sean valores válidos
+    let addressData = undefined
+    if (data.address) {
+      addressData = {
+        create: {
+          city: data.address.city,
+          postalCode: data.address.postalCode,
+          streetName: data.address.streetName,
+          description: data.address.description,
+          // Solo incluir estos campos si tienen valores válidos (números enteros)
+          ...(data.address.countryId && Number.isInteger(parseInt(data.address.countryId)) 
+              ? { countryId: parseInt(data.address.countryId) } 
+              : {}),
+          ...(data.address.stateId && Number.isInteger(parseInt(data.address.stateId)) 
+              ? { stateId: parseInt(data.address.stateId) } 
+              : {}),
+          positions: data.address.positions ? {
+            create: data.address.positions
+          } : undefined
+        }
+      }
+    }
+    
     // Crear el proyecto con datos relacionados
     const newProyect = await prisma.proyect.create({
       data: {
@@ -61,20 +84,8 @@ export async function POST(request: Request) {
         daysToStart: data.daysToStart,
         priority: data.priority,
         
-        // Crear dirección si se proporciona
-        address: data.address ? {
-          create: {
-            city: data.address.city,
-            postalCode: data.address.postalCode,
-            streetName: data.address.streetName,
-            description: data.address.description,
-            countryId: data.address.countryId,
-            stateId: data.address.stateId,
-            positions: data.address.positions ? {
-              create: data.address.positions
-            } : undefined
-          }
-        } : undefined,
+        // Usar los datos de dirección preprocesados
+        address: addressData,
         
         // Crear medios del proyecto si se proporciona
         projectMedia: data.projectMedia ? {

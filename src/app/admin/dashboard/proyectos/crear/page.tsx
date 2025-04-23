@@ -10,14 +10,17 @@ import { slugify } from '@/utils/slugify'
 // Importar componentes del formulario
 import InformacionBasica from './components/InformacionBasica'
 import Ubicacion from './components/Ubicacion'
-import DetallesTecnicos from './components/DetallesTecnicos'
-import Financiacion from './components/Financiacion'
 import MediaItems from './components/MediaItems'
 import BotonesAcciones from './components/BotonesAcciones'
 
 export default function CrearProyectoPage() {
   const router = useRouter()
   const { createProyect, isLoading, error: storeError } = useProyectStore()
+  
+  // Valores predeterminados para Argentina y Santa Fe
+  const defaultCountryId = 1 // Argentina
+  const defaultStateId = 21 // Santa Fe
+  const defaultCity = 'Rafaela'
   
   // Estados para los campos del formulario
   const [title, setTitle] = useState('')
@@ -32,11 +35,11 @@ export default function CrearProyectoPage() {
   const [daysToStart, setDaysToStart] = useState<number>(0)
   
   // Estados para dirección
-  const [city, setCity] = useState('')
+  const [city, setCity] = useState(defaultCity)
   const [postalCode, setPostalCode] = useState('')
   const [streetName, setStreetName] = useState('')
-  const [countryId, setCountryId] = useState<number | null>(null)
-  const [stateId, setStateId] = useState<number | null>(null)
+  const [countryId, setCountryId] = useState<number | null>(defaultCountryId)
+  const [stateId, setStateId] = useState<number | null>(defaultStateId)
   const [addressDescription, setAddressDescription] = useState('')
   const [latitude, setLatitude] = useState('')
   const [longitude, setLongitude] = useState('')
@@ -285,28 +288,6 @@ export default function CrearProyectoPage() {
           states={states}
         />
         
-        {/* Detalles técnicos del proyecto */}
-        <DetallesTecnicos 
-          proyectType={proyectType}
-          setProyectType={setProyectType}
-          investmentPeriod={investmentPeriod}
-          setInvestmentPeriod={setInvestmentPeriod}
-          surface={surface}
-          setSurface={setSurface}
-          rooms={rooms}
-          setRooms={setRooms}
-          floors={floors}
-          setFloors={setFloors}
-          features={features}
-          setFeatures={setFeatures}
-          buildingYear={buildingYear}
-          setBuildingYear={setBuildingYear}
-          riskScore={riskScore}
-          setRiskScore={setRiskScore}
-          profitabilityScore={profitabilityScore}
-          setProfitabilityScore={setProfitabilityScore}
-        />
-        
         {/* Medios del proyecto */}
         <MediaItems 
           mediaItems={mediaItems}
@@ -315,30 +296,6 @@ export default function CrearProyectoPage() {
           setShowMediaForm={setShowMediaForm}
           tempMedia={tempMedia}
           setTempMedia={setTempMedia}
-        />
-        
-        {/* Información de financiación */}
-        <Financiacion 
-          startInvestDate={startInvestDate}
-          setStartInvestDate={setStartInvestDate}
-          endInvestDate={endInvestDate}
-          setEndInvestDate={setEndInvestDate}
-          companyCapital={companyCapital}
-          setCompanyCapital={setCompanyCapital}
-          quantityFunded={quantityFunded}
-          setQuantityFunded={setQuantityFunded}
-          quantityToFund={quantityToFund}
-          setQuantityToFund={setQuantityToFund}
-          maxOverfunding={maxOverfunding}
-          setMaxOverfunding={setMaxOverfunding}
-          rentProfitability={rentProfitability}
-          setRentProfitability={setRentProfitability}
-          totalNetProfitability={totalNetProfitability}
-          setTotalNetProfitability={setTotalNetProfitability}
-          totalNetProfitabilityToShow={totalNetProfitabilityToShow}
-          setTotalNetProfitabilityToShow={setTotalNetProfitabilityToShow}
-          apreciationProfitability={apreciationProfitability}
-          setApreciationProfitability={setApreciationProfitability}
         />
         
         {/* Botones de acción */}
