@@ -244,65 +244,18 @@ export const Header: React.FC = () => {
                             >
                               Inicio
                             </MobileNavLink>
-
-                            <Disclosure>
-                              {({ open }) => (
-                                <>
-                                  <DisclosureButton className="flex justify-between w-full px-4 py-3 bg-white text-black hover:bg-gray-100">
-                                    <span>Propiedades</span>
-                                    <ChevronDown
-                                      className={`w-5 h-5 transition-transform ${
-                                        open ? 'transform rotate-180' : ''
-                                      }`}
-                                    />
-                                  </DisclosureButton>
-                                  <DisclosurePanel className="bg-gray-100">
-                                    <MobileNavLink
-                                      href="/propiedades/venta"
-                                      className="block w-full px-6 py-2 text-black hover:bg-gray-200"
-                                    >
-                                      En venta
-                                    </MobileNavLink>
-                                    <MobileNavLink
-                                      href="/propiedades/alquiler"
-                                      className="block w-full px-6 py-2 text-black hover:bg-gray-200"
-                                    >
-                                      En alquiler
-                                    </MobileNavLink>
-                                  </DisclosurePanel>
-                                </>
-                              )}
-                            </Disclosure>
-
-                            <Disclosure>
-                              {({ open }) => (
-                                <>
-                                  <DisclosureButton className="flex justify-between w-full px-4 py-3 bg-white text-black hover:bg-gray-100">
-                                    <span>Proyectos</span>
-                                    <ChevronDown
-                                      className={`w-5 h-5 transition-transform ${
-                                        open ? 'transform rotate-180' : ''
-                                      }`}
-                                    />
-                                  </DisclosureButton>
-                                  <DisclosurePanel className="bg-gray-100">
-                                    <MobileNavLink
-                                      href="/proyectos/residenciales"
-                                      className="block w-full px-6 py-2 text-black hover:bg-gray-200"
-                                    >
-                                      Residenciales
-                                    </MobileNavLink>
-                                    <MobileNavLink
-                                      href="/proyectos/comerciales"
-                                      className="block w-full px-6 py-2 text-black hover:bg-gray-200"
-                                    >
-                                      Comerciales
-                                    </MobileNavLink>
-                                  </DisclosurePanel>
-                                </>
-                              )}
-                            </Disclosure>
-
+                            <MobileNavLink
+                              href="/propiedades"
+                              className="w-full px-4 py-3 text-left bg-white text-black hover:bg-gray-100"
+                            >
+                              Propiedades
+                            </MobileNavLink>
+                            <MobileNavLink
+                              href="/proyectos"
+                              className="w-full px-4 py-3 text-left bg-white text-black hover:bg-gray-100"
+                            >
+                              Proyectos
+                            </MobileNavLink>
                             <MobileNavLink
                               href="/creditos"
                               className="w-full px-4 py-3 text-left bg-white text-black hover:bg-gray-100"
