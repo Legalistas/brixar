@@ -16,6 +16,11 @@ export default function PublicarPropiedad() {
   const [uploadingImages, setUploadingImages] = useState(false)
   const [imageUploadProgress, setImageUploadProgress] = useState(0)
 
+  // IDs por defecto para Argentina y Santa Fe
+  const defaultCountryId = 1 // Argentina
+  const defaultStateId = 21 // Santa Fe
+  const defaultCity = 'Rafaela'
+
   // Estados para el formulario
   const [formData, setFormData] = useState({
     title: '',
@@ -32,9 +37,9 @@ export default function PublicarPropiedad() {
     quantity: 1,
     amenities: {} as Record<string, boolean>,
     address: {
-      countryId: 0,
-      stateId: 0,
-      city: '',
+      countryId: defaultCountryId,
+      stateId: defaultStateId,
+      city: defaultCity,
       postalCode: '',
       streetName: '',
       description: '',
@@ -63,6 +68,17 @@ export default function PublicarPropiedad() {
       address: {
         ...formData.address,
         stateId,
+      },
+    })
+  }
+
+  // Manejador para el cambio de ciudad
+  const handleCityChange = (city: string) => {
+    setFormData({
+      ...formData,
+      address: {
+        ...formData.address,
+        city,
       },
     })
   }
@@ -544,23 +560,8 @@ export default function PublicarPropiedad() {
               selectedStateId={formData.address.stateId}
               onCountryChange={handleCountryChange}
               onStateChange={handleStateChange}
-            />
-          </div>
-
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="address.city"
-            >
-              Ciudad
-            </label>
-            <input
-              id="address.city"
-              name="address.city"
-              type="text"
-              value={formData.address.city || ''}
-              onChange={handleInputChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight"
+              defaultCity={defaultCity}
+              onCityChange={handleCityChange}
             />
           </div>
 

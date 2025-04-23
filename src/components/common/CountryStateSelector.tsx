@@ -20,6 +20,8 @@ interface CountryStateSelectorProps {
   selectedStateId: number
   onCountryChange: (countryId: number) => void
   onStateChange: (stateId: number) => void
+  defaultCity?: string
+  onCityChange?: (city: string) => void
 }
 
 const countries: Country[] = [
@@ -118,9 +120,12 @@ export default function CountryStateSelector({
   selectedCountryId,
   selectedStateId,
   onCountryChange,
-  onStateChange
+  onStateChange,
+  defaultCity,
+  onCityChange
 }: CountryStateSelectorProps) {
   const [availableStates, setAvailableStates] = useState<State[]>([])
+  const [city, setCity] = useState(defaultCity || '')
 
   // Actualizar estados disponibles cuando cambia el país seleccionado
   useEffect(() => {
@@ -143,6 +148,23 @@ export default function CountryStateSelector({
       }
     }
   }, [selectedCountryId])
+
+  // Manejar cambios en el campo de ciudad
+  const handleCityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newCity = e.target.value
+    setCity(newCity)
+    if (onCityChange) {
+      onCityChange(newCity)
+    }
+  }
+
+  // Usar el defaultCity cuando se monta el componente
+  useEffect(() => {
+    if (defaultCity && onCityChange) {
+      setCity(defaultCity)
+      onCityChange(defaultCity)
+    }
+  }, [defaultCity])
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -191,6 +213,25 @@ export default function CountryStateSelector({
             </option>
           ))}
         </select>
+      </div>
+
+      {/* Campo para la ciudad */}
+      <div className="mb-4 md:col-span-2">
+        <label
+          className="block text-gray-700 text-sm font-bold mb-2"
+          htmlFor="city"
+        >
+          Ciudad
+        </label>
+        <input
+          id="city"
+          name="city"
+          type="text"
+          value={city}
+          onChange={handleCityChange}
+          placeholder="Ingrese la ciudad"
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+        />
       </div>
     </div>
   )
