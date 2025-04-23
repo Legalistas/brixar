@@ -77,7 +77,7 @@ export function TikTok() {
           <div className="flex items-center gap-4">
             <div className="relative h-12 w-12 overflow-hidden rounded-full bg-gray-100">
               <Image
-                src="/logoLegalistas.webp"
+                src="/brixarlogo.jpeg"
                 alt="Abogados Legalistas"
                 width={48}
                 height={48}
@@ -86,17 +86,17 @@ export function TikTok() {
               />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900">Abogados Legalistas</h3>
-              <p className="text-sm text-gray-500">@legalistas.ar</p>
+              <h3 className="font-semibold text-gray-900">Brixar Propiedades</h3>
+              <p className="text-sm text-gray-500">@brixar.propiedades</p>
             </div>
           </div>
-          <Link href="https://www.tiktok.com/@legalistas.ar" target="_blank" rel="noopener noreferrer">
+          <Link href="https://www.tiktok.com/@brixar.propiedades" target="_blank" rel="noopener noreferrer">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="rounded-md bg-[#FE2C55] px-6 py-2 font-medium text-white transition-colors hover:bg-[#ef233c] cursor-pointer"
             >
-              Follow on TikTok
+              Síguenos en TikTok
             </motion.button>
           </Link>
         </div>
