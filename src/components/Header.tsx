@@ -262,36 +262,12 @@ export const Header: React.FC = () => {
                             >
                               Créditos
                             </MobileNavLink>
-
-                            <Disclosure>
-                              {({ open }) => (
-                                <>
-                                  <DisclosureButton className="flex justify-between w-full px-4 py-3 bg-white text-black hover:bg-gray-100">
-                                    <span>Opiniones</span>
-                                    <ChevronDown
-                                      className={`w-5 h-5 transition-transform ${
-                                        open ? 'transform rotate-180' : ''
-                                      }`}
-                                    />
-                                  </DisclosureButton>
-                                  <DisclosurePanel className="bg-gray-100">
-                                    <MobileNavLink
-                                      href="/#reviews"
-                                      className="block w-full px-6 py-2 text-black hover:bg-gray-200"
-                                    >
-                                      Ver todas
-                                    </MobileNavLink>
-                                    <MobileNavLink
-                                      href="/opiniones/destacadas"
-                                      className="block w-full px-6 py-2 text-black hover:bg-gray-200"
-                                    >
-                                      Destacadas
-                                    </MobileNavLink>
-                                  </DisclosurePanel>
-                                </>
-                              )}
-                            </Disclosure>
-
+                            <MobileNavLink
+                              href="/#reviews"
+                              className="w-full px-4 py-3 text-left bg-white text-black hover:bg-gray-100"
+                            >
+                              Opiniones
+                            </MobileNavLink>
                             <MobileNavLink
                               href="/contacto"
                               className="w-full px-4 py-3 text-left bg-white text-black hover:bg-gray-100"
