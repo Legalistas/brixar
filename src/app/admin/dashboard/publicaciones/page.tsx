@@ -310,7 +310,7 @@ export default function PublicacionesPage() {
             <button
               onClick={() => {
                 setShowEditPopup(null)
-                router.push(`/admin/editar/${slug}`)
+                router.push(`/admin/dashboard/propiedad/editar/${slug}`)
               }}
               className="border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-medium py-3 px-4 rounded-md transition-colors flex items-center justify-center"
             >
