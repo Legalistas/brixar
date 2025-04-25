@@ -8,6 +8,7 @@ import {
   Maximize,
   type LucideIcon,
 } from 'lucide-react'
+import { generatePropertySku } from '@/lib/utils'
 
 type ProjectPhase = 'CONSTRUCTION' | 'COMPLETED' | 'PLANNING'
 type ProjectType = 'APARTMENT' | 'HOUSE'
@@ -134,6 +135,12 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
           <p>
             {mainAddress?.state?.name}, {mainAddress?.country?.name}
           </p>
+        </div>
+      </div>
+
+      <div className="p-4 border-t border-gray-200 mb-2">
+        <div className="text-xs text-gray-600">
+          <span className="font-semibold">SKU:</span> {generatePropertySku(project?.id, project?.title)}
         </div>
       </div>
 

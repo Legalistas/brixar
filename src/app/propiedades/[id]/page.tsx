@@ -44,6 +44,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel'
+import { generatePropertySku } from '@/lib/utils'
 
 type Property = {
   id: number
@@ -436,6 +437,10 @@ export default function PropertyPage() {
                   <p className="text-gray-600 text-sm mb-4">
                     Completa el formulario y nos pondremos en contacto contigo a
                     la brevedad.
+                  </p>
+
+                  <p className="text-gray-600 text-sm mb-4">
+                    SKU: <strong>{generatePropertySku(property?.id, property?.title)}</strong>
                   </p>
 
                   {session ? (

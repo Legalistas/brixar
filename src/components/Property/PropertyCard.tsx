@@ -4,6 +4,7 @@ import { formatCurrency } from '@/utils/formatUtils'
 import { Bath, BedDouble, Building2, Home, Maximize } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { generatePropertySku } from '@/lib/utils'
 
 interface PropertyImage {
   id: number
@@ -157,6 +158,13 @@ const PropertyCard = ({ property }: PropertyProps) => {
           <p>
             {mainAddress?.state?.name}, {mainAddress?.country?.name}
           </p>
+        </div>
+      </div>
+
+      {/* SKU */}
+      <div className="p-4 border-t border-gray-200 mb-2">
+        <div className="text-xs text-gray-600">
+          <span className="font-semibold">SKU:</span> {generatePropertySku(property?.id, property?.title)}
         </div>
       </div>
 
