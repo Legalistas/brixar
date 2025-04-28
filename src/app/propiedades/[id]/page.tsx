@@ -45,6 +45,8 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel'
 import { generatePropertySku } from '@/lib/utils'
+import { CallToAction } from '@/components/CallToAction'
+import { TikTok } from '@/components/TikTok/TikTok'
 
 type Property = {
   id: number
@@ -440,7 +442,10 @@ export default function PropertyPage() {
                   </p>
 
                   <p className="text-gray-600 text-sm mb-4">
-                    SKU: <strong>{generatePropertySku(property?.id, property?.title)}</strong>
+                    SKU:{' '}
+                    <strong>
+                      {generatePropertySku(property?.id, property?.title)}
+                    </strong>
                   </p>
 
                   {session ? (
@@ -612,6 +617,11 @@ export default function PropertyPage() {
           </div>
         </div>
       </main>
+
+      <section className="py-8">
+        <CallToAction />
+        <TikTok />
+      </section>
       <Footer />
     </>
   )

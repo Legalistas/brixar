@@ -6,6 +6,7 @@ import { API_ENDPOINTS } from '@/constants/api-endpoint'
 import { PropertyState, ListingType } from '@prisma/client'
 import CountryStateSelector from '@/components/common/CountryStateSelector'
 import { Loader2 } from 'lucide-react'
+import { geocodeAddress } from '@/utils/geocodingUtils'
 
 export default function EditarPropiedad({ params }: { params: { slug: string } }) {
   const router = useRouter()
@@ -21,6 +22,7 @@ export default function EditarPropiedad({ params }: { params: { slug: string } }
   const [uploadingImages, setUploadingImages] = useState(false)
   const [imageUploadProgress, setImageUploadProgress] = useState(0)
   const [propertyNotFound, setPropertyNotFound] = useState(false)
+  const [loadingGeocode, setLoadingGeocode] = useState(false)
 
   // IDs por defecto para Argentina y Santa Fe
   const defaultCountryId = 1 // Argentina
@@ -345,6 +347,69 @@ export default function EditarPropiedad({ params }: { params: { slug: string } }
     } finally {
       setLoading(false)
     }
+  }
+
+  // Función para buscar coordenadas geográficas
+  const searchCoordinates = async () => {
+    if (!formData.address.streetName || !formData.address.city) {
+      setError('Se necesita una dirección válida para buscar coordenadas')
+      return
+    }
+    
+    setLoadingGeocode(true)
+    setError('')
+    
+    try {
+      // Obtener país y estado
+      const country = 'Argentina' // Por defecto Argentina, se podría buscar el nombre del país según countryId
+      const state = 'Santa Fe' // Por defecto Santa Fe, se podría buscar el nombre del estado según stateId
+      
+      const coordinates = await geocodeAddress(
+        formData.address.streetName,
+        formData.address.city,
+        state,
+        country,
+        formData.address.postalCode
+      )
+      
+      if (coordinates) {
+        setFormData({
+          ...formData,
+          address: {
+            ...formData.address,
+            positions: {
+              ...formData.address.positions,
+              latitude: coordinates.latitude,
+              longitude: coordinates.longitude,
+            },
+          },
+        })
+        
+        // Mensaje temporal de éxito
+        const successMessage = document.getElementById('geocode-success')
+        if (successMessage) {
+          successMessage.classList.remove('hidden')
+          setTimeout(() => {
+            successMessage.classList.add('hidden')
+          }, 3000)
+        }
+      } else {
+        setError('No se pudieron encontrar coordenadas para esta dirección')
+      }
+    } catch (error) {
+      console.error('Error al buscar coordenadas:', error)
+      setError('Error al buscar coordenadas geográficas')
+    } finally {
+      setLoadingGeocode(false)
+    }
+  }
+
+  // Manejador para actualizar la dirección y automáticamente buscar coordenadas
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleInputChange(e)
+    
+    // No buscamos automáticamente para no sobrecargar la API
+    // El usuario puede usar el botón "Buscar Coordenadas" cuando quiera
   }
 
   if (loadingProperty) {
@@ -734,7 +799,7 @@ export default function EditarPropiedad({ params }: { params: { slug: string } }
               name="address.streetName"
               type="text"
               value={formData.address.streetName || ''}
-              onChange={handleInputChange}
+              onChange={handleAddressChange}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight"
             />
           </div>
@@ -788,6 +853,19 @@ export default function EditarPropiedad({ params }: { params: { slug: string } }
               onChange={handleInputChange}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight"
             />
+          </div>
+
+          {/* Botón para buscar coordenadas */}
+          <div className="col-span-2 mb-4">
+            <button
+              type="button"
+              onClick={searchCoordinates}
+              className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+              disabled={loadingGeocode}
+            >
+              {loadingGeocode ? 'Buscando...' : 'Buscar Coordenadas'}
+            </button>
+            <p id="geocode-success" className="hidden text-green-500 mt-2">Coordenadas encontradas y actualizadas</p>
           </div>
 
           {/* Imágenes */}
