@@ -78,7 +78,7 @@ export function TikTok() {
             <div className="relative h-12 w-12 overflow-hidden rounded-full bg-gray-100">
               <Image
                 src="/brixarlogo.jpeg"
-                alt="Abogados Legalistas"
+                alt="Brixar Logo"
                 width={48}
                 height={48}
                 className="object-cover"
