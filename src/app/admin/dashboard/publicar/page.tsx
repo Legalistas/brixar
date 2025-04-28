@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { API_ENDPOINTS } from '@/constants/api-endpoint'
 import { PropertyState, ListingType } from '@prisma/client'
 import CountryStateSelector from '@/components/common/CountryStateSelector'
+import { Loader2 } from 'lucide-react'
+import { geocodeAddress } from '@/utils/geocodingUtils'
 
 export default function PublicarPropiedad() {
   const router = useRouter()
@@ -15,6 +17,7 @@ export default function PublicarPropiedad() {
   const [imageFiles, setImageFiles] = useState<File[]>([])
   const [uploadingImages, setUploadingImages] = useState(false)
   const [imageUploadProgress, setImageUploadProgress] = useState(0)
+  const [loadingGeocode, setLoadingGeocode] = useState(false)
 
   // IDs por defecto para Argentina y Santa Fe
   const defaultCountryId = 1 // Argentina
@@ -141,6 +144,60 @@ export default function PublicarPropiedad() {
         [name]: checked,
       },
     })
+  }
+
+  // Función para buscar coordenadas geográficas basadas en la dirección
+  const searchCoordinates = async () => {
+    if (!formData.address.streetName || !formData.address.city) {
+      setError('Se necesita una dirección completa para buscar coordenadas')
+      return
+    }
+    
+    setLoadingGeocode(true)
+    setError('')
+    
+    try {
+      // Obtener nombres de país y estado según sus IDs
+      const country = 'Argentina'
+      const state = 'Santa Fe'
+      
+      // En un caso real podríamos buscar los nombres según los IDs
+      // pero por simplicidad usamos los valores por defecto
+      
+      const coordinates = await geocodeAddress(
+        formData.address.streetName,
+        formData.address.city,
+        state,
+        country,
+        formData.address.postalCode
+      )
+      
+      if (coordinates) {
+        setFormData({
+          ...formData,
+          address: {
+            ...formData.address,
+            positions: {
+              latitude: coordinates.latitude,
+              longitude: coordinates.longitude,
+            },
+          },
+        })
+        
+        // Notificar éxito brevemente
+        setSuccess(true)
+        setTimeout(() => {
+          setSuccess(false)
+        }, 3000)
+      } else {
+        setError('No se pudieron encontrar coordenadas para esta dirección')
+      }
+    } catch (error) {
+      console.error('Error al buscar coordenadas:', error)
+      setError('Error al buscar coordenadas geográficas')
+    } finally {
+      setLoadingGeocode(false)
+    }
   }
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -589,14 +646,33 @@ export default function PublicarPropiedad() {
             >
               Dirección
             </label>
-            <input
-              id="address.streetName"
-              name="address.streetName"
-              type="text"
-              value={formData.address.streetName || ''}
-              onChange={handleInputChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight"
-            />
+            <div className="flex">
+              <input
+                id="address.streetName"
+                name="address.streetName"
+                type="text"
+                value={formData.address.streetName || ''}
+                onChange={handleInputChange}
+                className="shadow appearance-none border rounded-l w-full py-2 px-3 text-gray-700 leading-tight"
+              />
+              <button
+                type="button"
+                onClick={searchCoordinates}
+                disabled={loadingGeocode || !formData.address.streetName}
+                className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r focus:outline-none focus:shadow-outline ${
+                  loadingGeocode || !formData.address.streetName ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                {loadingGeocode ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  'Buscar Coordenadas'
+                )}
+              </button>
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Ingrese la dirección completa y haga clic en &quot;Buscar Coordenadas&quot; para obtener la ubicación exacta
+            </p>
           </div>
 
           <div className="mb-4">
