@@ -99,7 +99,7 @@ export async function POST(request: Request) {
         importePesos: data.importePesos,
         precioDolarBlue: data.precioDolarBlue,
         importeDolar: data.importeDolar,
-        usuarioId: session.user.id
+        usuarioId: parseInt(session.user.id, 10)
       },
       include: {
         proyect: {
