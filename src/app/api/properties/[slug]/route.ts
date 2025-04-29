@@ -54,6 +54,10 @@ export async function PATCH(
     // Verificar si la propiedad existe
     const existingProperty = await prisma.property.findUnique({
       where: { slug },
+      include: {
+        address: true,
+        images: true,
+      },
     });
 
     if (!existingProperty) {
@@ -74,12 +78,74 @@ export async function PATCH(
       }
     }
 
+    // Extraer datos de relaciones para manejarlos por separado
+    const { address, images, ...propertyData } = data;
+
+    // Datos básicos para actualizar la propiedad
+    const updateData: any = {
+      ...propertyData,
+      updatedAt: new Date(),
+    };
+
+    // Si hay datos de dirección, manejarlos adecuadamente
+    if (address) {
+      // Extraer datos específicos de actualización de la dirección
+      const { positions, id, ...addressData } = address;
+
+      updateData.address = {
+        update: existingProperty.address.map(addr => {
+          return {
+            where: { id: addr.id },
+            data: {
+              ...addressData,
+              // Si hay datos de posiciones, actualizar también las posiciones
+              ...(positions && {
+                positions: {
+                  update: {
+                    where: { id: positions.id },
+                    data: {
+                      latitude: positions.latitude,
+                      longitude: positions.longitude,
+                    },
+                  },
+                },
+              }),
+            },
+          };
+        }),
+      };
+    }
+
+    // Si hay datos de imágenes, manejarlos adecuadamente
+    if (images && Array.isArray(images)) {
+      // Si se proporcionan imágenes, asumimos que queremos reemplazar las existentes
+      if (images.length > 0) {
+        updateData.images = {
+          // Primero eliminar todas las imágenes existentes
+          deleteMany: {},
+          // Luego crear las nuevas imágenes
+          create: images.map(img => ({
+            url: img.url,
+            alt: img.alt || 'Imagen de propiedad',
+            isMain: img.isMain || false,
+          })),
+        };
+      }
+    }
+
     // Actualizar la propiedad
     const updatedProperty = await prisma.property.update({
       where: { slug },
-      data: {
-        ...data,
-        updatedAt: new Date(),
+      data: updateData,
+      include: {
+        address: {
+          include: {
+            positions: true,
+            country: true,
+            state: true,
+          },
+        },
+        images: true,
       },
     });
 
