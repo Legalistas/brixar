@@ -723,30 +723,30 @@ export default function EditarPropiedad({ params }: { params: { slug: string } }
             <h2 className="text-xl font-semibold mb-4">Amenidades</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                'wifi',
-                'pool',
-                'gym',
-                'parking',
-                'security',
-                'airConditioning',
-                'heating',
-                'laundry',
-                'elevator',
-                'petFriendly',
-                'garden',
-                'terrace',
-                'balcony',
+                { key: 'wifi', label: 'WiFi' },
+                { key: 'pool', label: 'Piscina' },
+                { key: 'gym', label: 'Gimnasio' },
+                { key: 'parking', label: 'Estacionamiento' },
+                { key: 'security', label: 'Seguridad' },
+                { key: 'airConditioning', label: 'Aire Acondicionado' },
+                { key: 'heating', label: 'Calefacción' },
+                { key: 'laundry', label: 'Lavandería' },
+                { key: 'elevator', label: 'Ascensor' },
+                { key: 'petFriendly', label: 'Acepta Mascotas' },
+                { key: 'garden', label: 'Jardín' },
+                { key: 'terrace', label: 'Terraza' },
+                { key: 'balcony', label: 'Balcón' },
               ].map((amenity) => (
-                <div key={amenity} className="mb-2">
+                <div key={amenity.key} className="mb-2">
                   <label className="inline-flex items-center">
                     <input
                       type="checkbox"
-                      name={amenity}
-                      checked={!!formData.amenities[amenity]}
+                      name={amenity.key}
+                      checked={!!formData.amenities[amenity.key]}
                       onChange={handleAmenityChange}
                       className="form-checkbox h-5 w-5 text-blue-600"
                     />
-                    <span className="ml-2 text-gray-700">{amenity}</span>
+                    <span className="ml-2 text-gray-700">{amenity.label}</span>
                   </label>
                 </div>
               ))}

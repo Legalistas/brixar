@@ -95,6 +95,7 @@ model Property {
   quantity      Int             @default(1)
   status        PropertyStatus  @default(EN_VENTA)
   images        PropertyImage[]
+  videos        PropertyVideo[] // Añadimos la relación con los videos
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @default(now())
   address       Address[]
@@ -112,6 +113,18 @@ model PropertyImage {
   property   Property @relation(fields: [propertyId], references: [id]) // Relación con la propiedad
 
   @@map("property_images") // Mapea el modelo PropertyImage a la tabla "property_images" en la base de datos
+}
+
+model PropertyVideo {
+  id          Int      @id @default(autoincrement()) 
+  url         String // URL donde se almacena el video
+  title       String? // Título opcional del video
+  description String? @db.Text // Descripción opcional del video
+  thumbnail   String? // URL de la miniatura del video
+  propertyId  Int // ID de la propiedad asociada
+  property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade) // Relación con la propiedad
+
+  @@map("property_videos") // Mapea el modelo a la tabla "property_videos" en la base de datos
 }
 
 model Proyect {
@@ -416,7 +429,7 @@ model InquiryMessage {
   message     String    @db.Text
   isAdmin     Boolean   @default(false)
   createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  updatedAt   DateTime  @default(now())
   inquiry     Inquiry   @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 

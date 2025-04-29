@@ -63,6 +63,7 @@ type Property = {
   yearBuilt: number
   parkingSpaces: number
   images: { id: number; url: string }[]
+  videos: { id: number; url: string; title?: string; description?: string; thumbnail?: string }[]
   address: {
     city: string
     postalCode: string
@@ -320,6 +321,35 @@ export default function PropertyPage() {
                 ))}
               </div>
             </section>
+
+            {/* Sección de videos */}
+            {property.videos && property.videos.length > 0 && (
+              <section className="mt-8">
+                <h3 className="text-xl font-semibold mb-4">Videos</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {property.videos.map((video) => (
+                    <div key={video.id} className="bg-gray-100 rounded-xl overflow-hidden">
+                      <div className="aspect-video">
+                        <video
+                          src={video.url}
+                          controls
+                          className="w-full h-full object-cover"
+                          poster={video.thumbnail || undefined}
+                        >
+                          Tu navegador no soporta la reproducción de videos.
+                        </video>
+                      </div>
+                      {(video.title || video.description) && (
+                        <div className="p-3 bg-white">
+                          {video.title && <h4 className="font-medium">{video.title}</h4>}
+                          {video.description && <p className="text-sm text-gray-600 mt-1">{video.description}</p>}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
 
             <section className="mt-12">
               <Card>

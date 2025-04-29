@@ -6,6 +6,7 @@ export async function GET() {
     const properties = await prisma.property.findMany({
       include: {
         images: true,
+        videos: true, // Incluimos los videos en la consulta
         address: {
           include: {
             state: true,
@@ -58,6 +59,14 @@ export async function POST(request: Request) {
           images: {
             create: data.images?.map((url: string) => ({
               url,
+            })) || [],
+          },
+          videos: {
+            create: data.videos?.map((url: string) => ({
+              url,
+              title: `Video ${data.title}`,
+              description: data.description ? `Video de ${data.title}` : null,
+              thumbnail: null, // Por ahora sin miniatura
             })) || [],
           },
         },

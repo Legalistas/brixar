@@ -41,6 +41,7 @@ export default function CostosProyectoPage() {
   const [formData, setFormData] = useState<{
     fecha: string;
     rubro: string;
+    rubroPersonalizado: string;
     proveedor: string;
     detalle: string;
     importePesos: string;
@@ -49,12 +50,16 @@ export default function CostosProyectoPage() {
   }>({
     fecha: new Date().toISOString().split('T')[0],
     rubro: '',
+    rubroPersonalizado: '',
     proveedor: '',
     detalle: '',
     importePesos: '',
     precioDolarBlue: '',
     importeDolar: ''
   })
+
+  // Lista de rubros predefinidos
+  const rubros = ['Materiales', 'Mano Obra', 'Seguros', 'Planos / Escrituras', 'Otros']
 
   // Cargar el proyecto si se proporciona un slug
   useEffect(() => {
@@ -100,7 +105,7 @@ export default function CostosProyectoPage() {
   }
   
   // Manejar cambios en el formulario
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
     
@@ -134,7 +139,7 @@ export default function CostosProyectoPage() {
         proyectId: currentProyect.id,
         fecha: formData.fecha,
         mes: mes,
-        rubro: formData.rubro,
+        rubro: formData.rubro === 'Otros' ? formData.rubroPersonalizado : formData.rubro,
         proveedor: formData.proveedor,
         detalle: formData.detalle,
         importePesos: parseFloat(formData.importePesos),
@@ -153,6 +158,7 @@ export default function CostosProyectoPage() {
         setFormData({
           fecha: new Date().toISOString().split('T')[0],
           rubro: '',
+          rubroPersonalizado: '',
           proveedor: '',
           detalle: '',
           importePesos: '',
@@ -202,15 +208,29 @@ export default function CostosProyectoPage() {
                 <label className="block text-sm font-medium text-slate-700 mb-1">
                   Rubro
                 </label>
-                <input 
-                  type="text"
+                <select 
                   name="rubro"
                   value={formData.rubro} 
                   onChange={handleChange}
-                  placeholder="ej: Construcción, Materiales, Servicios..." 
                   className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400"
                   required
-                />
+                >
+                  <option value="">Seleccione un rubro</option>
+                  {rubros.map((rubro) => (
+                    <option key={rubro} value={rubro}>{rubro}</option>
+                  ))}
+                </select>
+                {formData.rubro === 'Otros' && (
+                  <input 
+                    type="text"
+                    name="rubroPersonalizado"
+                    value={formData.rubroPersonalizado}
+                    onChange={handleChange}
+                    placeholder="Especifique el rubro"
+                    className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400 mt-2"
+                    required
+                  />
+                )}
               </div>
               
               <div>
