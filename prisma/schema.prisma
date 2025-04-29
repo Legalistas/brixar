@@ -121,6 +121,7 @@ model PropertyVideo {
   title       String? // Título opcional del video
   description String? @db.Text // Descripción opcional del video
   thumbnail   String? // URL de la miniatura del video
+  isPublished Boolean @default(false) // Indica si el video está publicado
   propertyId  Int // ID de la propiedad asociada
   property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade) // Relación con la propiedad
 
