@@ -221,6 +221,7 @@ model ProyectCost {
   importePesos      Decimal   @db.Decimal(12, 2) // IMPORTE PESOS
   precioDolarBlue   Decimal   @db.Decimal(12, 2) // PRECIO U$S BLUE VENDEDOR
   importeDolar      Decimal   @db.Decimal(12, 2) // IMPORTE U$D
+  inversor          String?   // INVERSOR (Oscar Andereggen, Agustín Andereggen u otro)
   usuarioId         Int       // USUARIO QUE ABONO - ID de usuario
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt

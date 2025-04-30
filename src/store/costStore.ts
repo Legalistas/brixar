@@ -27,6 +27,7 @@ export interface ProyectCost {
   importePesos: number
   precioDolarBlue: number
   importeDolar: number
+  inversor?: string // Campo añadido para el inversor
   usuarioId: number
   createdAt: string
   updatedAt: string
@@ -61,6 +62,7 @@ export interface CreateProyectCostInput {
   importePesos: number
   precioDolarBlue: number
   importeDolar: number
+  inversor?: string // Campo añadido para el inversor
 }
 
 // Interfaz para la tienda de costos

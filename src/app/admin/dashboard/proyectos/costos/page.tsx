@@ -47,6 +47,8 @@ export default function CostosProyectoPage() {
     importePesos: string;
     precioDolarBlue: string;
     importeDolar: string;
+    inversor: string;
+    inversorPersonalizado: string;
   }>({
     fecha: new Date().toISOString().split('T')[0],
     rubro: '',
@@ -55,11 +57,16 @@ export default function CostosProyectoPage() {
     detalle: '',
     importePesos: '',
     precioDolarBlue: '',
-    importeDolar: ''
+    importeDolar: '',
+    inversor: '',
+    inversorPersonalizado: ''
   })
 
   // Lista de rubros predefinidos
   const rubros = ['Materiales', 'Mano Obra', 'Seguros', 'Planos / Escrituras', 'Otros']
+  
+  // Lista de inversores predefinidos
+  const inversores = ['Oscar Andereggen', 'Agustín Andereggen', 'Otro']
 
   // Cargar el proyecto si se proporciona un slug
   useEffect(() => {
@@ -144,7 +151,8 @@ export default function CostosProyectoPage() {
         detalle: formData.detalle,
         importePesos: parseFloat(formData.importePesos),
         precioDolarBlue: parseFloat(formData.precioDolarBlue),
-        importeDolar: parseFloat(formData.importeDolar)
+        importeDolar: parseFloat(formData.importeDolar),
+        inversor: formData.inversor === 'Otro' ? formData.inversorPersonalizado : formData.inversor
       }
       
       const success = await createCost(costData)
@@ -163,7 +171,9 @@ export default function CostosProyectoPage() {
           detalle: '',
           importePesos: '',
           precioDolarBlue: '',
-          importeDolar: ''
+          importeDolar: '',
+          inversor: '',
+          inversorPersonalizado: ''
         })
       }
     } catch (err) {
@@ -309,6 +319,35 @@ export default function CostosProyectoPage() {
                   className="w-full bg-slate-50 border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400"
                 />
                 <p className="text-xs text-slate-500 mt-1">Este valor se calcula automáticamente</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Inversor
+                </label>
+                <select 
+                  name="inversor"
+                  value={formData.inversor} 
+                  onChange={handleChange}
+                  className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400"
+                  required
+                >
+                  <option value="">Seleccione un inversor</option>
+                  {inversores.map((inversor) => (
+                    <option key={inversor} value={inversor}>{inversor}</option>
+                  ))}
+                </select>
+                {formData.inversor === 'Otro' && (
+                  <input 
+                    type="text"
+                    name="inversorPersonalizado"
+                    value={formData.inversorPersonalizado}
+                    onChange={handleChange}
+                    placeholder="Especifique el inversor"
+                    className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400 mt-2"
+                    required
+                  />
+                )}
               </div>
             </div>
             

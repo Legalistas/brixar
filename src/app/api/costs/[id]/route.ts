@@ -111,7 +111,7 @@ export async function PUT(
         importePesos: data.importePesos,
         precioDolarBlue: data.precioDolarBlue,
         importeDolar: data.importeDolar,
-        // No permitimos cambiar el proyecto o usuario una vez creado el costo
+        inversor: data.inversor,
       },
       include: {
         proyect: {
