@@ -24,6 +24,10 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'asset.cloudinary.com',
+      },
+      {
+        protocol: 'https',
         hostname: 'p16-sign-va.tiktokcdn.com',
         port: '',
         pathname: '/**',
