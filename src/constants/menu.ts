@@ -50,11 +50,6 @@ export const MENU_DATA: MenuItem[] = [
     label: 'Ventas',
     href: '/admin/dashboard/ventas',
   },
-  {
-    icon: ClipboardList,
-    label: 'Proyectos',
-    href: '/admin/dashboard/proyectos',
-  }
 ]
 
 export const REPORTS_DATA: MenuItem[] = [
@@ -94,16 +89,9 @@ export const REPORTS_DATA: MenuItem[] = [
 
 export const MENU_CUSTOMERS_DATA: MenuItem[] = [
   { icon: Monitor, label: 'Panel de Control', href: '/customer/dashboard' },
-  {
-    icon: ChartNoAxesCombined,
-    label: 'Mis inversiones',
-    href: '/customer/investments',
-  },
   { icon: Home, label: 'Propiedades', href: '/customer/properties' },
   { icon: ClipboardList, label: 'Proyectos', href: '/customer/proyects' },
   { icon: MessageSquare, label: 'Mis consultas', href: '/customer/inquiries' },
-  { icon: ShoppingCart, label: 'Mis compras', href: '/customer/sales' },
-  { icon: CircleDollarSign, label: 'Créditos', href: '/customer/credits' },
   {
     icon: Settings,
     label: 'Configuración',

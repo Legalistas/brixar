@@ -19,15 +19,8 @@ export type MenuItem = {
 
 export const MENU_CUSTOMERS_DATA: MenuItem[] = [
   { icon: Monitor, label: 'Panel de Control', href: '/customer/dashboard' },
-  {
-    icon: ChartNoAxesCombined,
-    label: 'Mis inversiones',
-    href: '/customer/investments',
-  },
   { icon: Home, label: 'Propiedades', href: '/customer/properties' },
-  { icon: ClipboardList, label: 'Proyectos', href: '/customer/proyects' },
   { icon: MessageSquare, label: 'Mis consultas', href: '/customer/inquiries' },
-  { icon: CircleDollarSign, label: 'Créditos', href: '/customer/credits' },
   {
     icon: Settings,
     label: 'Configuración',
