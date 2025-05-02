@@ -47,6 +47,7 @@ import {
 import { generatePropertySku } from '@/lib/utils'
 import { CallToAction } from '@/components/CallToAction'
 import { TikTok } from '@/components/TikTok/TikTok'
+import { GoogleMap } from '@/components/GoogleMap'
 
 type Property = {
   id: number
@@ -228,6 +229,8 @@ export default function PropertyPage() {
     maximumFractionDigits: 0,
   }).format(Number(property.price))
 
+  console.log('Propiedad cargada:', property)
+  
   return (
     <>
       <Header />
@@ -447,11 +450,22 @@ export default function PropertyPage() {
                   </div>
 
                   {property.address[0].positions.length > 0 && (
-                    <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
-                      <p className="text-gray-500">
-                        Mapa no disponible en esta vista
-                      </p>
-                      {/* Aquí se podría integrar un mapa real usando las coordenadas */}
+                    <div className="mt-4">
+                      {property.address[0].positions[0].latitude && 
+                       property.address[0].positions[0].longitude ? (
+                        <div className="aspect-video rounded-lg overflow-hidden">
+                          <GoogleMap 
+                            latitude={Number(property.address[0].positions[0].latitude)} 
+                            longitude={Number(property.address[0].positions[0].longitude)}
+                          />
+                        </div>
+                      ) : (
+                        <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
+                          <p className="text-gray-500">
+                            Mapa no disponible en esta vista
+                          </p>
+                        </div>
+                      )}
                     </div>
                   )}
                 </CardContent>
