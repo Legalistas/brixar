@@ -99,6 +99,13 @@ export default function CostosProyectoPage() {
     }
   }, [storeError, costError])
 
+  // Cargar cotización del dólar blue cuando se abre el popup
+  useEffect(() => {
+    if (showAddCostPopup) {
+      fetchDolarBlueRate()
+    }
+  }, [showAddCostPopup])
+
   // Extraer años y meses únicos de los costos para los filtros
   const { uniqueYears, uniqueMonths, uniqueRubros, uniqueInversores } = useMemo(() => {
     if (!projectCosts) {
@@ -227,21 +234,23 @@ export default function CostosProyectoPage() {
   // Manejar cambios en el formulario
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
     
-    // Calcular automáticamente el importe en dólares cuando cambian los valores
-    if (name === 'importePesos' || name === 'precioDolarBlue') {
-      const pesos = parseFloat(name === 'importePesos' ? value : formData.importePesos) || 0
-      const cotizacion = parseFloat(name === 'precioDolarBlue' ? value : formData.precioDolarBlue) || 0
+    // Actualizar el estado en una sola operación para evitar múltiples renderizados
+    setFormData(prev => {
+      const newData = { ...prev, [name]: value }
       
-      if (pesos > 0 && cotizacion > 0) {
-        const dolares = pesos / cotizacion
-        setFormData(prev => ({ 
-          ...prev, 
-          importeDolar: dolares.toFixed(2)
-        }))
+      // Calcular automáticamente el importe en dólares cuando cambian los valores
+      if (name === 'importePesos' || name === 'precioDolarBlue') {
+        const pesos = parseFloat(name === 'importePesos' ? value : newData.importePesos) || 0
+        const cotizacion = parseFloat(name === 'precioDolarBlue' ? value : newData.precioDolarBlue) || 0
+        
+        if (pesos > 0 && cotizacion > 0) {
+          newData.importeDolar = (pesos / cotizacion).toFixed(2)
+        }
       }
-    }
+      
+      return newData
+    })
   }
   
   // Manejar cambios en los filtros
@@ -300,6 +309,46 @@ export default function CostosProyectoPage() {
     }
   }
   
+  // Función para obtener la cotización actual del dólar blue
+  const fetchDolarBlueRate = async () => {
+    try {
+      const response = await fetch('/api/currencies');
+      const data = await response.json();
+      
+      // Buscar la moneda "USD" o "USDBLUE" en los resultados
+      const usdCurrency = data.find(
+        (currency: any) => 
+          currency.code === 'USD' || 
+          currency.name?.toLowerCase().includes('dolar') ||
+          currency.code === 'USDBLUE'
+      );
+      
+      if (usdCurrency && usdCurrency.rate) {
+        // Actualizar el estado del formulario con la cotización actual
+        setFormData(prev => {
+          const newData = {
+            ...prev,
+            precioDolarBlue: usdCurrency.rate.toString()
+          };
+          
+          // Recalcular el importe en dólares si ya hay un importe en pesos
+          if (prev.importePesos) {
+            const pesos = parseFloat(prev.importePesos);
+            const cotizacion = parseFloat(usdCurrency.rate);
+            if (pesos > 0 && cotizacion > 0) {
+              newData.importeDolar = (pesos / cotizacion).toFixed(2);
+            }
+          }
+          
+          return newData;
+        });
+      }
+    } catch (error) {
+      console.error('Error al obtener la cotización del dólar blue:', error);
+      // No mostramos error en UI para no interrumpir la experiencia
+    }
+  };
+
   // Componente para el panel de filtros
   const FilterPanel = () => {
     return (

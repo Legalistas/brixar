@@ -8,6 +8,7 @@ import { Inter, Ubuntu } from 'next/font/google'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import Script from 'next/script'
 import WhatsAppButton from "@/components/wspBubble";
+import { Analytics } from "@vercel/analytics/react"
 
 const inter = Inter({ subsets: ['latin'] })
 const ubuntu = Ubuntu({
@@ -94,6 +95,7 @@ export default function RootLayout({
 
           <WhatsAppButton />
         </Providers>
+        <Analytics/>
       </body>
     </html>
   );

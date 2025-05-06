@@ -50,6 +50,11 @@ export const MENU_DATA: MenuItem[] = [
     label: 'Ventas',
     href: '/admin/dashboard/ventas',
   },
+  {
+    icon: ClipboardList,
+    label: 'Proyectos',
+    href: '/admin/dashboard/proyectos',
+  }
 ]
 
 export const REPORTS_DATA: MenuItem[] = [
