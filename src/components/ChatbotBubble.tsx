@@ -97,10 +97,12 @@ export const ChatbotBubble = () => {
       
       const data = await response.json()
       
-      if (data && data.response) {
+      console.log('Respuesta del servidor:', data.output)
+
+      if (data) {
         setMessages(prev => [...prev, {
           id: uuidv4(),
-          text: data.response,
+          text: data.output || data.response,
           isUser: false,
           timestamp: new Date()
         }])
