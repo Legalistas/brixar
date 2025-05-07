@@ -1,14 +1,15 @@
-import type { Metadata } from "next";
-import "@/styles/globals.css";
-import "react-toastify/dist/ReactToastify.css";
-import "flag-icons/css/flag-icons.min.css";
-import { ToastContainer } from "react-toastify";
-import { Providers } from "./Providers";
+import type { Metadata } from 'next'
+import '@/styles/globals.css'
+import 'react-toastify/dist/ReactToastify.css'
+import 'flag-icons/css/flag-icons.min.css'
+import { ToastContainer } from 'react-toastify'
+import { Providers } from './Providers'
 import { Inter, Ubuntu } from 'next/font/google'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import Script from 'next/script'
-import WhatsAppButton from "@/components/wspBubble";
-import { Analytics } from "@vercel/analytics/react"
+import { ChatbotBubble } from '@/components/ChatbotBubble'
+import { Analytics } from '@vercel/analytics/react'
+import WhatsAppButton from '@/components/wspBubble'
 
 const inter = Inter({ subsets: ['latin'] })
 const ubuntu = Ubuntu({
@@ -18,7 +19,8 @@ const ubuntu = Ubuntu({
 
 export const metadata: Metadata = {
   title: 'Brixar | Propiedades y Financiación en Argentina',
-  description: 'Cumplí el sueño del hogar propio con Brixar. Accedé a tu vivienda con financiamiento flexible y proyectos de calidad en Argentina.',
+  description:
+    'Cumplí el sueño del hogar propio con Brixar. Accedé a tu vivienda con financiamiento flexible y proyectos de calidad en Argentina.',
   keywords: [
     'Brixar',
     'propiedades en Argentina',
@@ -29,15 +31,14 @@ export const metadata: Metadata = {
     'compra de inmuebles',
     'créditos hipotecarios',
     'construcción de viviendas',
-    'inversiones inmobiliarias'
+    'inversiones inmobiliarias',
   ],
-  authors: [
-    { name: 'Brixar Team', url: 'https://www.brixar.ar' }
-  ],
+  authors: [{ name: 'Brixar Team', url: 'https://www.brixar.ar' }],
   openGraph: {
     type: 'website',
     title: 'Brixar | Propiedades y Financiación',
-    description: 'Cumplí el sueño del hogar propio con Brixar. Accedé a tu vivienda con financiamiento flexible y proyectos de calidad en Argentina.',
+    description:
+      'Cumplí el sueño del hogar propio con Brixar. Accedé a tu vivienda con financiamiento flexible y proyectos de calidad en Argentina.',
     url: 'https://www.brixar.ar',
     images: ['https://www.brixar.ar/images/og-image.jpg'],
     siteName: 'Brixar',
@@ -48,12 +49,12 @@ export const metadata: Metadata = {
     shortcut: ['/shortcut-icon.png'],
   },
   manifest: '/site.webmanifest',
-};
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <html lang="en">
@@ -70,7 +71,10 @@ export default function RootLayout({
           `}
         </Script>
         {/* Google Analytics */}
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-TKDYP32F6F" strategy="afterInteractive" />
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-TKDYP32F6F"
+          strategy="afterInteractive"
+        />
         <Script id="google-analytics" strategy="afterInteractive">
           {`
           window.dataLayer = window.dataLayer || [];
@@ -80,13 +84,15 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body
-        className={`${inter.className} antialiased bg-[#F1F5F9]`}
-      >
+      <body className={`${inter.className} antialiased bg-[#F1F5F9]`}>
         {/* Google Tag Manager (noscript) */}
         <noscript>
-          <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5ZMJCRMC"
-            height="0" width="0" style={{display:'none',visibility:'hidden'}}></iframe>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-5ZMJCRMC"
+            height="0"
+            width="0"
+            style={{ display: 'none', visibility: 'hidden' }}
+          ></iframe>
         </noscript>
         <Providers>
           {children}
@@ -94,9 +100,10 @@ export default function RootLayout({
           <ToastContainer />
 
           <WhatsAppButton />
+          <ChatbotBubble />
         </Providers>
-        <Analytics/>
+        <Analytics />
       </body>
     </html>
-  );
+  )
 }
