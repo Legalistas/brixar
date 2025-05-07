@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { 
   Loader2, 
@@ -21,6 +21,7 @@ import {
 import { useProyectStore } from '@/store/proyectStore'
 import { useCostStore } from '@/store/costStore'
 import type { CreateProyectCostInput, ProyectCost } from '@/store/costStore'
+import { AddCostPopup } from './AddCostPopup'
 
 export default function CostosProyectoPage() {
   const searchParams = useSearchParams()
@@ -445,197 +446,6 @@ export default function CostosProyectoPage() {
     )
   }
   
-  // Popup para agregar un nuevo costo
-  const AddCostPopup = () => {
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white p-6 rounded-lg shadow-lg max-w-xl w-full">
-          <h3 className="text-xl font-medium mb-4 text-slate-800">
-            Añadir nuevo costo al proyecto
-          </h3>
-          
-          {currentProyect && (
-            <p className="mb-4 text-slate-600">
-              Proyecto: <span className="font-medium text-slate-800">{currentProyect.title}</span>
-            </p>
-          )}
-
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Fecha
-                  </label>
-                  <input 
-                    type="date" 
-                    name="fecha"
-                    value={formData.fecha}
-                    onChange={handleChange}
-                    className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400"
-                    required
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Rubro
-                </label>
-                <select 
-                  name="rubro"
-                  value={formData.rubro} 
-                  onChange={handleChange}
-                  className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400"
-                  required
-                >
-                  <option value="">Seleccione un rubro</option>
-                  {rubros.map((rubro) => (
-                    <option key={rubro} value={rubro}>{rubro}</option>
-                  ))}
-                </select>
-                {formData.rubro === 'Otros' && (
-                  <input 
-                    type="text"
-                    name="rubroPersonalizado"
-                    value={formData.rubroPersonalizado}
-                    onChange={handleChange}
-                    placeholder="Especifique el rubro"
-                    className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400 mt-2"
-                    required
-                  />
-                )}
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Proveedor
-                </label>
-                <input 
-                  type="text"
-                  name="proveedor"
-                  value={formData.proveedor}
-                  onChange={handleChange}
-                  placeholder="Nombre del proveedor" 
-                  className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400"
-                  required
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Detalle
-                </label>
-                <textarea 
-                  name="detalle"
-                  value={formData.detalle}
-                  onChange={handleChange}
-                  placeholder="Descripción detallada del costo" 
-                  className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400"
-                  rows={3}
-                />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Importe en pesos (ARS)
-                  </label>
-                  <input 
-                    type="number"
-                    step="0.01"
-                    name="importePesos"
-                    value={formData.importePesos}
-                    onChange={handleChange}
-                    placeholder="0.00" 
-                    className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Cotización dólar blue
-                  </label>
-                  <input 
-                    type="number"
-                    step="0.01"
-                    name="precioDolarBlue"
-                    value={formData.precioDolarBlue}
-                    onChange={handleChange}
-                    placeholder="0.00" 
-                    className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400"
-                    required
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Importe en dólares (USD)
-                </label>
-                <input 
-                  type="number"
-                  step="0.01"
-                  name="importeDolar"
-                  value={formData.importeDolar}
-                  placeholder="0.00" 
-                  readOnly
-                  className="w-full bg-slate-50 border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400"
-                />
-                <p className="text-xs text-slate-500 mt-1">Este valor se calcula automáticamente</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Inversor
-                </label>
-                <select 
-                  name="inversor"
-                  value={formData.inversor} 
-                  onChange={handleChange}
-                  className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400"
-                  required
-                >
-                  <option value="">Seleccione un inversor</option>
-                  {inversores.map((inversor) => (
-                    <option key={inversor} value={inversor}>{inversor}</option>
-                  ))}
-                </select>
-                {formData.inversor === 'Otro' && (
-                  <input 
-                    type="text"
-                    name="inversorPersonalizado"
-                    value={formData.inversorPersonalizado}
-                    onChange={handleChange}
-                    placeholder="Especifique el inversor"
-                    className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400 mt-2"
-                    required
-                  />
-                )}
-              </div>
-            </div>
-            
-            <div className="flex justify-end space-x-2 pt-4">
-              <button
-                type="button"
-                onClick={() => setShowAddCostPopup(false)}
-                className="border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-medium py-2 px-4 rounded-md transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                className="bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 px-4 rounded-md transition-colors"
-              >
-                Guardar
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    )
-  }
-
   const isLoading = isLoadingProyect || isLoadingCosts
 
   if (isLoading) {
@@ -882,7 +692,18 @@ export default function CostosProyectoPage() {
         </table>
       </div>
 
-      {showAddCostPopup && <AddCostPopup />}
+      {/* Usar el componente AddCostPopup importado en lugar del componente interno */}
+      {showAddCostPopup && currentProyect && (
+        <AddCostPopup
+          currentProyect={currentProyect}
+          formData={formData}
+          handleChange={handleChange}
+          handleSubmit={handleSubmit}
+          setShowAddCostPopup={setShowAddCostPopup}
+          rubros={rubros}
+          inversores={inversores}
+        />
+      )}
     </div>
   )
 }
