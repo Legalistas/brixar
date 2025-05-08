@@ -23,6 +23,8 @@ interface InformacionBasicaProps {
   setDaysToEnd: (value: number) => void
   daysToStart: number
   setDaysToStart: (value: number) => void
+  surface: number
+  setSurface: (value: number) => void
 }
 
 export default function InformacionBasica({
@@ -30,33 +32,30 @@ export default function InformacionBasica({
   setTitle,
   slug,
   setSlug,
-  openingLine,
-  setOpeningLine,
   description,
   setDescription,
   phase,
   setPhase,
   businessModel,
   setBusinessModel,
-  openingPhase,
-  setOpeningPhase,
-  priority,
-  setPriority,
-  daysToEnd,
-  setDaysToEnd,
-  daysToStart,
-  setDaysToStart
+  surface,
+  setSurface,
 }: InformacionBasicaProps) {
   return (
     <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
       <div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
-        <h2 className="text-lg font-medium text-slate-800">Información del Proyecto</h2>
+        <h2 className="text-lg font-medium text-slate-800">
+          Información del Proyecto
+        </h2>
         <p className="text-sm text-slate-500">Datos básicos del proyecto</p>
       </div>
-      
+
       <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="col-span-1 md:col-span-2">
-          <label htmlFor="title" className="block text-sm font-medium text-slate-700 mb-1">
+          <label
+            htmlFor="title"
+            className="block text-sm font-medium text-slate-700 mb-1"
+          >
             Título <span className="text-red-500">*</span>
           </label>
           <input
@@ -68,9 +67,12 @@ export default function InformacionBasica({
             required
           />
         </div>
-        
+
         <div>
-          <label htmlFor="slug" className="block text-sm font-medium text-slate-700 mb-1">
+          <label
+            htmlFor="slug"
+            className="block text-sm font-medium text-slate-700 mb-1"
+          >
             Slug <span className="text-red-500">*</span>
           </label>
           <input
@@ -82,12 +84,32 @@ export default function InformacionBasica({
             required
           />
           <p className="mt-1 text-xs text-slate-500">
-            URL amigable para el proyecto (sin espacios ni caracteres especiales)
+            URL amigable para el proyecto (sin espacios ni caracteres
+            especiales)
           </p>
         </div>
-        
+
         <div>
-          <label htmlFor="businessModel" className="block text-sm font-medium text-slate-700 mb-1">
+          <label
+            htmlFor="surface"
+            className="block text-sm font-medium text-slate-700 mb-1"
+          >
+            Superficie (m²)
+          </label>
+          <input
+            id="surface"
+            type="number"
+            value={surface}
+            onChange={(e) => setSurface(parseInt(e.target.value) || 0)}
+            className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="businessModel"
+            className="block text-sm font-medium text-slate-700 mb-1"
+          >
             Modelo de Negocio <span className="text-red-500">*</span>
           </label>
           <select
@@ -102,9 +124,12 @@ export default function InformacionBasica({
             <option value="LEADING">Leasing</option>
           </select>
         </div>
-        
+
         <div>
-          <label htmlFor="phase" className="block text-sm font-medium text-slate-700 mb-1">
+          <label
+            htmlFor="phase"
+            className="block text-sm font-medium text-slate-700 mb-1"
+          >
             Fase del Proyecto <span className="text-red-500">*</span>
           </label>
           <select
@@ -120,9 +145,12 @@ export default function InformacionBasica({
             <option value="COMPLETED">Completado</option>
           </select>
         </div>
-        
+
         <div className="col-span-1 md:col-span-2">
-          <label htmlFor="description" className="block text-sm font-medium text-slate-700 mb-1">
+          <label
+            htmlFor="description"
+            className="block text-sm font-medium text-slate-700 mb-1"
+          >
             Descripción
           </label>
           <textarea

@@ -264,6 +264,8 @@ export default function CrearProyectoPage() {
           setDaysToEnd={setDaysToEnd}
           daysToStart={daysToStart}
           setDaysToStart={setDaysToStart}
+          surface={surface}
+          setSurface={setSurface}
         />
         
         {/* Ubicación del proyecto */}
