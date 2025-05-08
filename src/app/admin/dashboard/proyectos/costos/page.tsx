@@ -16,12 +16,14 @@ import {
   Edit,
   Trash2,
   Filter,
-  X
+  X,
+  Download
 } from 'lucide-react'
 import { useProyectStore } from '@/store/proyectStore'
 import { useCostStore } from '@/store/costStore'
 import type { CreateProyectCostInput, ProyectCost } from '@/store/costStore'
 import { AddCostPopup } from './AddCostPopup'
+import * as XLSX from 'xlsx'
 
 export default function CostosProyectoPage() {
   const searchParams = useSearchParams()
@@ -398,6 +400,37 @@ export default function CostosProyectoPage() {
     })
   }
 
+  // Función para exportar costos a Excel
+  const exportToExcel = () => {
+    // Datos que se exportarán
+    const dataToExport = (Object.values(filters).some(v => v !== '') ? filteredCosts : projectCosts || [])
+      .map((cost: ProyectCost) => ({
+        'Fecha': formatDate(cost.fecha),
+        'Rubro': cost.rubro,
+        'Proveedor': cost.proveedor || '-',
+        'Detalle': cost.detalle || '-',
+        'Importe ARS': cost.importePesos,
+        'Cotización USD': cost.precioDolarBlue,
+        'Importe USD': cost.importeDolar,
+        'Inversor': cost.inversor || '-',
+        'Usuario': cost.usuario?.name || cost.usuario?.email || '-'
+      }));
+    
+    // Crear un nuevo libro de trabajo
+    const wb = XLSX.utils.book_new();
+    // Convertir los datos a una hoja de cálculo
+    const ws = XLSX.utils.json_to_sheet(dataToExport);
+    
+    // Agregar la hoja al libro
+    XLSX.utils.book_append_sheet(wb, ws, 'Costos');
+    
+    // Generar un nombre para el archivo
+    const fileName = `Costos_${currentProyect.title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`;
+    
+    // Escribir el libro y descargar
+    XLSX.writeFile(wb, fileName);
+  };
+
   // Componente para el panel de filtros
   const FilterPanel = () => {
     return (
@@ -561,6 +594,13 @@ export default function CostosProyectoPage() {
           >
             <Plus className="h-4 w-4 mr-2" />
             Añadir Costo
+          </button>
+          <button
+            onClick={exportToExcel}
+            className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors flex items-center"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Exportar a Excel
           </button>
         </div>
       </div>
