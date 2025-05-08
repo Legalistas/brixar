@@ -40,22 +40,17 @@ export const AddCostPopup: React.FC<AddCostPopupProps> = ({
   inversores,
 }) => {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg max-w-xl w-full">
-        <h3 className="text-xl font-medium mb-4 text-slate-800">
-          {formData.tipo === 'compensacion'
-            ? 'Añadir compensación entre inversores'
-            : 'Añadir nuevo costo al proyecto'}
+<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+      <div className="bg-white p-4 sm:p-6 rounded-lg shadow-lg w-full max-w-xl max-h-[90vh] overflow-y-auto">
+        <h3 className="text-lg sm:text-xl font-medium mb-2 sm:mb-4 text-slate-800">
+          {formData.tipo === "compensacion" ? "Añadir compensación entre inversores" : "Añadir nuevo costo al proyecto"}
         </h3>
 
-        <p className="mb-4 text-slate-600">
-          Proyecto:{' '}
-          <span className="font-medium text-slate-800">
-            {currentProyect.title}
-          </span>
+        <p className="mb-3 sm:mb-4 text-sm sm:text-base text-slate-600">
+          Proyecto: <span className="font-medium text-slate-800">{currentProyect.title}</span>
         </p>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <form className="space-y-3 sm:space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
