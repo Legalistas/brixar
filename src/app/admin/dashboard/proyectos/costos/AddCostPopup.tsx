@@ -71,46 +71,44 @@ export const AddCostPopup: React.FC<AddCostPopupProps> = ({
                   required
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Tipo de operación
-                </label>
-                <div className="flex space-x-4 mt-2">
-                  <div className="flex items-center">
-                    <input
-                      type="radio"
-                      id="tipoCosto"
-                      name="tipo"
-                      value="costo"
-                      checked={formData.tipo === 'costo'}
-                      onChange={handleChange}
-                      className="mr-1 accent-slate-700"
-                      required
-                    />
-                    <label
-                      htmlFor="tipoCosto"
-                      className="text-sm text-slate-700"
-                    >
-                      Agregar costo
-                    </label>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="radio"
-                      id="tipoCompensacion"
-                      name="tipo"
-                      value="compensacion"
-                      checked={formData.tipo === 'compensacion'}
-                      onChange={handleChange}
-                      className="mr-1 accent-slate-700"
-                    />
-                    <label
-                      htmlFor="tipoCompensacion"
-                      className="text-sm text-slate-700"
-                    >
-                      Compensación
-                    </label>
-                  </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Tipo de operación
+              </label>
+              <div className="flex space-x-4 mt-2">
+                <div className="flex items-center">
+                  <input
+                    type="radio"
+                    id="tipoCosto"
+                    name="tipo"
+                    value="costo"
+                    checked={formData.tipo === 'costo'}
+                    onChange={handleChange}
+                    className="mr-1 accent-slate-700"
+                    required
+                  />
+                  <label htmlFor="tipoCosto" className="text-sm text-slate-700">
+                    Agregar costo
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="radio"
+                    id="tipoCompensacion"
+                    name="tipo"
+                    value="compensacion"
+                    checked={formData.tipo === 'compensacion'}
+                    onChange={handleChange}
+                    className="mr-1 accent-slate-700"
+                  />
+                  <label
+                    htmlFor="tipoCompensacion"
+                    className="text-sm text-slate-700"
+                  >
+                    Compensación
+                  </label>
                 </div>
               </div>
             </div>

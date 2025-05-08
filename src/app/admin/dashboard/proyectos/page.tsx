@@ -368,6 +368,8 @@ export default function ProyectosPage() {
     )
   }
 
+  console.log('Proyectos:', proyects)
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-white">
@@ -422,10 +424,10 @@ export default function ProyectosPage() {
                   Fase
                 </th>
                 <th className="py-3 px-4 border-b border-slate-200 text-left font-medium">
-                  Fondos / Meta
+                  Inicio
                 </th>
                 <th className="py-3 px-4 border-b border-slate-200 text-left font-medium">
-                  Inversores
+                  M2
                 </th>
                 <th className="py-3 px-4 border-b border-slate-200 text-left font-medium">
                   Acciones
@@ -471,22 +473,10 @@ export default function ProyectosPage() {
                     </span>
                   </td>
                   <td className="py-3 px-4 text-slate-700">
-                    {project.proyectFound ? (
-                      <span>
-                        {formatPrice(
-                          Number(project.proyectFound.quantityFunded)
-                        )}{' '}
-                        /{' '}
-                        {formatPrice(
-                          Number(project.proyectFound.quantityToFund)
-                        )}
-                      </span>
-                    ) : (
-                      <span className="text-slate-400">N/A</span>
-                    )}
+                    {formatDate(project.createdAt)}
                   </td>
                   <td className="py-3 px-4 text-slate-700">
-                    {formatDate(project.createdAt)}
+                    {project?.proyectDetails?.surface ? `${project?.proyectDetails?.surface} m²` : 'N/A'}
                   </td>
                   <td className="py-3 px-4">
                     {deleteConfirm === project.slug ? (
