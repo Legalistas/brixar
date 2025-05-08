@@ -34,12 +34,18 @@ export default function CostosProyectoPage() {
     isLoading: isLoadingCosts, 
     error: costError,
     fetchCostsByProyectSlug,
-    createCost
+    createCost,
+    deleteCost
   } = useCostStore()
   
   const [error, setError] = useState('')
   const [showAddCostPopup, setShowAddCostPopup] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{ show: boolean, costId: number | null }>({
+    show: false,
+    costId: null
+  })
   
   // Estado para los filtros
   const [filters, setFilters] = useState({
@@ -350,6 +356,48 @@ export default function CostosProyectoPage() {
     }
   };
 
+  // Manejar la eliminación de un costo
+  const handleDeleteCost = async (costId: number) => {
+    try {
+      setIsDeleting(true)
+      setError('')
+      
+      const success = await deleteCost(costId)
+      
+      if (success) {
+        // Cerrar el modal de confirmación
+        setDeleteConfirmation({ show: false, costId: null })
+        
+        // Recargar los costos para actualizar la vista
+        if (slug) {
+          await fetchCostsByProyectSlug(slug)
+        }
+      } else {
+        setError('No se pudo eliminar el costo. Intente nuevamente.')
+      }
+    } catch (err) {
+      setError('Error al eliminar el costo: ' + (err instanceof Error ? err.message : 'Error desconocido'))
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
+  // Mostrar confirmación antes de eliminar
+  const showDeleteConfirmation = (costId: number) => {
+    setDeleteConfirmation({
+      show: true,
+      costId
+    })
+  }
+  
+  // Cancelar la eliminación
+  const cancelDelete = () => {
+    setDeleteConfirmation({
+      show: false,
+      costId: null
+    })
+  }
+
   // Componente para el panel de filtros
   const FilterPanel = () => {
     return (
@@ -634,7 +682,10 @@ export default function CostosProyectoPage() {
                           <button className="text-blue-600 hover:text-blue-800">
                             <Edit className="h-4 w-4" />
                           </button>
-                          <button className="text-red-600 hover:text-red-800">
+                          <button 
+                            className="text-red-600 hover:text-red-800"
+                            onClick={() => showDeleteConfirmation(cost.id)}
+                          >
                             <Trash2 className="h-4 w-4" />
                           </button>
                         </div>
@@ -672,7 +723,10 @@ export default function CostosProyectoPage() {
                           <button className="text-blue-600 hover:text-blue-800">
                             <Edit className="h-4 w-4" />
                           </button>
-                          <button className="text-red-600 hover:text-red-800">
+                          <button 
+                            className="text-red-600 hover:text-red-800"
+                            onClick={() => showDeleteConfirmation(cost.id)}
+                          >
                             <Trash2 className="h-4 w-4" />
                           </button>
                         </div>
@@ -703,6 +757,31 @@ export default function CostosProyectoPage() {
           rubros={rubros}
           inversores={inversores}
         />
+      )}
+
+      {/* Modal de confirmación de eliminación */}
+      {deleteConfirmation.show && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h2 className="text-lg font-medium text-slate-800 mb-4">Confirmar eliminación</h2>
+            <p className="text-slate-600 mb-6">¿Está seguro de que desea eliminar este costo? Esta acción no se puede deshacer.</p>
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={cancelDelete}
+                className="bg-slate-200 hover:bg-slate-300 text-slate-800 font-medium py-2 px-4 rounded-md transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => handleDeleteCost(deleteConfirmation.costId!)}
+                className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Eliminando...' : 'Eliminar'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
