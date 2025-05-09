@@ -56,6 +56,7 @@ export interface CreateProyectCostInput {
   proyectId: number
   fecha: string
   mes: string
+  tipo?: string
   rubro: string
   proveedor: string
   detalle?: string
@@ -63,6 +64,7 @@ export interface CreateProyectCostInput {
   precioDolarBlue: number
   importeDolar: number
   inversor?: string // Campo añadido para el inversor
+  inversorDestino?: string // Campo para la compensación entre inversores
 }
 
 // Interfaz para la tienda de costos

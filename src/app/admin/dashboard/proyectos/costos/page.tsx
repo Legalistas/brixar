@@ -75,10 +75,10 @@ export default function CostosProyectoPage() {
     mes: '',
     año: '',
   })
-
   // Formulario para nuevo costo
   const [formData, setFormData] = useState<{
     fecha: string
+    tipo: string
     rubro: string
     rubroPersonalizado: string
     proveedor: string
@@ -88,8 +88,11 @@ export default function CostosProyectoPage() {
     importeDolar: string
     inversor: string
     inversorPersonalizado: string
+    inversorDestino: string
+    inversorDestinoPersonalizado: string
   }>({
     fecha: new Date().toISOString().split('T')[0],
+    tipo: 'costo',
     rubro: '',
     rubroPersonalizado: '',
     proveedor: '',
@@ -99,6 +102,8 @@ export default function CostosProyectoPage() {
     importeDolar: '',
     inversor: '',
     inversorPersonalizado: '',
+    inversorDestino: '',
+    inversorDestinoPersonalizado: '',
   })
 
   // Datos compartidos
@@ -372,7 +377,6 @@ export default function CostosProyectoPage() {
       // No mostramos error en UI para no interrumpir la experiencia
     }
   }
-
   // Guardar el costo en la base de datos
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -390,6 +394,7 @@ export default function CostosProyectoPage() {
         proyectId: currentProyect.id,
         fecha: formData.fecha,
         mes: mes,
+        tipo: formData.tipo,
         rubro:
           formData.rubro === 'Otros'
             ? formData.rubroPersonalizado
@@ -403,6 +408,12 @@ export default function CostosProyectoPage() {
           formData.inversor === 'Otro'
             ? formData.inversorPersonalizado
             : formData.inversor,
+        inversorDestino:
+          formData.tipo === 'compensacion'
+            ? formData.inversorDestino === 'Otro'
+              ? formData.inversorDestinoPersonalizado
+              : formData.inversorDestino
+            : undefined,
       }
 
       const success = await createCost(costData)
@@ -410,11 +421,10 @@ export default function CostosProyectoPage() {
       if (success) {
         setShowAddCostPopup(false)
         // Recargar los costos para actualizar la vista
-        fetchCostsByProyectSlug(slug as string)
-
-        // Limpiar el formulario
+        fetchCostsByProyectSlug(slug as string)        // Limpiar el formulario
         setFormData({
           fecha: new Date().toISOString().split('T')[0],
+          tipo: 'costo',
           rubro: '',
           rubroPersonalizado: '',
           proveedor: '',
@@ -424,6 +434,8 @@ export default function CostosProyectoPage() {
           importeDolar: '',
           inversor: '',
           inversorPersonalizado: '',
+          inversorDestino: '',
+          inversorDestinoPersonalizado: '',
         })
       }
     } catch (err) {
