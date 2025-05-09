@@ -1,0 +1,69 @@
+import { MetricsData, FormattingFunctions } from './types';
+
+interface CostosMetricsProps {
+  metrics: MetricsData;
+  formatting: FormattingFunctions;
+  isFiltered?: boolean;
+  totalCount: number;
+  metrosConstruidos?: number;
+}
+
+const CostosMetrics = ({ 
+  metrics, 
+  formatting, 
+  isFiltered = false,
+  totalCount,
+  metrosConstruidos 
+}: CostosMetricsProps) => {
+  const { formatCurrency, formatCurrencyUSD } = formatting;
+
+  return (
+    <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
+      <h2 className="text-lg font-medium text-slate-800 mb-4">
+        Resumen de Costos{' '}
+        {isFiltered ? '(Filtrados)' : ''}
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white p-4 rounded-lg border border-slate-200">
+          <h3 className="text-sm font-medium text-slate-500 mb-1">
+            Total en ARS
+          </h3>
+          <p className="text-2xl font-bold text-slate-800">
+            {formatCurrency(metrics.totalPesos)}
+          </p>
+        </div>
+        <div className="bg-white p-4 rounded-lg border border-slate-200">
+          <h3 className="text-sm font-medium text-slate-500 mb-1">
+            Total en USD
+          </h3>
+          <p className="text-2xl font-bold text-slate-800">
+            {formatCurrencyUSD(metrics.totalDolares)}
+          </p>
+        </div>
+        <div className="bg-white p-4 rounded-lg border border-slate-200">
+          <h3 className="text-sm font-medium text-slate-500 mb-1">
+            Cantidad de registros
+          </h3>
+          <p className="text-2xl font-bold text-slate-800">
+            {totalCount}
+          </p>
+        </div>
+        {metrosConstruidos && metrosConstruidos > 0 && (
+          <div className="bg-white p-4 rounded-lg border border-slate-200">
+            <h3 className="text-sm font-medium text-slate-500 mb-1">
+              Costo por m²
+            </h3>
+            <p className="text-2xl font-bold text-slate-800">
+              {formatCurrencyUSD(metrics.totalDolares / metrosConstruidos)}
+            </p>
+            <p className="text-xs text-slate-500 mt-1">
+              {metrosConstruidos} m² construidos
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default CostosMetrics;

@@ -22,19 +22,29 @@ import {
 import { useProyectStore } from '@/store/proyectStore'
 import { useCostStore } from '@/store/costStore'
 import type { CreateProyectCostInput, ProyectCost } from '@/store/costStore'
-import { AddCostPopup } from './AddCostPopup'
 import * as XLSX from 'xlsx'
+
+// Componentes
+import { AddCostPopup } from './AddCostPopup'
+import FilterPanel from './FilterPanel'
+import CostosTable from './CostosTable'
+import CostosMetrics from './CostosMetrics'
+import CostosCharts from './CostosCharts'
+import DeleteConfirmationModal from './DeleteConfirmationModal'
+import { FilterValues, FormattingFunctions, FilterOptions } from './types'
 
 export default function CostosProyectoPage() {
   const searchParams = useSearchParams()
   const slug = searchParams?.get('slug')
 
+  // Stores
   const {
     currentProyect,
     isLoading: isLoadingProyect,
     error: storeError,
     fetchProyectBySlug,
   } = useProyectStore()
+
   const {
     projectCosts,
     metrics,
@@ -45,6 +55,7 @@ export default function CostosProyectoPage() {
     deleteCost,
   } = useCostStore()
 
+  // Estado local
   const [error, setError] = useState('')
   const [showAddCostPopup, setShowAddCostPopup] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
@@ -58,7 +69,7 @@ export default function CostosProyectoPage() {
   })
 
   // Estado para los filtros
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<FilterValues>({
     rubro: '',
     inversor: '',
     mes: '',
@@ -90,7 +101,7 @@ export default function CostosProyectoPage() {
     inversorPersonalizado: '',
   })
 
-  // Lista de rubros predefinidos
+  // Datos compartidos
   const rubros = [
     'Materiales',
     'Mano Obra',
@@ -99,7 +110,6 @@ export default function CostosProyectoPage() {
     'Otros',
   ]
 
-  // Lista de inversores predefinidos
   const inversores = ['Oscar Andereggen', 'Agustín Andereggen', 'Otro']
 
   // Cargar el proyecto si se proporciona un slug
@@ -112,8 +122,6 @@ export default function CostosProyectoPage() {
 
   // Actualizar el error local si hay error en el store
   useEffect(() => {
-    console.log('Error en el store:', storeError, costError)
-
     if (storeError) {
       setError(storeError)
     }
@@ -129,53 +137,98 @@ export default function CostosProyectoPage() {
     }
   }, [showAddCostPopup])
 
+  // Formato de fechas y monedas (compartido entre componentes)
+  const formatting: FormattingFunctions = {
+    formatDate: (dateString: string) => {
+      const date = new Date(dateString)
+      return new Intl.DateTimeFormat('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      }).format(date)
+    },
+
+    formatCurrency: (amount: number) => {
+      return new Intl.NumberFormat('es-ES', {
+        style: 'currency',
+        currency: 'ARS',
+        minimumFractionDigits: 2,
+      }).format(amount)
+    },
+
+    formatCurrencyUSD: (amount: number) => {
+      return new Intl.NumberFormat('es-ES', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+      }).format(amount)
+    },
+
+    getMonthName: (monthNumber: string) => {
+      const monthNames = [
+        'Enero',
+        'Febrero',
+        'Marzo',
+        'Abril',
+        'Mayo',
+        'Junio',
+        'Julio',
+        'Agosto',
+        'Septiembre',
+        'Octubre',
+        'Noviembre',
+        'Diciembre',
+      ]
+      return monthNames[parseInt(monthNumber)]
+    },
+  }
+
   // Extraer años y meses únicos de los costos para los filtros
-  const { uniqueYears, uniqueMonths, uniqueRubros, uniqueInversores } =
-    useMemo(() => {
-      if (!projectCosts) {
-        return {
-          uniqueYears: [],
-          uniqueMonths: [],
-          uniqueRubros: [],
-          uniqueInversores: [],
-        }
-      }
-
-      const years = Array.from(
-        new Set(
-          projectCosts.map((cost) => {
-            const date = new Date(cost.fecha)
-            return date.getFullYear().toString()
-          })
-        )
-      ).sort((a, b) => b.localeCompare(a)) // Ordenar años de forma descendente
-
-      const months = Array.from(
-        new Set(
-          projectCosts.map((cost) => {
-            const date = new Date(cost.fecha)
-            return date.getMonth().toString()
-          })
-        )
-      )
-
-      const rubros = Array.from(new Set(projectCosts.map((cost) => cost.rubro)))
-
-      const inversores = Array.from(
-        new Set(
-          projectCosts
-            .filter((cost) => cost.inversor) // Filtrar registros con inversor definido
-            .map((cost) => cost.inversor as string)
-        )
-      )
-
+  const filterOptions: FilterOptions = useMemo(() => {
+    if (!projectCosts) {
       return {
-        uniqueYears: years,
-        uniqueMonths: months,
-        uniqueRubros: rubros,
-        uniqueInversores: inversores,
+        uniqueYears: [],
+        uniqueMonths: [],
+        uniqueRubros: [],
+        uniqueInversores: [],
       }
-    }, [projectCosts])
+    }
+
+    const years = Array.from(
+      new Set(
+        projectCosts.map((cost) => {
+          const date = new Date(cost.fecha)
+          return date.getFullYear().toString()
+        })
+      )
+    ).sort((a, b) => b.localeCompare(a)) // Ordenar años de forma descendente
+
+    const months = Array.from(
+      new Set(
+        projectCosts.map((cost) => {
+          const date = new Date(cost.fecha)
+          return date.getMonth().toString()
+        })
+      )
+    )
+
+    const rubros = Array.from(new Set(projectCosts.map((cost) => cost.rubro)))
+
+    const inversores = Array.from(
+      new Set(
+        projectCosts
+          .filter((cost) => cost.inversor) // Filtrar registros con inversor definido
+          .map((cost) => cost.inversor as string)
+      )
+    )
+
+    return {
+      uniqueYears: years,
+      uniqueMonths: months,
+      uniqueRubros: rubros,
+      uniqueInversores: inversores,
+    }
+  }, [projectCosts])
 
   // Aplicar filtros a la lista de costos
   const filteredCosts = useMemo(() => {
@@ -243,50 +296,6 @@ export default function CostosProyectoPage() {
     })
   }
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return new Intl.DateTimeFormat('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    }).format(date)
-  }
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: 'ARS',
-      minimumFractionDigits: 2,
-    }).format(amount)
-  }
-
-  const formatCurrencyUSD = (amount: number) => {
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-    }).format(amount)
-  }
-
-  // Obtener nombre del mes en español
-  const getMonthName = (monthNumber: string) => {
-    const monthNames = [
-      'Enero',
-      'Febrero',
-      'Marzo',
-      'Abril',
-      'Mayo',
-      'Junio',
-      'Julio',
-      'Agosto',
-      'Septiembre',
-      'Octubre',
-      'Noviembre',
-      'Diciembre',
-    ]
-    return monthNames[parseInt(monthNumber)]
-  }
-
   // Manejar cambios en el formulario
   const handleChange = (
     e: React.ChangeEvent<
@@ -322,6 +331,46 @@ export default function CostosProyectoPage() {
   const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target
     setFilters((prev) => ({ ...prev, [name]: value }))
+  }
+
+  // Función para obtener la cotización actual del dólar blue
+  const fetchDolarBlueRate = async () => {
+    try {
+      const response = await fetch('/api/currencies')
+      const data = await response.json()
+
+      // Buscar la moneda "USD" o "USDBLUE" en los resultados
+      const usdCurrency = data.find(
+        (currency: any) =>
+          currency.code === 'USD' ||
+          currency.name?.toLowerCase().includes('dolar') ||
+          currency.code === 'USDBLUE'
+      )
+
+      if (usdCurrency && usdCurrency.rate) {
+        // Actualizar el estado del formulario con la cotización actual
+        setFormData((prev) => {
+          const newData = {
+            ...prev,
+            precioDolarBlue: usdCurrency.rate.toString(),
+          }
+
+          // Recalcular el importe en dólares si ya hay un importe en pesos
+          if (prev.importePesos) {
+            const pesos = parseFloat(prev.importePesos)
+            const cotizacion = parseFloat(usdCurrency.rate)
+            if (pesos > 0 && cotizacion > 0) {
+              newData.importeDolar = (pesos / cotizacion).toFixed(2)
+            }
+          }
+
+          return newData
+        })
+      }
+    } catch (error) {
+      console.error('Error al obtener la cotización del dólar blue:', error)
+      // No mostramos error en UI para no interrumpir la experiencia
+    }
   }
 
   // Guardar el costo en la base de datos
@@ -385,46 +434,6 @@ export default function CostosProyectoPage() {
     }
   }
 
-  // Función para obtener la cotización actual del dólar blue
-  const fetchDolarBlueRate = async () => {
-    try {
-      const response = await fetch('/api/currencies')
-      const data = await response.json()
-
-      // Buscar la moneda "USD" o "USDBLUE" en los resultados
-      const usdCurrency = data.find(
-        (currency: any) =>
-          currency.code === 'USD' ||
-          currency.name?.toLowerCase().includes('dolar') ||
-          currency.code === 'USDBLUE'
-      )
-
-      if (usdCurrency && usdCurrency.rate) {
-        // Actualizar el estado del formulario con la cotización actual
-        setFormData((prev) => {
-          const newData = {
-            ...prev,
-            precioDolarBlue: usdCurrency.rate.toString(),
-          }
-
-          // Recalcular el importe en dólares si ya hay un importe en pesos
-          if (prev.importePesos) {
-            const pesos = parseFloat(prev.importePesos)
-            const cotizacion = parseFloat(usdCurrency.rate)
-            if (pesos > 0 && cotizacion > 0) {
-              newData.importeDolar = (pesos / cotizacion).toFixed(2)
-            }
-          }
-
-          return newData
-        })
-      }
-    } catch (error) {
-      console.error('Error al obtener la cotización del dólar blue:', error)
-      // No mostramos error en UI para no interrumpir la experiencia
-    }
-  }
-
   // Manejar la eliminación de un costo
   const handleDeleteCost = async (costId: number) => {
     try {
@@ -478,7 +487,7 @@ export default function CostosProyectoPage() {
         ? filteredCosts
         : projectCosts || []
     ).map((cost: ProyectCost) => ({
-      Fecha: formatDate(cost.fecha),
+      Fecha: formatting.formatDate(cost.fecha),
       Rubro: cost.rubro,
       Proveedor: cost.proveedor || '-',
       Detalle: cost.detalle || '-',
@@ -506,111 +515,7 @@ export default function CostosProyectoPage() {
     XLSX.writeFile(wb, fileName)
   }
 
-  // Componente para el panel de filtros
-  const FilterPanel = () => {
-    return (
-      <div className="bg-slate-50 rounded-lg border border-slate-200 p-4 mb-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-medium text-slate-800">Filtros</h2>
-          <button
-            onClick={clearFilters}
-            className="text-sm text-slate-600 hover:text-slate-800 flex items-center"
-          >
-            <X className="w-4 h-4 mr-1" />
-            Limpiar filtros
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Filtro por rubro */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Rubro
-            </label>
-            <select
-              name="rubro"
-              value={filters.rubro}
-              onChange={handleFilterChange}
-              className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400"
-            >
-              <option value="">Todos los rubros</option>
-              {uniqueRubros.map((rubro) => (
-                <option key={rubro} value={rubro}>
-                  {rubro}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Filtro por inversor */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Inversor
-            </label>
-            <select
-              name="inversor"
-              value={filters.inversor}
-              onChange={handleFilterChange}
-              className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400"
-            >
-              <option value="">Todos los inversores</option>
-              {uniqueInversores.map((inversor) => (
-                <option key={inversor} value={inversor}>
-                  {inversor}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Filtro por mes */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Mes
-            </label>
-            <select
-              name="mes"
-              value={filters.mes}
-              onChange={handleFilterChange}
-              className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400"
-            >
-              <option value="">Todos los meses</option>
-              {uniqueMonths.map((month) => (
-                <option key={month} value={month}>
-                  {getMonthName(month)}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Filtro por año */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Año
-            </label>
-            <select
-              name="año"
-              value={filters.año}
-              onChange={handleFilterChange}
-              className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400"
-            >
-              <option value="">Todos los años</option>
-              {uniqueYears.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="mt-4 text-sm text-slate-600">
-          Mostrando {filteredCosts.length} de {projectCosts?.length || 0}{' '}
-          registros
-        </div>
-      </div>
-    )
-  }
-
+  // Verificar estado de carga
   const isLoading = isLoadingProyect || isLoadingCosts
 
   if (isLoading) {
@@ -651,6 +556,15 @@ export default function CostosProyectoPage() {
       </div>
     )
   }
+
+  // Verificar si hay filtros activos
+  const isFiltered = Object.values(filters).some((v) => v !== '')
+  // Costos a mostrar (filtrados o todos)
+  const costsToShow = isFiltered ? filteredCosts : projectCosts || []
+  // Métricas a mostrar
+  const metricsToShow = isFiltered
+    ? filteredMetrics
+    : metrics || { totalPesos: 0, totalDolares: 0 }
 
   return (
     <div className="container mx-auto py-8 px-4 bg-white">
@@ -700,206 +614,41 @@ export default function CostosProyectoPage() {
       )}
 
       {/* Panel de filtros (mostrar/ocultar) */}
-      {showFilters && <FilterPanel />}
+      {showFilters && (
+        <FilterPanel
+          filters={filters}
+          handleFilterChange={handleFilterChange}
+          clearFilters={clearFilters}
+          options={filterOptions}
+          formatting={formatting}
+          filteredCount={filteredCosts.length}
+          totalCount={projectCosts?.length || 0}
+        />
+      )}
 
       {/* Sección de resumen de costos */}
-      <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
-        <h2 className="text-lg font-medium text-slate-800 mb-4">
-          Resumen de Costos{' '}
-          {Object.values(filters).some((v) => v !== '') ? '(Filtrados)' : ''}
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white p-4 rounded-lg border border-slate-200">
-            <h3 className="text-sm font-medium text-slate-500 mb-1">
-              Total en ARS
-            </h3>
-            <p className="text-2xl font-bold text-slate-800">
-              {Object.values(filters).some((v) => v !== '')
-                ? formatCurrency(filteredMetrics.totalPesos)
-                : formatCurrency(metrics?.totalPesos || 0)}
-            </p>
-          </div>
-          <div className="bg-white p-4 rounded-lg border border-slate-200">
-            <h3 className="text-sm font-medium text-slate-500 mb-1">
-              Total en USD
-            </h3>
-            <p className="text-2xl font-bold text-slate-800">
-              {Object.values(filters).some((v) => v !== '')
-                ? formatCurrencyUSD(filteredMetrics.totalDolares)
-                : formatCurrencyUSD(metrics?.totalDolares || 0)}
-            </p>
-          </div>
-          <div className="bg-white p-4 rounded-lg border border-slate-200">
-            <h3 className="text-sm font-medium text-slate-500 mb-1">
-              Cantidad de registros
-            </h3>
-            <p className="text-2xl font-bold text-slate-800">
-              {Object.values(filters).some((v) => v !== '')
-                ? filteredCosts.length
-                : projectCosts?.length || 0}
-            </p>
-          </div>
-        </div>
-      </div>
+      <CostosMetrics
+        metrics={metricsToShow}
+        formatting={formatting}
+        isFiltered={isFiltered}
+        totalCount={costsToShow.length}
+        metrosConstruidos={currentProyect.proyectDetails?.surface}
+      />
+
+      {/* Sección de gráficos */}
+      {costsToShow.length > 0 && (
+        <CostosCharts costs={costsToShow} formatting={formatting} />
+      )}
 
       {/* Lista de costos */}
-      <div className="overflow-x-auto rounded-md border border-slate-200">
-        <table className="min-w-full bg-white">
-          <thead>
-            <tr className="bg-slate-50 text-slate-600 text-sm">
-              <th className="py-3 px-4 border-b border-slate-200 text-left font-medium">
-                <div className="flex items-center">
-                  <Calendar className="h-4 w-4 mr-1" />
-                  Fecha
-                </div>
-              </th>
-              <th className="py-3 px-4 border-b border-slate-200 text-left font-medium">
-                <div className="flex items-center">
-                  <Tag className="h-4 w-4 mr-1" />
-                  Rubro / Proveedor
-                </div>
-              </th>
-              <th className="py-3 px-4 border-b border-slate-200 text-left font-medium">
-                <div className="flex items-center">
-                  <FileText className="h-4 w-4 mr-1" />
-                  Detalle
-                </div>
-              </th>
-              <th className="py-3 px-4 border-b border-slate-200 text-left font-medium">
-                <div className="flex items-center">
-                  <DollarSign className="h-4 w-4 mr-1" />
-                  Importe ARS
-                </div>
-              </th>
-              <th className="py-3 px-4 border-b border-slate-200 text-left font-medium">
-                <div className="flex items-center">
-                  <DollarSign className="h-4 w-4 mr-1" />
-                  Cotización USD
-                </div>
-              </th>
-              <th className="py-3 px-4 border-b border-slate-200 text-left font-medium">
-                <div className="flex items-center">
-                  <DollarSign className="h-4 w-4 mr-1" />
-                  Importe USD
-                </div>
-              </th>
-              <th className="py-3 px-4 border-b border-slate-200 text-left font-medium">
-                <div className="flex items-center">
-                  <User className="h-4 w-4 mr-1" />
-                  Inversor
-                </div>
-              </th>
-              <th className="py-3 px-4 border-b border-slate-200 text-center font-medium">
-                Acciones
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-200">
-            {Object.values(filters).some((v) => v !== '') ? (
-              filteredCosts.length > 0 ? (
-                filteredCosts.map((cost: ProyectCost) => (
-                  <tr key={cost.id} className="hover:bg-slate-50">
-                    <td className="py-3 px-4">{formatDate(cost.fecha)}</td>
-                    <td className="py-3 px-4">
-                      <div className="font-medium text-slate-800">
-                        {cost.rubro}
-                      </div>
-                      <div className="text-sm text-slate-500">
-                        {cost.proveedor}
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="max-w-xs truncate">
-                        {cost.detalle || '-'}
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      {formatCurrency(cost.importePesos)}
-                    </td>
-                    <td className="py-3 px-4">
-                      {formatCurrency(cost.precioDolarBlue)}
-                    </td>
-                    <td className="py-3 px-4">
-                      {formatCurrencyUSD(cost.importeDolar)}
-                    </td>
-                    <td className="py-3 px-4">{cost.inversor || '-'}</td>
-                    <td className="py-3 px-4 text-center">
-                      <div className="flex justify-center gap-2">
-                        <button className="text-blue-600 hover:text-blue-800">
-                          <Edit className="h-4 w-4" />
-                        </button>
-                        <button
-                          className="text-red-600 hover:text-red-800"
-                          onClick={() => showDeleteConfirmation(cost.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr className="text-center">
-                  <td colSpan={8} className="py-8 text-slate-500">
-                    No hay registros que coincidan con los filtros aplicados
-                  </td>
-                </tr>
-              )
-            ) : projectCosts && projectCosts.length > 0 ? (
-              projectCosts.map((cost: ProyectCost) => (
-                <tr key={cost.id} className="hover:bg-slate-50">
-                  <td className="py-3 px-4">{formatDate(cost.fecha)}</td>
-                  <td className="py-3 px-4">
-                    <div className="font-medium text-slate-800">
-                      {cost.rubro}
-                    </div>
-                    <div className="text-sm text-slate-500">
-                      {cost.proveedor}
-                    </div>
-                  </td>
-                  <td className="py-3 px-4">
-                    <div className="max-w-xs truncate">
-                      {cost.detalle || '-'}
-                    </div>
-                  </td>
-                  <td className="py-3 px-4">
-                    {formatCurrency(cost.importePesos)}
-                  </td>
-                  <td className="py-3 px-4">
-                    {formatCurrency(cost.precioDolarBlue)}
-                  </td>                  <td className="py-3 px-4">
-                    {formatCurrencyUSD(cost.importeDolar)}
-                  </td>
-                  <td className="py-3 px-4">
-                    {cost.inversor || '-'}
-                  </td>
-                  <td className="py-3 px-4 text-center">
-                    <div className="flex justify-center gap-2">
-                      <button className="text-blue-600 hover:text-blue-800">
-                        <Edit className="h-4 w-4" />
-                      </button>
-                      <button
-                        className="text-red-600 hover:text-red-800"
-                        onClick={() => showDeleteConfirmation(cost.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr className="text-center">
-                <td colSpan={8} className="py-8 text-slate-500">
-                  No hay registros de costos para este proyecto
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      <CostosTable
+        costs={costsToShow}
+        showDeleteConfirmation={showDeleteConfirmation}
+        formatting={formatting}
+        isFiltered={isFiltered}
+      />
 
-      {/* Usar el componente AddCostPopup importado en lugar del componente interno */}
+      {/* Popup para añadir un nuevo costo */}
       {showAddCostPopup && currentProyect && (
         <AddCostPopup
           currentProyect={currentProyect}
@@ -913,34 +662,13 @@ export default function CostosProyectoPage() {
       )}
 
       {/* Modal de confirmación de eliminación */}
-      {deleteConfirmation.show && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-lg font-medium text-slate-800 mb-4">
-              Confirmar eliminación
-            </h2>
-            <p className="text-slate-600 mb-6">
-              ¿Está seguro de que desea eliminar este costo? Esta acción no se
-              puede deshacer.
-            </p>
-            <div className="flex justify-end space-x-2">
-              <button
-                onClick={cancelDelete}
-                className="bg-slate-200 hover:bg-slate-300 text-slate-800 font-medium py-2 px-4 rounded-md transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={() => handleDeleteCost(deleteConfirmation.costId!)}
-                className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
-                disabled={isDeleting}
-              >
-                {isDeleting ? 'Eliminando...' : 'Eliminar'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteConfirmationModal
+        isOpen={deleteConfirmation.show}
+        costId={deleteConfirmation.costId}
+        onDelete={handleDeleteCost}
+        onCancel={cancelDelete}
+        isDeleting={isDeleting}
+      />
     </div>
   )
 }
