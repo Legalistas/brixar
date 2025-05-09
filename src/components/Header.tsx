@@ -18,7 +18,7 @@ import { Button } from '@/components/Button'
 import { Container } from '@/components/Container'
 import { NavLinks } from '@/components/NavLinks'
 import LogoBrixar from './LogoBrixar'
-import { ChevronDown, FileText, Gift, LogOut, User } from 'lucide-react'
+import { ChevronDown, LogOut, User } from 'lucide-react'
 import { useSession, signOut } from 'next-auth/react'
 import { useCurrency } from '@/context/CurrencyContext'
 

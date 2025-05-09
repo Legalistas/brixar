@@ -3,8 +3,8 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { 
-  Loader2, 
+import {
+  Loader2,
   Calendar,
   DollarSign,
   FileText,
@@ -17,7 +17,7 @@ import {
   Trash2,
   Filter,
   X,
-  Download
+  Download,
 } from 'lucide-react'
 import { useProyectStore } from '@/store/proyectStore'
 import { useCostStore } from '@/store/costStore'
@@ -28,47 +28,55 @@ import * as XLSX from 'xlsx'
 export default function CostosProyectoPage() {
   const searchParams = useSearchParams()
   const slug = searchParams?.get('slug')
-  
-  const { currentProyect, isLoading: isLoadingProyect, error: storeError, fetchProyectBySlug } = useProyectStore()
-  const { 
-    projectCosts, 
-    metrics, 
-    isLoading: isLoadingCosts, 
+
+  const {
+    currentProyect,
+    isLoading: isLoadingProyect,
+    error: storeError,
+    fetchProyectBySlug,
+  } = useProyectStore()
+  const {
+    projectCosts,
+    metrics,
+    isLoading: isLoadingCosts,
     error: costError,
     fetchCostsByProyectSlug,
     createCost,
-    deleteCost
+    deleteCost,
   } = useCostStore()
-  
+
   const [error, setError] = useState('')
   const [showAddCostPopup, setShowAddCostPopup] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [deleteConfirmation, setDeleteConfirmation] = useState<{ show: boolean, costId: number | null }>({
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{
+    show: boolean
+    costId: number | null
+  }>({
     show: false,
-    costId: null
+    costId: null,
   })
-  
+
   // Estado para los filtros
   const [filters, setFilters] = useState({
     rubro: '',
     inversor: '',
     mes: '',
-    año: ''
+    año: '',
   })
-  
+
   // Formulario para nuevo costo
   const [formData, setFormData] = useState<{
-    fecha: string;
-    rubro: string;
-    rubroPersonalizado: string;
-    proveedor: string;
-    detalle: string;
-    importePesos: string;
-    precioDolarBlue: string;
-    importeDolar: string;
-    inversor: string;
-    inversorPersonalizado: string;
+    fecha: string
+    rubro: string
+    rubroPersonalizado: string
+    proveedor: string
+    detalle: string
+    importePesos: string
+    precioDolarBlue: string
+    importeDolar: string
+    inversor: string
+    inversorPersonalizado: string
   }>({
     fecha: new Date().toISOString().split('T')[0],
     rubro: '',
@@ -79,17 +87,23 @@ export default function CostosProyectoPage() {
     precioDolarBlue: '',
     importeDolar: '',
     inversor: '',
-    inversorPersonalizado: ''
+    inversorPersonalizado: '',
   })
 
   // Lista de rubros predefinidos
-  const rubros = ['Materiales', 'Mano Obra', 'Seguros', 'Planos / Escrituras', 'Otros']
-  
+  const rubros = [
+    'Materiales',
+    'Mano Obra',
+    'Seguros',
+    'Planos / Escrituras',
+    'Otros',
+  ]
+
   // Lista de inversores predefinidos
   const inversores = ['Oscar Andereggen', 'Agustín Andereggen', 'Otro']
 
   // Cargar el proyecto si se proporciona un slug
-  useEffect(() => {    
+  useEffect(() => {
     if (slug) {
       fetchProyectBySlug(slug)
       fetchCostsByProyectSlug(slug)
@@ -99,7 +113,7 @@ export default function CostosProyectoPage() {
   // Actualizar el error local si hay error en el store
   useEffect(() => {
     console.log('Error en el store:', storeError, costError)
-    
+
     if (storeError) {
       setError(storeError)
     }
@@ -116,83 +130,106 @@ export default function CostosProyectoPage() {
   }, [showAddCostPopup])
 
   // Extraer años y meses únicos de los costos para los filtros
-  const { uniqueYears, uniqueMonths, uniqueRubros, uniqueInversores } = useMemo(() => {
-    if (!projectCosts) {
-      return { uniqueYears: [], uniqueMonths: [], uniqueRubros: [], uniqueInversores: [] }
-    }
-    
-    const years = Array.from(new Set(projectCosts.map(cost => {
-      const date = new Date(cost.fecha)
-      return date.getFullYear().toString()
-    }))).sort((a, b) => b.localeCompare(a)) // Ordenar años de forma descendente
-    
-    const months = Array.from(new Set(projectCosts.map(cost => {
-      const date = new Date(cost.fecha)
-      return date.getMonth().toString()
-    })))
-    
-    const rubros = Array.from(new Set(projectCosts.map(cost => cost.rubro)))
-    
-    const inversores = Array.from(new Set(projectCosts
-      .filter(cost => cost.inversor) // Filtrar registros con inversor definido
-      .map(cost => cost.inversor as string)
-    ))
-    
-    return { 
-      uniqueYears: years, 
-      uniqueMonths: months, 
-      uniqueRubros: rubros,
-      uniqueInversores: inversores
-    }
-  }, [projectCosts])
-  
+  const { uniqueYears, uniqueMonths, uniqueRubros, uniqueInversores } =
+    useMemo(() => {
+      if (!projectCosts) {
+        return {
+          uniqueYears: [],
+          uniqueMonths: [],
+          uniqueRubros: [],
+          uniqueInversores: [],
+        }
+      }
+
+      const years = Array.from(
+        new Set(
+          projectCosts.map((cost) => {
+            const date = new Date(cost.fecha)
+            return date.getFullYear().toString()
+          })
+        )
+      ).sort((a, b) => b.localeCompare(a)) // Ordenar años de forma descendente
+
+      const months = Array.from(
+        new Set(
+          projectCosts.map((cost) => {
+            const date = new Date(cost.fecha)
+            return date.getMonth().toString()
+          })
+        )
+      )
+
+      const rubros = Array.from(new Set(projectCosts.map((cost) => cost.rubro)))
+
+      const inversores = Array.from(
+        new Set(
+          projectCosts
+            .filter((cost) => cost.inversor) // Filtrar registros con inversor definido
+            .map((cost) => cost.inversor as string)
+        )
+      )
+
+      return {
+        uniqueYears: years,
+        uniqueMonths: months,
+        uniqueRubros: rubros,
+        uniqueInversores: inversores,
+      }
+    }, [projectCosts])
+
   // Aplicar filtros a la lista de costos
   const filteredCosts = useMemo(() => {
     if (!projectCosts) {
       return []
     }
-    
-    return projectCosts.filter(cost => {
+
+    return projectCosts.filter((cost) => {
       const costDate = new Date(cost.fecha)
       const costYear = costDate.getFullYear().toString()
       const costMonth = costDate.getMonth().toString()
-      
+
       // Aplicar filtro por año si se ha seleccionado
       if (filters.año && costYear !== filters.año) {
         return false
       }
-      
+
       // Aplicar filtro por mes si se ha seleccionado
       if (filters.mes && costMonth !== filters.mes) {
         return false
       }
-      
+
       // Aplicar filtro por rubro si se ha seleccionado
       if (filters.rubro && cost.rubro !== filters.rubro) {
         return false
       }
-      
+
       // Aplicar filtro por inversor si se ha seleccionado
       if (filters.inversor && cost.inversor !== filters.inversor) {
         return false
       }
-      
+
       return true
     })
   }, [projectCosts, filters])
-  
+
   // Calcular métricas filtradas
   const filteredMetrics = useMemo(() => {
     if (filteredCosts.length === 0) {
       return {
         totalPesos: 0,
-        totalDolares: 0
+        totalDolares: 0,
       }
     }
-    
+
     return {
-      totalPesos: filteredCosts.reduce((sum, cost) => sum + Number(cost.importePesos), 0),
-      totalDolares: filteredCosts.reduce((sum, cost) => sum + Number(cost.importeDolar), 0)
+      totalPesos: filteredCosts.reduce(
+        (sum, cost) => sum + Number(cost.importePesos),
+        0
+      ),
+      totalDolares: filteredCosts.reduce(
+        (sum, cost) => sum + Number(cost.importeDolar),
+        0
+      ),
     }
   }, [filteredCosts])
 
@@ -202,7 +239,7 @@ export default function CostosProyectoPage() {
       rubro: '',
       inversor: '',
       mes: '',
-      año: ''
+      año: '',
     })
   }
 
@@ -211,7 +248,7 @@ export default function CostosProyectoPage() {
     return new Intl.DateTimeFormat('es-ES', {
       day: '2-digit',
       month: '2-digit',
-      year: 'numeric'
+      year: 'numeric',
     }).format(date)
   }
 
@@ -219,7 +256,7 @@ export default function CostosProyectoPage() {
     return new Intl.NumberFormat('es-ES', {
       style: 'currency',
       currency: 'ARS',
-      minimumFractionDigits: 2
+      minimumFractionDigits: 2,
     }).format(amount)
   }
 
@@ -227,78 +264,105 @@ export default function CostosProyectoPage() {
     return new Intl.NumberFormat('es-ES', {
       style: 'currency',
       currency: 'USD',
-      minimumFractionDigits: 2
+      minimumFractionDigits: 2,
     }).format(amount)
   }
-  
+
   // Obtener nombre del mes en español
   const getMonthName = (monthNumber: string) => {
     const monthNames = [
-      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+      'Enero',
+      'Febrero',
+      'Marzo',
+      'Abril',
+      'Mayo',
+      'Junio',
+      'Julio',
+      'Agosto',
+      'Septiembre',
+      'Octubre',
+      'Noviembre',
+      'Diciembre',
     ]
     return monthNames[parseInt(monthNumber)]
   }
-  
+
   // Manejar cambios en el formulario
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target
-    
+
     // Actualizar el estado en una sola operación para evitar múltiples renderizados
-    setFormData(prev => {
+    setFormData((prev) => {
       const newData = { ...prev, [name]: value }
-      
+
       // Calcular automáticamente el importe en dólares cuando cambian los valores
       if (name === 'importePesos' || name === 'precioDolarBlue') {
-        const pesos = parseFloat(name === 'importePesos' ? value : newData.importePesos) || 0
-        const cotizacion = parseFloat(name === 'precioDolarBlue' ? value : newData.precioDolarBlue) || 0
-        
+        const pesos =
+          parseFloat(name === 'importePesos' ? value : newData.importePesos) ||
+          0
+        const cotizacion =
+          parseFloat(
+            name === 'precioDolarBlue' ? value : newData.precioDolarBlue
+          ) || 0
+
         if (pesos > 0 && cotizacion > 0) {
           newData.importeDolar = (pesos / cotizacion).toFixed(2)
         }
       }
-      
+
       return newData
     })
   }
-  
+
   // Manejar cambios en los filtros
   const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target
-    setFilters(prev => ({ ...prev, [name]: value }))
+    setFilters((prev) => ({ ...prev, [name]: value }))
   }
-  
+
   // Guardar el costo en la base de datos
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!currentProyect) return
-    
+
     try {
       setError('')
       const fechaObj = new Date(formData.fecha)
-      const mes = `${fechaObj.getFullYear()}-${String(fechaObj.getMonth() + 1).padStart(2, '0')}`
-      
+      const mes = `${fechaObj.getFullYear()}-${String(
+        fechaObj.getMonth() + 1
+      ).padStart(2, '0')}`
+
       const costData: CreateProyectCostInput = {
         proyectId: currentProyect.id,
         fecha: formData.fecha,
         mes: mes,
-        rubro: formData.rubro === 'Otros' ? formData.rubroPersonalizado : formData.rubro,
+        rubro:
+          formData.rubro === 'Otros'
+            ? formData.rubroPersonalizado
+            : formData.rubro,
         proveedor: formData.proveedor,
         detalle: formData.detalle,
         importePesos: parseFloat(formData.importePesos),
         precioDolarBlue: parseFloat(formData.precioDolarBlue),
         importeDolar: parseFloat(formData.importeDolar),
-        inversor: formData.inversor === 'Otro' ? formData.inversorPersonalizado : formData.inversor
+        inversor:
+          formData.inversor === 'Otro'
+            ? formData.inversorPersonalizado
+            : formData.inversor,
       }
-      
+
       const success = await createCost(costData)
-      
+
       if (success) {
         setShowAddCostPopup(false)
         // Recargar los costos para actualizar la vista
         fetchCostsByProyectSlug(slug as string)
-        
+
         // Limpiar el formulario
         setFormData({
           fecha: new Date().toISOString().split('T')[0],
@@ -310,66 +374,69 @@ export default function CostosProyectoPage() {
           precioDolarBlue: '',
           importeDolar: '',
           inversor: '',
-          inversorPersonalizado: ''
+          inversorPersonalizado: '',
         })
       }
     } catch (err) {
-      setError('Error al guardar el costo: ' + (err instanceof Error ? err.message : 'Error desconocido'))
+      setError(
+        'Error al guardar el costo: ' +
+          (err instanceof Error ? err.message : 'Error desconocido')
+      )
     }
   }
-  
+
   // Función para obtener la cotización actual del dólar blue
   const fetchDolarBlueRate = async () => {
     try {
-      const response = await fetch('/api/currencies');
-      const data = await response.json();
-      
+      const response = await fetch('/api/currencies')
+      const data = await response.json()
+
       // Buscar la moneda "USD" o "USDBLUE" en los resultados
       const usdCurrency = data.find(
-        (currency: any) => 
-          currency.code === 'USD' || 
+        (currency: any) =>
+          currency.code === 'USD' ||
           currency.name?.toLowerCase().includes('dolar') ||
           currency.code === 'USDBLUE'
-      );
-      
+      )
+
       if (usdCurrency && usdCurrency.rate) {
         // Actualizar el estado del formulario con la cotización actual
-        setFormData(prev => {
+        setFormData((prev) => {
           const newData = {
             ...prev,
-            precioDolarBlue: usdCurrency.rate.toString()
-          };
-          
+            precioDolarBlue: usdCurrency.rate.toString(),
+          }
+
           // Recalcular el importe en dólares si ya hay un importe en pesos
           if (prev.importePesos) {
-            const pesos = parseFloat(prev.importePesos);
-            const cotizacion = parseFloat(usdCurrency.rate);
+            const pesos = parseFloat(prev.importePesos)
+            const cotizacion = parseFloat(usdCurrency.rate)
             if (pesos > 0 && cotizacion > 0) {
-              newData.importeDolar = (pesos / cotizacion).toFixed(2);
+              newData.importeDolar = (pesos / cotizacion).toFixed(2)
             }
           }
-          
-          return newData;
-        });
+
+          return newData
+        })
       }
     } catch (error) {
-      console.error('Error al obtener la cotización del dólar blue:', error);
+      console.error('Error al obtener la cotización del dólar blue:', error)
       // No mostramos error en UI para no interrumpir la experiencia
     }
-  };
+  }
 
   // Manejar la eliminación de un costo
   const handleDeleteCost = async (costId: number) => {
     try {
       setIsDeleting(true)
       setError('')
-      
+
       const success = await deleteCost(costId)
-      
+
       if (success) {
         // Cerrar el modal de confirmación
         setDeleteConfirmation({ show: false, costId: null })
-        
+
         // Recargar los costos para actualizar la vista
         if (slug) {
           await fetchCostsByProyectSlug(slug)
@@ -378,7 +445,10 @@ export default function CostosProyectoPage() {
         setError('No se pudo eliminar el costo. Intente nuevamente.')
       }
     } catch (err) {
-      setError('Error al eliminar el costo: ' + (err instanceof Error ? err.message : 'Error desconocido'))
+      setError(
+        'Error al eliminar el costo: ' +
+          (err instanceof Error ? err.message : 'Error desconocido')
+      )
     } finally {
       setIsDeleting(false)
     }
@@ -388,48 +458,53 @@ export default function CostosProyectoPage() {
   const showDeleteConfirmation = (costId: number) => {
     setDeleteConfirmation({
       show: true,
-      costId
+      costId,
     })
   }
-  
+
   // Cancelar la eliminación
   const cancelDelete = () => {
     setDeleteConfirmation({
       show: false,
-      costId: null
+      costId: null,
     })
   }
 
   // Función para exportar costos a Excel
   const exportToExcel = () => {
     // Datos que se exportarán
-    const dataToExport = (Object.values(filters).some(v => v !== '') ? filteredCosts : projectCosts || [])
-      .map((cost: ProyectCost) => ({
-        'Fecha': formatDate(cost.fecha),
-        'Rubro': cost.rubro,
-        'Proveedor': cost.proveedor || '-',
-        'Detalle': cost.detalle || '-',
-        'Importe ARS': cost.importePesos,
-        'Cotización USD': cost.precioDolarBlue,
-        'Importe USD': cost.importeDolar,
-        'Inversor': cost.inversor || '-',
-        'Usuario': cost.usuario?.name || cost.usuario?.email || '-'
-      }));
-    
+    const dataToExport = (
+      Object.values(filters).some((v) => v !== '')
+        ? filteredCosts
+        : projectCosts || []
+    ).map((cost: ProyectCost) => ({
+      Fecha: formatDate(cost.fecha),
+      Rubro: cost.rubro,
+      Proveedor: cost.proveedor || '-',
+      Detalle: cost.detalle || '-',
+      'Importe ARS': cost.importePesos,
+      'Cotización USD': cost.precioDolarBlue,
+      'Importe USD': cost.importeDolar,
+      Inversor: cost.inversor || '-',
+      Usuario: cost.usuario?.name || cost.usuario?.email || '-',
+    }))
+
     // Crear un nuevo libro de trabajo
-    const wb = XLSX.utils.book_new();
+    const wb = XLSX.utils.book_new()
     // Convertir los datos a una hoja de cálculo
-    const ws = XLSX.utils.json_to_sheet(dataToExport);
-    
+    const ws = XLSX.utils.json_to_sheet(dataToExport)
+
     // Agregar la hoja al libro
-    XLSX.utils.book_append_sheet(wb, ws, 'Costos');
-    
+    XLSX.utils.book_append_sheet(wb, ws, 'Costos')
+
     // Generar un nombre para el archivo
-    const fileName = `Costos_${currentProyect.title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`;
-    
+    const fileName = `Costos_${
+      currentProyect?.title.replace(/\s+/g, '_') || 'Proyecto'
+    }_${new Date().toISOString().split('T')[0]}.xlsx`
+
     // Escribir el libro y descargar
-    XLSX.writeFile(wb, fileName);
-  };
+    XLSX.writeFile(wb, fileName)
+  }
 
   // Componente para el panel de filtros
   const FilterPanel = () => {
@@ -437,7 +512,7 @@ export default function CostosProyectoPage() {
       <div className="bg-slate-50 rounded-lg border border-slate-200 p-4 mb-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-medium text-slate-800">Filtros</h2>
-          <button 
+          <button
             onClick={clearFilters}
             className="text-sm text-slate-600 hover:text-slate-800 flex items-center"
           >
@@ -445,7 +520,7 @@ export default function CostosProyectoPage() {
             Limpiar filtros
           </button>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* Filtro por rubro */}
           <div>
@@ -459,12 +534,14 @@ export default function CostosProyectoPage() {
               className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400"
             >
               <option value="">Todos los rubros</option>
-              {uniqueRubros.map(rubro => (
-                <option key={rubro} value={rubro}>{rubro}</option>
+              {uniqueRubros.map((rubro) => (
+                <option key={rubro} value={rubro}>
+                  {rubro}
+                </option>
               ))}
             </select>
           </div>
-          
+
           {/* Filtro por inversor */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
@@ -477,12 +554,14 @@ export default function CostosProyectoPage() {
               className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400"
             >
               <option value="">Todos los inversores</option>
-              {uniqueInversores.map(inversor => (
-                <option key={inversor} value={inversor}>{inversor}</option>
+              {uniqueInversores.map((inversor) => (
+                <option key={inversor} value={inversor}>
+                  {inversor}
+                </option>
               ))}
             </select>
           </div>
-          
+
           {/* Filtro por mes */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
@@ -495,12 +574,14 @@ export default function CostosProyectoPage() {
               className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400"
             >
               <option value="">Todos los meses</option>
-              {uniqueMonths.map(month => (
-                <option key={month} value={month}>{getMonthName(month)}</option>
+              {uniqueMonths.map((month) => (
+                <option key={month} value={month}>
+                  {getMonthName(month)}
+                </option>
               ))}
             </select>
           </div>
-          
+
           {/* Filtro por año */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
@@ -513,20 +594,23 @@ export default function CostosProyectoPage() {
               className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400"
             >
               <option value="">Todos los años</option>
-              {uniqueYears.map(year => (
-                <option key={year} value={year}>{year}</option>
+              {uniqueYears.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
               ))}
             </select>
           </div>
         </div>
-        
+
         <div className="mt-4 text-sm text-slate-600">
-          Mostrando {filteredCosts.length} de {projectCosts?.length || 0} registros
+          Mostrando {filteredCosts.length} de {projectCosts?.length || 0}{' '}
+          registros
         </div>
       </div>
     )
   }
-  
+
   const isLoading = isLoadingProyect || isLoadingCosts
 
   if (isLoading) {
@@ -534,7 +618,9 @@ export default function CostosProyectoPage() {
       <div className="flex justify-center items-center min-h-screen bg-white">
         <div className="flex flex-col items-center">
           <Loader2 className="h-8 w-8 text-slate-400 animate-spin" />
-          <p className="mt-2 text-slate-500">Cargando información del proyecto...</p>
+          <p className="mt-2 text-slate-500">
+            Cargando información del proyecto...
+          </p>
         </div>
       </div>
     )
@@ -549,11 +635,12 @@ export default function CostosProyectoPage() {
             Costos de Proyectos
           </h1>
         </div>
-        
+
         <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-md mb-4">
-          Por favor, seleccione un proyecto para gestionar sus costos desde la página de proyectos.
+          Por favor, seleccione un proyecto para gestionar sus costos desde la
+          página de proyectos.
         </div>
-        
+
         <Link
           href="/admin/dashboard/proyectos"
           className="inline-flex items-center text-slate-700 hover:text-slate-900"
@@ -617,28 +704,37 @@ export default function CostosProyectoPage() {
 
       {/* Sección de resumen de costos */}
       <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
-        <h2 className="text-lg font-medium text-slate-800 mb-4">Resumen de Costos {Object.values(filters).some(v => v !== '') ? '(Filtrados)' : ''}</h2>
+        <h2 className="text-lg font-medium text-slate-800 mb-4">
+          Resumen de Costos{' '}
+          {Object.values(filters).some((v) => v !== '') ? '(Filtrados)' : ''}
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white p-4 rounded-lg border border-slate-200">
-            <h3 className="text-sm font-medium text-slate-500 mb-1">Total en ARS</h3>
+            <h3 className="text-sm font-medium text-slate-500 mb-1">
+              Total en ARS
+            </h3>
             <p className="text-2xl font-bold text-slate-800">
-              {Object.values(filters).some(v => v !== '')
+              {Object.values(filters).some((v) => v !== '')
                 ? formatCurrency(filteredMetrics.totalPesos)
                 : formatCurrency(metrics?.totalPesos || 0)}
             </p>
           </div>
           <div className="bg-white p-4 rounded-lg border border-slate-200">
-            <h3 className="text-sm font-medium text-slate-500 mb-1">Total en USD</h3>
+            <h3 className="text-sm font-medium text-slate-500 mb-1">
+              Total en USD
+            </h3>
             <p className="text-2xl font-bold text-slate-800">
-              {Object.values(filters).some(v => v !== '')
+              {Object.values(filters).some((v) => v !== '')
                 ? formatCurrencyUSD(filteredMetrics.totalDolares)
                 : formatCurrencyUSD(metrics?.totalDolares || 0)}
             </p>
           </div>
           <div className="bg-white p-4 rounded-lg border border-slate-200">
-            <h3 className="text-sm font-medium text-slate-500 mb-1">Cantidad de registros</h3>
+            <h3 className="text-sm font-medium text-slate-500 mb-1">
+              Cantidad de registros
+            </h3>
             <p className="text-2xl font-bold text-slate-800">
-              {Object.values(filters).some(v => v !== '')
+              {Object.values(filters).some((v) => v !== '')
                 ? filteredCosts.length
                 : projectCosts?.length || 0}
             </p>
@@ -690,7 +786,7 @@ export default function CostosProyectoPage() {
               <th className="py-3 px-4 border-b border-slate-200 text-left font-medium">
                 <div className="flex items-center">
                   <User className="h-4 w-4 mr-1" />
-                  Usuario
+                  Inversor
                 </div>
               </th>
               <th className="py-3 px-4 border-b border-slate-200 text-center font-medium">
@@ -699,89 +795,106 @@ export default function CostosProyectoPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
-            {Object.values(filters).some(v => v !== '')
-              ? (filteredCosts.length > 0 ? (
-                  filteredCosts.map((cost: ProyectCost) => (
-                    <tr key={cost.id} className="hover:bg-slate-50">
-                      <td className="py-3 px-4">{formatDate(cost.fecha)}</td>
-                      <td className="py-3 px-4">
-                        <div className="font-medium text-slate-800">{cost.rubro}</div>
-                        <div className="text-sm text-slate-500">{cost.proveedor}</div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="max-w-xs truncate">{cost.detalle || '-'}</div>
-                      </td>
-                      <td className="py-3 px-4">{formatCurrency(cost.importePesos)}</td>
-                      <td className="py-3 px-4">{formatCurrency(cost.precioDolarBlue)}</td>
-                      <td className="py-3 px-4">{formatCurrencyUSD(cost.importeDolar)}</td>
-                      <td className="py-3 px-4">
-                        {cost.usuario?.name || cost.usuario?.email || '-'}
-                      </td>
-                      <td className="py-3 px-4 text-center">
-                        <div className="flex justify-center gap-2">
-                          <button className="text-blue-600 hover:text-blue-800">
-                            <Edit className="h-4 w-4" />
-                          </button>
-                          <button 
-                            className="text-red-600 hover:text-red-800"
-                            onClick={() => showDeleteConfirmation(cost.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr className="text-center">
-                    <td colSpan={8} className="py-8 text-slate-500">
-                      No hay registros que coincidan con los filtros aplicados
+            {Object.values(filters).some((v) => v !== '') ? (
+              filteredCosts.length > 0 ? (
+                filteredCosts.map((cost: ProyectCost) => (
+                  <tr key={cost.id} className="hover:bg-slate-50">
+                    <td className="py-3 px-4">{formatDate(cost.fecha)}</td>
+                    <td className="py-3 px-4">
+                      <div className="font-medium text-slate-800">
+                        {cost.rubro}
+                      </div>
+                      <div className="text-sm text-slate-500">
+                        {cost.proveedor}
+                      </div>
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="max-w-xs truncate">
+                        {cost.detalle || '-'}
+                      </div>
+                    </td>
+                    <td className="py-3 px-4">
+                      {formatCurrency(cost.importePesos)}
+                    </td>
+                    <td className="py-3 px-4">
+                      {formatCurrency(cost.precioDolarBlue)}
+                    </td>
+                    <td className="py-3 px-4">
+                      {formatCurrencyUSD(cost.importeDolar)}
+                    </td>
+                    <td className="py-3 px-4">{cost.inversor || '-'}</td>
+                    <td className="py-3 px-4 text-center">
+                      <div className="flex justify-center gap-2">
+                        <button className="text-blue-600 hover:text-blue-800">
+                          <Edit className="h-4 w-4" />
+                        </button>
+                        <button
+                          className="text-red-600 hover:text-red-800"
+                          onClick={() => showDeleteConfirmation(cost.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
-                )
+                ))
+              ) : (
+                <tr className="text-center">
+                  <td colSpan={8} className="py-8 text-slate-500">
+                    No hay registros que coincidan con los filtros aplicados
+                  </td>
+                </tr>
               )
-              : (
-                projectCosts && projectCosts.length > 0 ? (
-                  projectCosts.map((cost: ProyectCost) => (
-                    <tr key={cost.id} className="hover:bg-slate-50">
-                      <td className="py-3 px-4">{formatDate(cost.fecha)}</td>
-                      <td className="py-3 px-4">
-                        <div className="font-medium text-slate-800">{cost.rubro}</div>
-                        <div className="text-sm text-slate-500">{cost.proveedor}</div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="max-w-xs truncate">{cost.detalle || '-'}</div>
-                      </td>
-                      <td className="py-3 px-4">{formatCurrency(cost.importePesos)}</td>
-                      <td className="py-3 px-4">{formatCurrency(cost.precioDolarBlue)}</td>
-                      <td className="py-3 px-4">{formatCurrencyUSD(cost.importeDolar)}</td>
-                      <td className="py-3 px-4">
-                        {cost.usuario?.name || cost.usuario?.email || '-'}
-                      </td>
-                      <td className="py-3 px-4 text-center">
-                        <div className="flex justify-center gap-2">
-                          <button className="text-blue-600 hover:text-blue-800">
-                            <Edit className="h-4 w-4" />
-                          </button>
-                          <button 
-                            className="text-red-600 hover:text-red-800"
-                            onClick={() => showDeleteConfirmation(cost.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr className="text-center">
-                    <td colSpan={8} className="py-8 text-slate-500">
-                      No hay registros de costos para este proyecto
-                    </td>
-                  </tr>
-                )
-              )
-            }
+            ) : projectCosts && projectCosts.length > 0 ? (
+              projectCosts.map((cost: ProyectCost) => (
+                <tr key={cost.id} className="hover:bg-slate-50">
+                  <td className="py-3 px-4">{formatDate(cost.fecha)}</td>
+                  <td className="py-3 px-4">
+                    <div className="font-medium text-slate-800">
+                      {cost.rubro}
+                    </div>
+                    <div className="text-sm text-slate-500">
+                      {cost.proveedor}
+                    </div>
+                  </td>
+                  <td className="py-3 px-4">
+                    <div className="max-w-xs truncate">
+                      {cost.detalle || '-'}
+                    </div>
+                  </td>
+                  <td className="py-3 px-4">
+                    {formatCurrency(cost.importePesos)}
+                  </td>
+                  <td className="py-3 px-4">
+                    {formatCurrency(cost.precioDolarBlue)}
+                  </td>                  <td className="py-3 px-4">
+                    {formatCurrencyUSD(cost.importeDolar)}
+                  </td>
+                  <td className="py-3 px-4">
+                    {cost.inversor || '-'}
+                  </td>
+                  <td className="py-3 px-4 text-center">
+                    <div className="flex justify-center gap-2">
+                      <button className="text-blue-600 hover:text-blue-800">
+                        <Edit className="h-4 w-4" />
+                      </button>
+                      <button
+                        className="text-red-600 hover:text-red-800"
+                        onClick={() => showDeleteConfirmation(cost.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr className="text-center">
+                <td colSpan={8} className="py-8 text-slate-500">
+                  No hay registros de costos para este proyecto
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -803,8 +916,13 @@ export default function CostosProyectoPage() {
       {deleteConfirmation.show && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-lg font-medium text-slate-800 mb-4">Confirmar eliminación</h2>
-            <p className="text-slate-600 mb-6">¿Está seguro de que desea eliminar este costo? Esta acción no se puede deshacer.</p>
+            <h2 className="text-lg font-medium text-slate-800 mb-4">
+              Confirmar eliminación
+            </h2>
+            <p className="text-slate-600 mb-6">
+              ¿Está seguro de que desea eliminar este costo? Esta acción no se
+              puede deshacer.
+            </p>
             <div className="flex justify-end space-x-2">
               <button
                 onClick={cancelDelete}
