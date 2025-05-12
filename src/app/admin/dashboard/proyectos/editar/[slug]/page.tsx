@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { useProyectStore } from '@/store/proyectStore'
 import { ProyectPhase, BusinessModel } from '@prisma/client'
 import { AlertCircle, Loader2, ArrowLeft, Upload, Plus, Trash2, FileText } from 'lucide-react'
-import { slugify } from '@/utils/slugify'
 
 export default function EditarProyectoPage({ params }: { params: { slug: string } }) {
   const router = useRouter()
@@ -23,7 +22,7 @@ export default function EditarProyectoPage({ params }: { params: { slug: string 
   const [openingLine, setOpeningLine] = useState('')
   const [description, setDescription] = useState('')
   const [phase, setPhase] = useState<ProyectPhase>('FUNDING')
-  const [businessModel, setBusinessModel] = useState<BusinessModel>('SOLD')
+  const [businessModel, setBusinessModel] = useState<BusinessModel | string>('SOLD')
   const [openingPhase, setOpeningPhase] = useState<number>(0)
   const [priority, setPriority] = useState<number>(0)
   const [daysToEnd, setDaysToEnd] = useState<number>(0)
@@ -268,7 +267,7 @@ export default function EditarProyectoPage({ params }: { params: { slug: string 
         openingLine,
         description,
         phase,
-        businessModel,
+        businessModel: businessModel as BusinessModel,
         openingPhase,
         priority,
         daysToEnd,
@@ -414,8 +413,7 @@ export default function EditarProyectoPage({ params }: { params: { slug: string 
             <div>
               <label htmlFor="businessModel" className="block text-sm font-medium text-slate-700 mb-1">
                 Modelo de Negocio <span className="text-red-500">*</span>
-              </label>
-              <select
+              </label>              <select
                 id="businessModel"
                 value={businessModel}
                 onChange={(e) => setBusinessModel(e.target.value as BusinessModel)}
@@ -424,7 +422,8 @@ export default function EditarProyectoPage({ params }: { params: { slug: string 
               >
                 <option value="SOLD">Venta</option>
                 <option value="RENT">Alquiler</option>
-                <option value="LEADING">Leasing</option>
+                <option value="TRUST">Fideicomiso</option>
+                <option value="POZO">Pozo</option>
               </select>
             </div>
             
