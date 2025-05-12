@@ -110,8 +110,12 @@ export default function CostosProyectoPage() {
   const rubros = [
     'Materiales',
     'Mano Obra',
+    'Remuneraciones',
     'Seguros',
     'Planos / Escrituras',
+    'Bienes de Uso',
+    'Logística',
+    'Marketing',
     'Otros',
   ]
 
@@ -645,6 +649,12 @@ export default function CostosProyectoPage() {
         isFiltered={isFiltered}
         totalCount={costsToShow.length}
         metrosConstruidos={currentProyect.proyectDetails?.surface}
+        gastosPorInversor={costsToShow.reduce((acc, cost) => {
+          if (cost.inversor) {
+            acc[cost.inversor] = (acc[cost.inversor] || 0) + cost.importePesos
+          }
+          return acc
+        }, {} as Record<string, number>)}	
       />
 
       {/* Sección de gráficos */}

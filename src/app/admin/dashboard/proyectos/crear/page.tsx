@@ -33,6 +33,7 @@ export default function CrearProyectoPage() {
   const [priority, setPriority] = useState<number>(0)
   const [daysToEnd, setDaysToEnd] = useState<number>(0)
   const [daysToStart, setDaysToStart] = useState<number>(0)
+  const [openingDate, setOpeningDate] = useState<Date | null>(null)
   
   // Estados para dirección
   const [city, setCity] = useState(defaultCity)
@@ -266,6 +267,8 @@ export default function CrearProyectoPage() {
           setDaysToStart={setDaysToStart}
           surface={surface}
           setSurface={setSurface}
+          openingDate={openingDate || new Date()}
+          setOpeningDate={setOpeningDate}
         />
         
         {/* Ubicación del proyecto */}

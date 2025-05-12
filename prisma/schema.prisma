@@ -475,7 +475,8 @@ enum ProyectPhase {
 enum BusinessModel {
   SOLD
   RENT
-  LEADING
+  TRUST
+  POZO
 }
 
 enum PropertyStatus {

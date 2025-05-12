@@ -25,6 +25,8 @@ interface InformacionBasicaProps {
   setDaysToStart: (value: number) => void
   surface: number
   setSurface: (value: number) => void
+  openingDate: Date
+  setOpeningDate: (value: Date) => void
 }
 
 export default function InformacionBasica({
@@ -40,6 +42,8 @@ export default function InformacionBasica({
   setBusinessModel,
   surface,
   setSurface,
+  openingDate,
+  setOpeningDate,
 }: InformacionBasicaProps) {
   return (
     <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
@@ -158,6 +162,22 @@ export default function InformacionBasica({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={4}
+            className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
+          />
+        </div>
+
+        <div className="col-span-1 md:col-span-2">
+          <label
+            htmlFor="inicioObra"
+            className="block text-sm font-medium text-slate-700 mb-1"
+          >
+            Inicio de Obra
+          </label>
+          <input
+            id="inicioObra"
+            type="date"
+            value={openingDate.toISOString().split('T')[0]}
+            onChange={(e) => setOpeningDate(new Date(e.target.value))}
             className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
           />
         </div>

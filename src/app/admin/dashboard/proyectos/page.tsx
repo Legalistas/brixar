@@ -111,14 +111,17 @@ export default function ProyectosPage() {
     }).format(price)
   }
 
+  // Venta, alquiler, fideicomiso, pozo
   const getBusinessModelLabel = (model: BusinessModel) => {
     switch (model) {
       case 'SOLD':
         return 'Venta'
       case 'RENT':
         return 'Alquiler'
-      case 'LEADING':
-        return 'Leasing'
+      case 'TRUST':
+        return 'Fideicomiso'
+      case 'POZO':
+        return 'Pozo'
       default:
         return model
     }
