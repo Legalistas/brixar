@@ -101,7 +101,7 @@ export interface CreateProyectInput {
   openingLine?: string
   description?: string
   phase: 'IN_STUDY' | 'FUNDING' | 'CONSTRUCTION' | 'COMPLETED'
-  businessModel: 'SOLD' | 'RENT' | 'LEADING'
+  businessModel: 'SOLD' | 'RENT' | 'TRUST' | 'POZO'
   openingPhase?: number
   priority?: number
   daysToEnd?: number

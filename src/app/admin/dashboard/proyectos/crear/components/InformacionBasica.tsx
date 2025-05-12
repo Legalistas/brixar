@@ -125,7 +125,6 @@ export default function InformacionBasica({
           >
             <option value="SOLD">Venta</option>
             <option value="RENT">Alquiler</option>
-            <option value="LEADING">Leasing</option>
           </select>
         </div>
 
