@@ -81,8 +81,7 @@ export const API_ENDPOINTS = {
   PROYECT_SHOW: (slug: string) => `${API_BASE_URL}/proyects/${slug}`,
   PROYECTS_CREATE: `${API_BASE_URL}/proyects`,
   PROYECT_UPDATE: (slug: string) => `${API_BASE_URL}/proyects/${slug}`,
-  
-  // Costos de proyectos
+    // Costos de proyectos
   COSTS_INDEX: `${API_BASE_URL}/costs`,
   COSTS_CREATE: `${API_BASE_URL}/costs`,
   COSTS_BY_PROJECT_ID: (proyectId: number) => `${API_BASE_URL}/costs?proyectId=${proyectId}`,
@@ -90,4 +89,13 @@ export const API_ENDPOINTS = {
   COST_BY_ID: (id: number) => `${API_BASE_URL}/costs/${id}`,
   COST_UPDATE: (id: number) => `${API_BASE_URL}/costs/${id}`,
   COST_DELETE: (id: number) => `${API_BASE_URL}/costs/${id}`,
+  
+  // Compensaciones entre inversores
+  COMPENSATIONS_INDEX: `${API_BASE_URL}/compensations`,
+  COMPENSATIONS_CREATE: `${API_BASE_URL}/compensations`,
+  COMPENSATIONS_BY_PROJECT_ID: (proyectId: number) => `${API_BASE_URL}/compensations?proyectId=${proyectId}`,
+  COMPENSATIONS_BY_PROJECT_SLUG: (slug: string) => `${API_BASE_URL}/compensations/proyecto/${slug}`,
+  COMPENSATION_BY_ID: (id: number) => `${API_BASE_URL}/compensations/${id}`,
+  COMPENSATION_UPDATE: (id: number) => `${API_BASE_URL}/compensations/${id}`,
+  COMPENSATION_DELETE: (id: number) => `${API_BASE_URL}/compensations/${id}`,
 }

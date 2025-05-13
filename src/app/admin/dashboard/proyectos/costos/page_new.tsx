@@ -47,6 +47,7 @@ export default function CostosProyectoPage() {
     error: storeError,
     fetchProyectBySlug,
   } = useProyectStore()
+
   const {
     projectCosts,
     metrics,
@@ -71,7 +72,7 @@ export default function CostosProyectoPage() {
   const [error, setError] = useState('')
   const [showAddCostPopup, setShowAddCostPopup] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)  
+  const [isDeleting, setIsDeleting] = useState(false)
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
     show: boolean
     costId: number | null
@@ -91,6 +92,7 @@ export default function CostosProyectoPage() {
     mes: '',
     año: '',
   })
+  
   // Formulario para nuevo costo
   const [formData, setFormData] = useState<{
     fecha: string
@@ -142,8 +144,9 @@ export default function CostosProyectoPage() {
     if (slug) {
       fetchProyectBySlug(slug)
       fetchCostsByProyectSlug(slug)
+      fetchCompensationsByProyectSlug(slug)
     }
-  }, [slug, fetchProyectBySlug, fetchCostsByProyectSlug])
+  }, [slug, fetchProyectBySlug, fetchCostsByProyectSlug, fetchCompensationsByProyectSlug])
 
   // Actualizar el error local si hay error en el store
   useEffect(() => {
@@ -153,7 +156,10 @@ export default function CostosProyectoPage() {
     if (costError) {
       setError(costError)
     }
-  }, [storeError, costError])
+    if (compensationError) {
+      setError(compensationError)
+    }
+  }, [storeError, costError, compensationError])
 
   // Cargar cotización del dólar blue cuando se abre el popup
   useEffect(() => {
@@ -290,6 +296,36 @@ export default function CostosProyectoPage() {
     })
   }, [projectCosts, filters])
 
+  // Aplicar filtros a la lista de compensaciones
+  const filteredCompensations = useMemo(() => {
+    if (!projectCompensations) {
+      return []
+    }
+
+    return projectCompensations.filter((comp) => {
+      const compDate = new Date(comp.fecha)
+      const compYear = compDate.getFullYear().toString()
+      const compMonth = compDate.getMonth().toString()
+
+      // Aplicar filtro por año si se ha seleccionado
+      if (filters.año && compYear !== filters.año) {
+        return false
+      }
+
+      // Aplicar filtro por mes si se ha seleccionado
+      if (filters.mes && compMonth !== filters.mes) {
+        return false
+      }
+
+      // Aplicar filtro por inversor si se ha seleccionado
+      if (filters.inversor && comp.inversorOrigen !== filters.inversor && comp.inversorDestino !== filters.inversor) {
+        return false
+      }
+
+      return true
+    })
+  }, [projectCompensations, filters])
+
   // Calcular métricas filtradas
   const filteredMetrics = useMemo(() => {
     if (filteredCosts.length === 0) {
@@ -397,7 +433,8 @@ export default function CostosProyectoPage() {
       // No mostramos error en UI para no interrumpir la experiencia
     }
   }
-  // Guardar el costo en la base de datos
+
+  // Guardar en la base de datos (costo o compensación)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -410,84 +447,130 @@ export default function CostosProyectoPage() {
         fechaObj.getMonth() + 1
       ).padStart(2, '0')}`
 
-      const costData: CreateProyectCostInput = {
-        proyectId: currentProyect.id,
-        fecha: formData.fecha,
-        mes: mes,
-        tipo: formData.tipo,
-        rubro:
-          formData.rubro === 'Otros'
-            ? formData.rubroPersonalizado
-            : formData.rubro,
-        proveedor: formData.proveedor,
-        detalle: formData.detalle,
-        importePesos: parseFloat(formData.importePesos),
-        precioDolarBlue: parseFloat(formData.precioDolarBlue),
-        importeDolar: parseFloat(formData.importeDolar),
-        inversor:
-          formData.inversor === 'Otro'
-            ? formData.inversorPersonalizado
-            : formData.inversor,
-        inversorDestino:
-          formData.tipo === 'compensacion'
-            ? formData.inversorDestino === 'Otro'
+      // Si el tipo es compensación, registramos una compensación entre inversores
+      if (formData.tipo === 'compensacion') {
+        const compensationData: CreateProyectCompensationInput = {
+          proyectId: currentProyect.id,
+          fecha: formData.fecha,
+          mes: mes,
+          detalle: formData.detalle,
+          importePesos: parseFloat(formData.importePesos),
+          precioDolarBlue: parseFloat(formData.precioDolarBlue),
+          importeDolar: parseFloat(formData.importeDolar),
+          inversorOrigen:
+            formData.inversor === 'Otro'
+              ? formData.inversorPersonalizado
+              : formData.inversor,
+          inversorDestino:
+            formData.inversorDestino === 'Otro'
               ? formData.inversorDestinoPersonalizado
-              : formData.inversorDestino
-            : undefined,
-      }
+              : formData.inversorDestino,
+        }
 
-      const success = await createCost(costData)
+        const success = await createCompensation(compensationData)
 
-      if (success) {
-        setShowAddCostPopup(false)
-        // Recargar los costos para actualizar la vista
-        fetchCostsByProyectSlug(slug as string)        // Limpiar el formulario
-        setFormData({
-          fecha: new Date().toISOString().split('T')[0],
-          tipo: 'costo',
-          rubro: '',
-          rubroPersonalizado: '',
-          proveedor: '',
-          detalle: '',
-          importePesos: '',
-          precioDolarBlue: '',
-          importeDolar: '',
-          inversor: '',
-          inversorPersonalizado: '',
-          inversorDestino: '',
-          inversorDestinoPersonalizado: '',
-        })
+        if (success) {
+          setShowAddCostPopup(false)
+          // Recargar las compensaciones para actualizar la vista
+          fetchCompensationsByProyectSlug(slug as string)
+          // Limpiar el formulario
+          resetForm()
+        }
+      } else {
+        // Registramos un costo normal
+        const costData: CreateProyectCostInput = {
+          proyectId: currentProyect.id,
+          fecha: formData.fecha,
+          mes: mes,
+          tipo: formData.tipo,
+          rubro:
+            formData.rubro === 'Otros'
+              ? formData.rubroPersonalizado
+              : formData.rubro,
+          proveedor: formData.proveedor,
+          detalle: formData.detalle,
+          importePesos: parseFloat(formData.importePesos),
+          precioDolarBlue: parseFloat(formData.precioDolarBlue),
+          importeDolar: parseFloat(formData.importeDolar),
+          inversor:
+            formData.inversor === 'Otro'
+              ? formData.inversorPersonalizado
+              : formData.inversor
+        }
+
+        const success = await createCost(costData)
+
+        if (success) {
+          setShowAddCostPopup(false)
+          // Recargar los costos para actualizar la vista
+          fetchCostsByProyectSlug(slug as string)
+          // Limpiar el formulario
+          resetForm()
+        }
       }
     } catch (err) {
       setError(
-        'Error al guardar el costo: ' +
+        'Error al guardar: ' +
           (err instanceof Error ? err.message : 'Error desconocido')
       )
     }
   }
 
-  // Manejar la eliminación de un costo
-  const handleDeleteCost = async (costId: number) => {
+  // Resetear el formulario
+  const resetForm = () => {
+    setFormData({
+      fecha: new Date().toISOString().split('T')[0],
+      tipo: 'costo',
+      rubro: '',
+      rubroPersonalizado: '',
+      proveedor: '',
+      detalle: '',
+      importePesos: '',
+      precioDolarBlue: '',
+      importeDolar: '',
+      inversor: '',
+      inversorPersonalizado: '',
+      inversorDestino: '',
+      inversorDestinoPersonalizado: '',
+    })
+  }
+
+  // Manejar la eliminación de un costo o compensación
+  const handleDelete = async () => {
     try {
       setIsDeleting(true)
       setError('')
 
-      const success = await deleteCost(costId)
+      let success = false;
+
+      if (deleteConfirmation.type === 'costo' && deleteConfirmation.costId) {
+        success = await deleteCost(deleteConfirmation.costId)
+        
+        if (success && slug) {
+          await fetchCostsByProyectSlug(slug)
+        }
+      } else if (deleteConfirmation.type === 'compensacion' && deleteConfirmation.compensationId) {
+        success = await deleteCompensation(deleteConfirmation.compensationId)
+        
+        if (success && slug) {
+          await fetchCompensationsByProyectSlug(slug)
+        }
+      }
 
       if (success) {
         // Cerrar el modal de confirmación
-        setDeleteConfirmation({ show: false, costId: null })
-
-        // Recargar los costos para actualizar la vista
-        if (slug) {
-          await fetchCostsByProyectSlug(slug)
-        }
+        setDeleteConfirmation({ 
+          show: false, 
+          costId: null,
+          compensationId: null,
+          type: 'costo' 
+        })
       } else {
-        setError('No se pudo eliminar el costo. Intente nuevamente.')
+        setError('No se pudo eliminar el registro. Intente nuevamente.')
       }
     } catch (err) {
       setError(
-        'Error al eliminar el costo: ' +
+        'Error al eliminar: ' +
           (err instanceof Error ? err.message : 'Error desconocido')
       )
     } finally {
@@ -496,11 +579,22 @@ export default function CostosProyectoPage() {
   }
 
   // Mostrar confirmación antes de eliminar
-  const showDeleteConfirmation = (costId: number) => {
-    setDeleteConfirmation({
-      show: true,
-      costId,
-    })
+  const showDeleteConfirmation = (id: number, type: 'costo' | 'compensacion' = 'costo') => {
+    if (type === 'costo') {
+      setDeleteConfirmation({
+        show: true,
+        costId: id,
+        compensationId: null,
+        type: 'costo'
+      })
+    } else {
+      setDeleteConfirmation({
+        show: true,
+        costId: null,
+        compensationId: id,
+        type: 'compensacion'
+      })
+    }
   }
 
   // Cancelar la eliminación
@@ -508,6 +602,8 @@ export default function CostosProyectoPage() {
     setDeleteConfirmation({
       show: false,
       costId: null,
+      compensationId: null,
+      type: 'costo'
     })
   }
 
@@ -548,7 +644,7 @@ export default function CostosProyectoPage() {
   }
 
   // Verificar estado de carga
-  const isLoading = isLoadingProyect || isLoadingCosts
+  const isLoading = isLoadingProyect || isLoadingCosts || isLoadingCompensations
 
   if (isLoading) {
     return (
@@ -597,6 +693,8 @@ export default function CostosProyectoPage() {
   const metricsToShow = isFiltered
     ? filteredMetrics
     : metrics || { totalPesos: 0, totalDolares: 0 }
+  // Compensaciones a mostrar
+  const compensationsToShow = isFiltered ? filteredCompensations : projectCompensations || []
 
   return (
     <div className="container mx-auto py-8 px-4 bg-white">
@@ -626,7 +724,7 @@ export default function CostosProyectoPage() {
             className="bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 px-4 rounded-md transition-colors flex items-center"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Añadir Costo
+            Añadir Costo/Compensación
           </button>
           <button
             onClick={exportToExcel}
@@ -681,12 +779,22 @@ export default function CostosProyectoPage() {
       {/* Lista de costos */}
       <CostosTable
         costs={costsToShow}
-        showDeleteConfirmation={showDeleteConfirmation}
+        showDeleteConfirmation={(id) => showDeleteConfirmation(id, 'costo')}
         formatting={formatting}
         isFiltered={isFiltered}
       />
 
-      {/* Popup para añadir un nuevo costo */}
+      {/* Lista de compensaciones entre inversores */}
+      {projectCompensations && (
+        <CompensacionesTable
+          compensations={compensationsToShow}
+          showDeleteConfirmation={(id) => showDeleteConfirmation(id, 'compensacion')}
+          formatting={formatting}
+          isFiltered={isFiltered}
+        />
+      )}
+
+      {/* Popup para añadir un nuevo costo o compensación */}
       {showAddCostPopup && currentProyect && (
         <AddCostPopup
           currentProyect={currentProyect}
@@ -703,7 +811,9 @@ export default function CostosProyectoPage() {
       <DeleteConfirmationModal
         isOpen={deleteConfirmation.show}
         costId={deleteConfirmation.costId}
-        onDelete={handleDeleteCost}
+        compensationId={deleteConfirmation.compensationId}
+        type={deleteConfirmation.type}
+        onDelete={handleDelete}
         onCancel={cancelDelete}
         isDeleting={isDeleting}
       />

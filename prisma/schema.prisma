@@ -129,14 +129,14 @@ model PropertyVideo {
 }
 
 model Proyect {
-  id             Int             @id @default(autoincrement())
-  slug           String          @unique
+  id             Int                  @id @default(autoincrement())
+  slug           String               @unique
   title          String
-  openingLine    String?         @db.Text
-  description    String?         @db.Text
+  openingLine    String?              @db.Text
+  description    String?              @db.Text
   promotorId     Int? // Hacemos que sea opcional
   openingPhase   Int?
-  phase          ProyectPhase    @default(FUNDING)
+  phase          ProyectPhase         @default(FUNDING)
   businessModel  BusinessModel
   fundedDate     DateTime?
   projectMedia   ProyectMedia[]
@@ -145,14 +145,15 @@ model Proyect {
   daysToEnd      Int?
   priority       Int?
   daysToStart    Int?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @default(now())
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @default(now())
   address        Address[]
   // Relación opcional con User
-  promotor       User?           @relation(fields: [promotorId], references: [id], onDelete: Cascade)
+  promotor       User?                @relation(fields: [promotorId], references: [id], onDelete: Cascade)
   proyectDetails ProyectDetails?
   proyectFound   ProyectFound?
-  costs          ProyectCost[]   // Relación con los costos del proyecto
+  costs          ProyectCost[]        // Relación con los costos del proyecto
+  compensations  ProyectCompensation[] // Relación con las compensaciones entre inversores
 
   @@map("proyects")
 }
@@ -303,28 +304,29 @@ model Session {
 }
 
 model User {
-  id            Int             @id @default(autoincrement())
-  name          String?
-  email         String         @unique
-  emailVerified DateTime?
-  password      String?
-  image         String?
-  role          Role           @default(CUSTOMER)
-  status        Boolean        @default(true)
-  created_at    DateTime       @default(now())
-  updated_at    DateTime       @updatedAt
-  accounts      Account[]
-  sessions      Session[]
-  activity      UserActivity?
-  profile       UserProfile?
-  Visit         Visit[]
-  Proyect       Proyect[]
-  ProyectFound  ProyectFound[]
-  inquiries     Inquiry[]       // Relación con consultas
-  messages      InquiryMessage[] // Relación con mensajes
-  buyerSales    Sale[]          @relation("BuyerSales")  // Ventas donde es comprador
-  sellerSales   Sale[]          @relation("SellerSales") // Ventas donde es vendedor
-  proyectCosts  ProyectCost[]   // Relación con los costos que ha abonado
+  id                Int                  @id @default(autoincrement())
+  name              String?
+  email             String               @unique
+  emailVerified     DateTime?
+  password          String?
+  image             String?
+  role              Role                 @default(CUSTOMER)
+  status            Boolean              @default(true)
+  created_at        DateTime             @default(now())
+  updated_at        DateTime             @updatedAt
+  accounts          Account[]
+  sessions          Session[]
+  activity          UserActivity?
+  profile           UserProfile?
+  Visit             Visit[]
+  Proyect           Proyect[]
+  ProyectFound      ProyectFound[]
+  inquiries         Inquiry[]            // Relación con consultas
+  messages          InquiryMessage[]     // Relación con mensajes
+  buyerSales        Sale[]               @relation("BuyerSales")  // Ventas donde es comprador
+  sellerSales       Sale[]               @relation("SellerSales") // Ventas donde es vendedor
+  proyectCosts      ProyectCost[]        // Relación con los costos que ha abonado
+  compensations     ProyectCompensation[] // Relación con compensaciones registradas
 
   @@map("users")
 }
@@ -490,4 +492,28 @@ enum SaleStatus {
   PROCESSING
   COMPLETED
   CANCELLED
+}
+
+// Modelo para compensaciones entre inversores
+model ProyectCompensation {
+  id              Int       @id @default(autoincrement())
+  proyectId       Int
+  fecha           DateTime  
+  mes             String    // Formato "YYYY-MM" para agrupar por mes
+  detalle         String?   @db.Text
+  importePesos    Decimal   @db.Decimal(12, 2)
+  precioDolarBlue Decimal   @db.Decimal(12, 2)
+  importeDolar    Decimal   @db.Decimal(12, 2)
+  inversorOrigen  String    // Inversor que envía los fondos
+  inversorDestino String    // Inversor que recibe los fondos
+  usuarioId       Int       // Usuario que registra la compensación
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  proyect         Proyect   @relation(fields: [proyectId], references: [id], onDelete: Cascade)
+  usuario         User      @relation(fields: [usuarioId], references: [id])
+
+  @@index([proyectId])
+  @@index([usuarioId])
+  @@map("proyect_compensations")
 }

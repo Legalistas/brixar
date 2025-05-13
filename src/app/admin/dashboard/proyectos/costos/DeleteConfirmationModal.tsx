@@ -3,19 +3,25 @@ import { Loader2 } from 'lucide-react';
 interface DeleteConfirmationModalProps {
   isOpen: boolean;
   costId: number | null;
-  onDelete: (costId: number) => Promise<void>;
+  compensationId?: number | null;
+  type?: 'costo' | 'compensacion';
+  onDelete: () => Promise<void>;
   onCancel: () => void;
   isDeleting: boolean;
 }
 
 const DeleteConfirmationModal = ({ 
   isOpen, 
-  costId, 
+  costId,
+  compensationId,
+  type = 'costo', 
   onDelete, 
   onCancel,
   isDeleting
 }: DeleteConfirmationModalProps) => {
   if (!isOpen) return null;
+
+  const isCompensation = type === 'compensacion';
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -24,7 +30,7 @@ const DeleteConfirmationModal = ({
           Confirmar eliminación
         </h2>
         <p className="text-slate-600 mb-6">
-          ¿Está seguro de que desea eliminar este costo? Esta acción no se
+          ¿Está seguro de que desea eliminar {isCompensation ? 'esta compensación' : 'este costo'}? Esta acción no se
           puede deshacer.
         </p>
         <div className="flex justify-end space-x-2">
@@ -36,7 +42,7 @@ const DeleteConfirmationModal = ({
             Cancelar
           </button>
           <button
-            onClick={() => costId !== null && onDelete(costId)}
+            onClick={onDelete}
             className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition-colors flex items-center"
             disabled={isDeleting}
           >
