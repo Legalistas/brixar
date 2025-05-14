@@ -23,7 +23,10 @@ import { useProyectStore } from '@/store/proyectStore'
 import { useCostStore } from '@/store/costStore'
 import { useCompensationStore } from '@/store/compensationStore'
 import type { CreateProyectCostInput, ProyectCost } from '@/store/costStore'
-import type { CreateProyectCompensationInput, ProyectCompensation } from '@/store/compensationStore'
+import type {
+  CreateProyectCompensationInput,
+  ProyectCompensation,
+} from '@/store/compensationStore'
 import * as XLSX from 'xlsx'
 
 // Componentes
@@ -71,7 +74,7 @@ export default function CostosProyectoPage() {
   const [error, setError] = useState('')
   const [showAddCostPopup, setShowAddCostPopup] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)  
+  const [isDeleting, setIsDeleting] = useState(false)
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
     show: boolean
     costId: number | null
@@ -81,7 +84,7 @@ export default function CostosProyectoPage() {
     show: false,
     costId: null,
     compensationId: null,
-    type: 'costo'
+    type: 'costo',
   })
 
   // Estado para los filtros
@@ -136,14 +139,19 @@ export default function CostosProyectoPage() {
   ]
 
   const inversores = ['Oscar Andereggen', 'Agustín Andereggen', 'Otro']
-
   // Cargar el proyecto si se proporciona un slug
   useEffect(() => {
     if (slug) {
       fetchProyectBySlug(slug)
       fetchCostsByProyectSlug(slug)
+      fetchCompensationsByProyectSlug(slug)
     }
-  }, [slug, fetchProyectBySlug, fetchCostsByProyectSlug])
+  }, [
+    slug,
+    fetchProyectBySlug,
+    fetchCostsByProyectSlug,
+    fetchCompensationsByProyectSlug,
+  ])
 
   // Actualizar el error local si hay error en el store
   useEffect(() => {
@@ -441,7 +449,7 @@ export default function CostosProyectoPage() {
       if (success) {
         setShowAddCostPopup(false)
         // Recargar los costos para actualizar la vista
-        fetchCostsByProyectSlug(slug as string)        // Limpiar el formulario
+        fetchCostsByProyectSlug(slug as string) // Limpiar el formulario
         setFormData({
           fecha: new Date().toISOString().split('T')[0],
           tipo: 'costo',
@@ -465,41 +473,63 @@ export default function CostosProyectoPage() {
       )
     }
   }
-
-  // Manejar la eliminación de un costo
-  const handleDeleteCost = async (costId: number) => {
+  // Manejar la eliminación de un costo o compensación
+  const handleDelete = async () => {
     try {
       setIsDeleting(true)
       setError('')
 
-      const success = await deleteCost(costId)
+      let success = false
+
+      if (deleteConfirmation.type === 'costo' && deleteConfirmation.costId) {
+        success = await deleteCost(deleteConfirmation.costId)
+
+        if (success && slug) {
+          await fetchCostsByProyectSlug(slug)
+        }
+      } else if (
+        deleteConfirmation.type === 'compensacion' &&
+        deleteConfirmation.compensationId
+      ) {
+        success = await deleteCompensation(deleteConfirmation.compensationId)
+
+        if (success && slug) {
+          await fetchCompensationsByProyectSlug(slug)
+        }
+      }
 
       if (success) {
         // Cerrar el modal de confirmación
-        setDeleteConfirmation({ show: false, costId: null })
-
-        // Recargar los costos para actualizar la vista
-        if (slug) {
-          await fetchCostsByProyectSlug(slug)
-        }
+        setDeleteConfirmation({
+          show: false,
+          costId: null,
+          compensationId: null,
+          type: 'costo',
+        })
       } else {
-        setError('No se pudo eliminar el costo. Intente nuevamente.')
+        setError(
+          `No se pudo eliminar el ${deleteConfirmation.type}. Intente nuevamente.`
+        )
       }
     } catch (err) {
       setError(
-        'Error al eliminar el costo: ' +
+        `Error al eliminar el ${deleteConfirmation.type}: ` +
           (err instanceof Error ? err.message : 'Error desconocido')
       )
     } finally {
       setIsDeleting(false)
     }
   }
-
   // Mostrar confirmación antes de eliminar
-  const showDeleteConfirmation = (costId: number) => {
+  const showDeleteConfirmation = (
+    id: number,
+    type: 'costo' | 'compensacion' = 'costo'
+  ) => {
     setDeleteConfirmation({
       show: true,
-      costId,
+      costId: type === 'costo' ? id : null,
+      compensationId: type === 'compensacion' ? id : null,
+      type,
     })
   }
 
@@ -508,6 +538,8 @@ export default function CostosProyectoPage() {
     setDeleteConfirmation({
       show: false,
       costId: null,
+      compensationId: null,
+      type: 'costo',
     })
   }
 
@@ -637,14 +669,12 @@ export default function CostosProyectoPage() {
           </button>
         </div>
       </div>
-
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4 flex items-center">
           <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
-
       {/* Panel de filtros (mostrar/ocultar) */}
       {showFilters && (
         <FilterPanel
@@ -657,7 +687,6 @@ export default function CostosProyectoPage() {
           totalCount={projectCosts?.length || 0}
         />
       )}
-
       {/* Sección de resumen de costos */}
       <CostosMetrics
         metrics={metricsToShow}
@@ -670,22 +699,40 @@ export default function CostosProyectoPage() {
             acc[cost.inversor] = (acc[cost.inversor] || 0) + cost.importePesos
           }
           return acc
-        }, {} as Record<string, number>)}	
+        }, {} as Record<string, number>)}
       />
-
       {/* Sección de gráficos */}
       {costsToShow.length > 0 && (
         <CostosCharts costs={costsToShow} formatting={formatting} />
-      )}
-
+      )}{' '}
       {/* Lista de costos */}
-      <CostosTable
-        costs={costsToShow}
-        showDeleteConfirmation={showDeleteConfirmation}
-        formatting={formatting}
-        isFiltered={isFiltered}
-      />
-
+      <div className="my-6">
+        <h2 className="text-xl font-medium text-slate-800 mb-4">
+          Costos del proyecto
+        </h2>
+        <CostosTable
+          costs={costsToShow}
+          showDeleteConfirmation={showDeleteConfirmation}
+          formatting={formatting}
+          isFiltered={isFiltered}
+        />
+      </div>
+      {/* Lista de compensaciones */}
+      {projectCompensations.length > 0 && (
+        <CompensacionesTable
+          compensations={projectCompensations}
+          showDeleteConfirmation={(compensationId, type) =>
+            setDeleteConfirmation({
+              show: true,
+              compensationId,
+              costId: null,
+              type: 'compensacion',
+            })
+          }
+          formatting={formatting}
+          isFiltered={isFiltered}
+        />
+      )}
       {/* Popup para añadir un nuevo costo */}
       {showAddCostPopup && currentProyect && (
         <AddCostPopup
@@ -697,13 +744,14 @@ export default function CostosProyectoPage() {
           rubros={rubros}
           inversores={inversores}
         />
-      )}
-
+      )}{' '}
       {/* Modal de confirmación de eliminación */}
       <DeleteConfirmationModal
         isOpen={deleteConfirmation.show}
         costId={deleteConfirmation.costId}
-        onDelete={handleDeleteCost}
+        compensationId={deleteConfirmation.compensationId}
+        type={deleteConfirmation.type}
+        onDelete={handleDelete}
         onCancel={cancelDelete}
         isDeleting={isDeleting}
       />

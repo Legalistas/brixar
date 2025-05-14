@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import type { CreateProyectCostInput } from '@/store/costStore'
 import { Proyect } from '@/store/proyectStore'
+import { useCompensationStore, type CreateProyectCompensationInput } from '@/store/compensationStore'
 
 interface AddCostPopupProps {
   currentProyect: Proyect
@@ -39,6 +40,57 @@ export const AddCostPopup: React.FC<AddCostPopupProps> = ({
   rubros,
   inversores,
 }) => {
+  // Usamos el store de compensaciones
+  const createCompensation = useCompensationStore(state => state.createCompensation)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  // Esta función manejará el envío de compensaciones utilizando compensationStore
+  const handleCompensationSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (formData.tipo === 'compensacion') {
+      try {
+        setLoading(true)
+        setError(null)
+        
+        // Extraer el mes de la fecha (formato: YYYY-MM-DD)
+        const date = new Date(formData.fecha)
+        const mes = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`
+        
+        // Preparar los datos para la compensación
+        const compensationData: CreateProyectCompensationInput = {
+          proyectId: currentProyect.id,
+          fecha: formData.fecha,
+          mes: mes,
+          detalle: formData.detalle || undefined,
+          importePesos: parseFloat(formData.importePesos),
+          precioDolarBlue: parseFloat(formData.precioDolarBlue),
+          importeDolar: parseFloat(formData.importeDolar),
+          inversorOrigen: formData.inversor === 'Otro' ? formData.inversorPersonalizado : formData.inversor,
+          inversorDestino: formData.inversorDestino === 'Otro' ? formData.inversorDestinoPersonalizado : formData.inversorDestino
+        }
+        
+        // Enviar la compensación utilizando el store de compensaciones
+        const success = await createCompensation(compensationData)
+        
+        if (success) {
+          // Cerrar el popup si la operación fue exitosa
+          setShowAddCostPopup(false)
+        } else {
+          setError('No se pudo registrar la compensación. Inténtelo nuevamente.')
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Error desconocido al guardar la compensación')
+      } finally {
+        setLoading(false)
+      }
+    } else {
+      // Si no es una compensación, usar el manejador de envío original para costos
+      await handleSubmit(e)
+    }
+  }
+
   return (
 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
       <div className="bg-white p-4 sm:p-6 rounded-lg shadow-lg w-full max-w-xl max-h-[90vh] overflow-y-auto">
@@ -50,7 +102,7 @@ export const AddCostPopup: React.FC<AddCostPopupProps> = ({
           Proyecto: <span className="font-medium text-slate-800">{currentProyect.title}</span>
         </p>
 
-        <form className="space-y-3 sm:space-y-4" onSubmit={handleSubmit}>
+        <form className="space-y-3 sm:space-y-4" onSubmit={handleCompensationSubmit}>
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -325,17 +377,30 @@ export const AddCostPopup: React.FC<AddCostPopupProps> = ({
           </div>
 
           <div className="flex justify-end space-x-2 pt-4 mt-4 border-t border-slate-200">
+            {error && (
+              <div className="flex-1 text-red-600 text-sm self-center">
+                {error}
+              </div>
+            )}
             <button
               type="button"
               onClick={() => setShowAddCostPopup(false)}
               className="border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-medium py-2 px-4 rounded-md transition-colors"
+              disabled={loading}
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 px-4 rounded-md transition-colors"
+              className="bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 px-4 rounded-md transition-colors flex items-center"
+              disabled={loading}
             >
+              {loading && (
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              )}
               {formData.tipo === 'compensacion'
                 ? 'Registrar Compensación'
                 : 'Guardar Costo'}
