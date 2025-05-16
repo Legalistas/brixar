@@ -43,11 +43,19 @@ export default function PublicacionesPage() {
   const [showEditPopup, setShowEditPopup] = useState<string | null>(null)
   const [selectedStatus, setSelectedStatus] = useState<any | null>(null)
   const [statusUpdating, setStatusUpdating] = useState(false)
+  const [redirectToSale, setRedirectToSale] = useState<number | null>(null)
 
   // Cargar propiedades al montar el componente
   useEffect(() => {
     fetchProperties()
   }, [])
+
+  // Efecto para redirigir a la página de venta cuando es necesario
+  useEffect(() => {
+    if (redirectToSale) {
+      router.push(`/admin/dashboard/ventas/${redirectToSale}`)
+    }
+  }, [redirectToSale, router])
 
   const fetchProperties = async () => {
     setLoading(true)
@@ -87,7 +95,6 @@ export default function PublicacionesPage() {
       setDeleting(false)
     }
   }
-
   const handleStatusChange = async (slug: string) => {
     if (!selectedStatus) return
 
@@ -116,6 +123,37 @@ export default function PublicacionesPage() {
             : property
         )
       )
+
+      // Si la propiedad fue marcada como vendida, crear una venta y redirigir
+      if (selectedStatus === 'VENDIDA') {
+        const property = properties.find(p => p.slug === slug)
+        if (property) {
+          try {            // Crear una nueva venta para esta propiedad
+            const saleResponse = await fetch(API_ENDPOINTS.SALE_CREATE, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                propertyId: property.id,
+                price: property.price,
+                status: 'PENDING' // Estado inicial de la venta
+              }),
+            })
+
+            if (saleResponse.ok) {
+              const saleData = await saleResponse.json()
+              
+              // Redirigir al usuario a la página de detalles de la venta
+              router.push(`/admin/dashboard/ventas/${saleData.id}`)
+            } else {
+              console.error('Error al crear la venta')
+            }
+          } catch (err) {
+            console.error('Error al crear la venta', err)
+          }
+        }
+      }
 
       setShowStatusPopup(null)
       setSelectedStatus(null)
@@ -187,8 +225,7 @@ export default function PublicacionesPage() {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-          <h3 className="text-xl font-medium mb-4 text-slate-800">
+        <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">          <h3 className="text-xl font-medium mb-4 text-slate-800">
             Cambiar estado de propiedad
           </h3>
           <p className="mb-4 text-slate-600">
@@ -255,6 +292,17 @@ export default function PublicacionesPage() {
               </div>
             </div>
           </div>
+          
+          {selectedStatus === 'VENDIDA' && (
+            <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-md">
+              <p className="text-amber-700 text-sm mb-2">
+                Al marcar esta propiedad como vendida, deberá registrar los detalles de la venta.
+              </p>
+              <p className="text-amber-800 text-sm">
+                Después de guardar, será redirigido al formulario para completar la información de la venta.
+              </p>
+            </div>
+          )}
 
           <div className="flex justify-end space-x-2">
             <button

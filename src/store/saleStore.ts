@@ -26,6 +26,32 @@ export interface Sale {
   paymentReference?: string
   documents?: any
   notes?: string
+  
+  // Datos detallados del comprador
+  buyerDocumentType?: string
+  buyerDocumentNumber?: string
+  buyerAddress?: string
+  buyerPhone?: string
+  
+  // Datos detallados de la venta
+  saleDate?: string
+  contractNumber?: string
+  signingPlace?: string
+  
+  // Datos de pago
+  totalAmount?: number
+  downPayment?: number
+  financedAmount?: number
+  financingTermMonths?: number
+  interestRate?: number
+  monthlyPayment?: number
+  
+  // Gastos legales
+  legalExpenses?: number
+  transferTaxes?: number
+  notaryFees?: number
+  registrationFees?: number
+  
   createdAt: string
   updatedAt: string
   property: {
@@ -62,6 +88,7 @@ interface SaleStore {
   updateSaleStatus: (saleId: number, status: string) => Promise<void>
   addSaleTransaction: (saleId: number, transactionData: Partial<SaleTransaction>) => Promise<void>
   updateSaleNotes: (saleId: number, notes: string) => Promise<void>
+  updateSaleDetails: (saleId: number, saleData: Partial<Sale>) => Promise<void>
   resetState: () => void
 }
 
@@ -188,7 +215,6 @@ export const useSaleStore = create<SaleStore>((set, get) => ({
       })
     }
   },
-
   updateSaleNotes: async (saleId: number, notes: string) => {
     try {
       set({ isLoading: true, error: null })
@@ -218,6 +244,41 @@ export const useSaleStore = create<SaleStore>((set, get) => ({
         error: error instanceof Error ? error.message : 'Error desconocido', 
         isLoading: false 
       })
+    }
+  },
+
+  updateSaleDetails: async (saleId: number, saleData: Partial<Sale>) => {
+    try {
+      set({ isLoading: true, error: null })
+      const response = await fetch(API_ENDPOINTS.SALE_UPDATE(saleId), {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(saleData),
+      })
+      
+      if (!response.ok) {
+        throw new Error('Error al actualizar los detalles de la venta')
+      }
+      
+      const updatedSale = await response.json()
+      
+      set((state) => ({
+        sales: state.sales.map(sale => 
+          sale.id === saleId ? updatedSale : sale
+        ),
+        currentSale: updatedSale,
+        isLoading: false
+      }))
+
+      return updatedSale
+    } catch (error) {
+      set({ 
+        error: error instanceof Error ? error.message : 'Error desconocido', 
+        isLoading: false 
+      })
+      throw error
     }
   },
 
