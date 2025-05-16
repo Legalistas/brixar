@@ -249,12 +249,11 @@ export const useProyectStore = create<ProyectStore>((set, get) => ({
       return false
     }
   },
-
   updateProyect: async (slug: string, proyectData: Partial<CreateProyectInput>) => {
     try {
       set({ isLoading: true, error: null })
       const response = await fetch(API_ENDPOINTS.PROYECT_UPDATE(slug), {
-        method: 'PATCH',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
