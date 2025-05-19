@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react'
-import type { CreateProyectCostInput } from '@/store/costStore'
+import { useState } from 'react'
 import { Proyect } from '@/store/proyectStore'
 import { useCompensationStore, type CreateProyectCompensationInput } from '@/store/compensationStore'
 

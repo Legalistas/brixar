@@ -372,26 +372,22 @@ export default function CostosProyectoPage() {
       const response = await fetch('/api/currencies')
       const data = await response.json()
 
-      // Buscar la moneda "USD" o "USDBLUE" en los resultados
-      const usdCurrency = data.find(
-        (currency: any) =>
-          currency.code === 'USD' ||
-          currency.name?.toLowerCase().includes('dolar') ||
-          currency.code === 'USDBLUE'
-      )
+      const dolarInfo = data[1];
 
-      if (usdCurrency && usdCurrency.rate) {
+      console.log('DolarInfo:', dolarInfo)
+
+      if (dolarInfo) {
         // Actualizar el estado del formulario con la cotización actual
         setFormData((prev) => {
           const newData = {
             ...prev,
-            precioDolarBlue: usdCurrency.rate.toString(),
+            precioDolarBlue: dolarInfo.rate.toString() || '1200',
           }
 
           // Recalcular el importe en dólares si ya hay un importe en pesos
           if (prev.importePesos) {
             const pesos = parseFloat(prev.importePesos)
-            const cotizacion = parseFloat(usdCurrency.rate)
+            const cotizacion = parseFloat(dolarInfo.rate)
             if (pesos > 0 && cotizacion > 0) {
               newData.importeDolar = (pesos / cotizacion).toFixed(2)
             }
@@ -744,7 +740,7 @@ export default function CostosProyectoPage() {
           rubros={rubros}
           inversores={inversores}
         />
-      )}{' '}
+      )}
       {/* Modal de confirmación de eliminación */}
       <DeleteConfirmationModal
         isOpen={deleteConfirmation.show}
