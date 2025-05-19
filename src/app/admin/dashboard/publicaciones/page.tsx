@@ -143,9 +143,9 @@ export default function PublicacionesPage() {
 
             if (saleResponse.ok) {
               const saleData = await saleResponse.json()
-              
+
               // Redirigir al usuario a la página de detalles de la venta
-              router.push(`/admin/dashboard/ventas/${saleData.id}`)
+              setRedirectToSale(saleData.id)
             } else {
               console.error('Error al crear la venta')
             }
@@ -160,7 +160,7 @@ export default function PublicacionesPage() {
     } catch (err: any) {
       setError(
         err.message ||
-          'Ocurrió un error al actualizar el estado de la propiedad'
+        'Ocurrió un error al actualizar el estado de la propiedad'
       )
     } finally {
       setStatusUpdating(false)
@@ -226,8 +226,8 @@ export default function PublicacionesPage() {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">          <h3 className="text-xl font-medium mb-4 text-slate-800">
-            Cambiar estado de propiedad
-          </h3>
+          Cambiar estado de propiedad
+        </h3>
           <p className="mb-4 text-slate-600">
             Propiedad:{' '}
             <span className="font-medium text-slate-800">{property.title}</span>
@@ -292,7 +292,7 @@ export default function PublicacionesPage() {
               </div>
             </div>
           </div>
-          
+
           {selectedStatus === 'VENDIDA' && (
             <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-md">
               <p className="text-amber-700 text-sm mb-2">
@@ -317,11 +317,10 @@ export default function PublicacionesPage() {
             <button
               onClick={() => handleStatusChange(slug)}
               disabled={!selectedStatus || statusUpdating}
-              className={`bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 px-4 rounded-md transition-colors ${
-                !selectedStatus || statusUpdating
+              className={`bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 px-4 rounded-md transition-colors ${!selectedStatus || statusUpdating
                   ? 'opacity-50 cursor-not-allowed'
                   : ''
-              }`}
+                }`}
             >
               {statusUpdating ? (
                 <span className="flex items-center">
@@ -529,11 +528,10 @@ export default function PublicacionesPage() {
                   </td>
                   <td className="py-3 px-4">
                     <span
-                      className={`inline-block rounded-md px-2 py-1 text-xs font-medium ${
-                        property.isAvailable
+                      className={`inline-block rounded-md px-2 py-1 text-xs font-medium ${property.isAvailable
                           ? 'bg-slate-100 text-slate-700 border border-slate-200'
                           : 'bg-slate-100 text-slate-500 border border-slate-200'
-                      }`}
+                        }`}
                     >
                       {property.isAvailable ? 'Disponible' : 'No disponible'}
                     </span>
@@ -556,9 +554,8 @@ export default function PublicacionesPage() {
                         <button
                           onClick={() => handleDelete(property.slug)}
                           disabled={deleting}
-                          className={`bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs py-1 px-2 rounded-md transition-colors ${
-                            deleting ? 'opacity-50 cursor-not-allowed' : ''
-                          }`}
+                          className={`bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs py-1 px-2 rounded-md transition-colors ${deleting ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
                         >
                           {deleting ? (
                             <span className="flex items-center">

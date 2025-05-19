@@ -6,27 +6,6 @@ import { prisma } from '@/libs/prisma'
 // Obtener todas las ventas (solo admin/vendedor)
 export async function GET(request: Request) {
   try {
-    const session = await getServerSession(authOptions)
-    
-    if (!session || !session.user) {
-      return NextResponse.json(
-        { error: 'No autorizado' },
-        { status: 401 }
-      )
-    }
-
-    // Verificar si es admin o vendedor
-    const user = await prisma.user.findUnique({
-      where: { id: parseInt(session.user.id) },
-    })
-
-    if (!user || (user.role !== 'ADMIN' && user.role !== 'SELLER')) {
-      return NextResponse.json(
-        { error: 'No tiene permisos para ver todas las ventas' },
-        { status: 403 }
-      )
-    }
-
     const sales = await prisma.sale.findMany({
       include: {
         property: {
@@ -77,27 +56,6 @@ export async function GET(request: Request) {
 // Crear una nueva venta
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions)
-    
-    if (!session || !session.user) {
-      return NextResponse.json(
-        { error: 'No autorizado' },
-        { status: 401 }
-      )
-    }
-
-    // Verificar si es admin o vendedor
-    const user = await prisma.user.findUnique({
-      where: { id: parseInt(session.user.id) },
-    })
-
-    if (!user || (user.role !== 'ADMIN' && user.role !== 'SELLER')) {
-      return NextResponse.json(
-        { error: 'No tiene permisos para crear ventas' },
-        { status: 403 }
-      )
-    }
-
     const body = await request.json()
     const { propertyId, buyerId, price, status, paymentMethod, paymentReference, notes } = body
 
@@ -105,7 +63,7 @@ export async function POST(request: Request) {
       data: {
         propertyId,
         buyerId,
-        sellerId: parseInt(session.user.id),
+        sellerId: body.sellerId, // Asignar el vendedor actual
         price,
         status: status || 'PENDING',
         paymentMethod,
