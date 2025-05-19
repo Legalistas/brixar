@@ -122,36 +122,12 @@ export default function PublicacionesPage() {
             ? { ...property, status: selectedStatus }
             : property
         )
-      )
-
-      // Si la propiedad fue marcada como vendida, crear una venta y redirigir
+      )      // Si la propiedad fue marcada como vendida, redirigir al formulario de nueva venta
       if (selectedStatus === 'VENDIDA') {
         const property = properties.find(p => p.slug === slug)
         if (property) {
-          try {            // Crear una nueva venta para esta propiedad
-            const saleResponse = await fetch(API_ENDPOINTS.SALE_CREATE, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                propertyId: property.id,
-                price: property.price,
-                status: 'PENDING' // Estado inicial de la venta
-              }),
-            })
-
-            if (saleResponse.ok) {
-              const saleData = await saleResponse.json()
-
-              // Redirigir al usuario a la página de detalles de la venta
-              setRedirectToSale(saleData.id)
-            } else {
-              console.error('Error al crear la venta')
-            }
-          } catch (err) {
-            console.error('Error al crear la venta', err)
-          }
+          // Redirigir al usuario a la página de creación de venta con la propertyId como parámetro
+          router.push(`/admin/dashboard/newSale?propertyId=${property.id}`)
         }
       }
 

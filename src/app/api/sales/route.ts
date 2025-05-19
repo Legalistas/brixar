@@ -59,18 +59,39 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { propertyId, buyerId, price, status, paymentMethod, paymentReference, notes } = body
 
-    const newSale = await prisma.sale.create({
+    // Verificar si la propiedad existe
+    const property = await prisma.property.findUnique({
+      where: { id: propertyId }
+    })
+    
+    if (!property) {
+      return NextResponse.json(
+        { error: 'La propiedad no existe' }, 
+        { status: 404 }
+      )
+    }    const newSale = await prisma.sale.create({
       data: {
         propertyId,
-        buyerId,
-        sellerId: body.sellerId, // Asignar el vendedor actual
+        buyerId: buyerId || undefined,
         price,
         status: status || 'PENDING',
         paymentMethod,
         paymentReference,
         notes,
       },
+      include: {
+        property: true,
+        buyer: true
+      }
     })
+
+    // Actualizar el estado de la propiedad a VENDIDA si no lo está ya
+    if (property.status !== 'VENDIDA') {
+      await prisma.property.update({
+        where: { id: propertyId },
+        data: { status: 'VENDIDA' }
+      })
+    }
 
     return NextResponse.json(newSale)
   } catch (error) {
