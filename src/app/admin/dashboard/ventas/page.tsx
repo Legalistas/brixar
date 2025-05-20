@@ -46,7 +46,7 @@ const statusLabels = {
 }
 
 export default function AdminSalesPage() {
-  const { sales, isLoading, fetchAllSales } = useSaleStore()
+  const { sales, isLoading, error, fetchAllSales } = useSaleStore()
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('ALL')
 
@@ -98,11 +98,26 @@ export default function AdminSalesPage() {
             </Select>
           </div>
         </div>
-      </div>
-
-      {isLoading ? (
+      </div>      {isLoading ? (
         <div className="flex justify-center items-center h-64">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      ) : error ? (
+        <div className="text-center py-10 border rounded-lg bg-red-50">
+          <DollarSign className="h-12 w-12 mx-auto text-red-400" />
+          <h3 className="mt-4 text-lg font-medium">
+            Error al cargar las ventas
+          </h3>
+          <p className="text-red-500 mt-2">
+            {error}. Por favor, intenta de nuevo.
+          </p>
+          <Button 
+            onClick={() => fetchAllSales()} 
+            className="mt-4"
+            variant="outline"
+          >
+            Reintentar
+          </Button>
         </div>
       ) : (
         <>
