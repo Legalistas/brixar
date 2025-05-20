@@ -98,14 +98,13 @@ export default function NewSalePage() {
       [name]: value
     }))
   }
-  
-  const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSubmitting(true)
     setError('')
     
     try {
-      // Crear la venta
+      // Crear la venta con buyerId convertido a número
       const response = await fetch(API_ENDPOINTS.SALE_CREATE, {
         method: 'POST',
         headers: {
@@ -113,6 +112,8 @@ export default function NewSalePage() {
         },
         body: JSON.stringify({
           ...formData,
+          buyerId: formData.buyerId ? parseInt(formData.buyerId) : undefined,
+          price: parseFloat(formData.price),
           status: 'PENDING'
         })
       })

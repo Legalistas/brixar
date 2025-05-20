@@ -54,8 +54,7 @@ export async function GET(request: Request) {
 }
 
 // Crear una nueva venta
-export async function POST(request: Request) {
-  try {
+export async function POST(request: Request) {  try {
     const body = await request.json()
     const { propertyId, buyerId, price, status, paymentMethod, paymentReference, notes } = body
 
@@ -69,16 +68,26 @@ export async function POST(request: Request) {
         { error: 'La propiedad no existe' }, 
         { status: 404 }
       )
-    }    const newSale = await prisma.sale.create({
-      data: {
-        propertyId,
-        buyerId: buyerId || undefined,
-        price,
-        status: status || 'PENDING',
-        paymentMethod,
-        paymentReference,
-        notes,
-      },
+    }    
+    
+    // Asegurarse de que buyerId y price sean del tipo correcto
+    const parsedBuyerId = buyerId ? Number(buyerId) : undefined;
+    const parsedPrice = typeof price === 'string' ? parseFloat(price) : price;
+    
+    const saleData: any = {
+      propertyId: Number(propertyId),
+      price: parsedPrice,
+      status: status || 'PENDING',
+      paymentMethod,
+      paymentReference,
+      notes,
+    };
+    if (parsedBuyerId !== undefined) {
+      saleData.buyerId = parsedBuyerId;
+    }
+
+    const newSale = await prisma.sale.create({
+      data: saleData,
       include: {
         property: true,
         buyer: true

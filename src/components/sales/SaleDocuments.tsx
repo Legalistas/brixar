@@ -51,7 +51,7 @@ export function SaleDocuments({ sale, onUpdate, isLoading = false }: SaleDocumen
     }
 
     try {
-      setIsLoading(true)
+      setIsLoadingLocal(true)
       
       // Aquí iría el código para subir el archivo a un servidor/almacenamiento
       // Por ahora simulamos la subida con un timeout
@@ -89,13 +89,13 @@ export function SaleDocuments({ sale, onUpdate, isLoading = false }: SaleDocumen
         variant: 'destructive',
       })
     } finally {
-      setIsLoading(false)
+      setIsLoadingLocal(false)
     }
   }
 
   const handleDelete = async (documentId: string) => {
     try {
-      setIsLoading(true)
+      setIsLoadingLocal(true)
       
       const updatedDocuments = documents.filter(doc => doc.id !== documentId)
       setDocuments(updatedDocuments)
@@ -114,11 +114,11 @@ export function SaleDocuments({ sale, onUpdate, isLoading = false }: SaleDocumen
         variant: 'destructive',
       })
     } finally {
-      setIsLoading(false)
+      setIsLoadingLocal(false)
     }
   }
 
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingLocal, setIsLoadingLocal] = useState(false)
 
   return (
     <Card>
@@ -152,7 +152,7 @@ export function SaleDocuments({ sale, onUpdate, isLoading = false }: SaleDocumen
                 <Button 
                   type="button" 
                   onClick={handleUpload}
-                  disabled={!uploadingFile || !documentType || isLoading}
+                  disabled={!uploadingFile || !documentType || isLoading || isLoadingLocal}
                 >
                   <FileUp className="h-4 w-4 mr-2" />
                   Subir
