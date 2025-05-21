@@ -97,6 +97,7 @@ export const MENU_CUSTOMERS_DATA: MenuItem[] = [
   { icon: Home, label: 'Propiedades', href: '/customer/properties' },
   { icon: ClipboardList, label: 'Proyectos', href: '/customer/proyects' },
   { icon: MessageSquare, label: 'Mis consultas', href: '/customer/inquiries' },
+  { icon: ShoppingCart, label: 'Mis Compras', href: '/customer/purchases' },
   {
     icon: Settings,
     label: 'Configuración',

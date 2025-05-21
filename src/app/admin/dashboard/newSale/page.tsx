@@ -73,9 +73,12 @@ export default function NewSalePage() {
           ...prev,
           price: foundProperty.price.toString()
         }))
-        
-        // Obtener usuarios para el selector de compradores
-        const usersResponse = await fetch(API_ENDPOINTS.USERS_INDEX)
+          // Obtener usuarios para el selector de compradores
+        const usersResponse = await fetch(API_ENDPOINTS.CUSTOMERS_INDEX, {
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
+        })
         if (!usersResponse.ok) {
           throw new Error('No se pudieron cargar los usuarios')
         }

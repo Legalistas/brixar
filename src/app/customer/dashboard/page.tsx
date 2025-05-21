@@ -37,7 +37,7 @@ export default function AdminDashboard() {
             Bienvenido al panel de control de Brixar
           </p>
         </div>
-        
+
         <div className="flex flex-col md:flex-row gap-6 mt-4">
           <div className="flex-1 p-6 bg-orange-50 rounded-lg border border-orange-100 flex items-center">
             <div className="p-3 bg-orange-100 rounded-full mr-4">
@@ -50,7 +50,7 @@ export default function AdminDashboard() {
               <p className="text-sm text-gray-500">Gestiona tus inversiones inmobiliarias</p>
             </div>
           </div>
-          
+
           <div className="flex-1 p-6 bg-blue-50 rounded-lg border border-blue-100 flex items-center">
             <div className="p-3 bg-blue-100 rounded-full mr-4">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -58,12 +58,14 @@ export default function AdminDashboard() {
               </svg>
             </div>
             <div>
-              <p className="font-medium text-blue-900">Gestión financiera</p>
-              <p className="text-sm text-gray-500">Revisa el rendimiento de tus Brixs</p>
+              <p className="font-medium text-blue-900">Revisa tus consultas</p>
+              <p className="text-sm text-gray-500">
+                Haz un seguimiento de las consultas de tus propiedades
+              </p>
             </div>
           </div>
         </div>
-        
+
         <div className="mt-4 p-6 bg-gray-50 rounded-lg border border-gray-100 flex items-center">
           <div className="p-3 bg-gray-100 rounded-full mr-4">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
