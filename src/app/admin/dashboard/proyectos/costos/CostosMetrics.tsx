@@ -18,20 +18,6 @@ const CostosMetrics = ({
   gastosPorInversor = {}
 }: CostosMetricsProps) => {
   const { formatCurrency, formatCurrencyUSD } = formatting;
-  
-  // Función para formatear valores grandes en formato abreviado
-  const formatLargeNumber = (value: number): string => {
-    if (value >= 1_000_000_000_000) {
-      return `$ ${(value / 1_000_000_000_000).toFixed(1)} Bill.`;
-    } else if (value >= 1_000_000_000) {
-      return `$ ${(value / 1_000_000_000).toFixed(1)} Mill. Mill.`;
-    } else if (value >= 1_000_000) {
-      return `$ ${(value / 1_000_000).toFixed(1)} Mill.`;
-    } else if (value >= 1_000) {
-      return `$ ${(value / 1_000).toFixed(1)} Mil`;
-    }
-    return `$ ${value.toFixed(0)}`;
-  };
 
   return (
     <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
@@ -58,14 +44,12 @@ const CostosMetrics = ({
         </div>        <div className="bg-white p-4 rounded-lg border border-slate-200">
           <h3 className="text-sm font-medium text-slate-500 mb-2">
             Gastos por inversor
-          </h3>
-          {Object.keys(gastosPorInversor).length > 0 ? (
+          </h3>        {Object.keys(gastosPorInversor).length > 0 ? (
             <div className="space-y-3">
-              {Object.entries(gastosPorInversor).map(([inversor, gasto]) => (
-                <div key={inversor} className="border-b border-slate-100 pb-2 last:border-0 last:pb-0">
+              {Object.entries(gastosPorInversor).map(([inversor, gasto]) => (                <div key={inversor} className="border-b border-slate-100 pb-2 last:border-0 last:pb-0">
                   <div className="text-sm font-medium text-slate-700">{inversor}</div>
                   <div className="font-semibold text-lg text-slate-800">
-                    {formatLargeNumber(gasto)}
+                    ${(Number(gasto)).toLocaleString('es-AR')}
                   </div>
                 </div>
               ))}

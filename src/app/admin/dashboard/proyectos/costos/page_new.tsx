@@ -762,13 +762,12 @@ export default function CostosProyectoPage() {
         formatting={formatting}
         isFiltered={isFiltered}
         totalCount={costsToShow.length}
-        metrosConstruidos={currentProyect.proyectDetails?.surface}
-        gastosPorInversor={costsToShow.reduce((acc, cost) => {
+        metrosConstruidos={currentProyect.proyectDetails?.surface}        gastosPorInversor={costsToShow.reduce((acc, cost) => {
           if (cost.inversor) {
-            acc[cost.inversor] = (acc[cost.inversor] || 0) + cost.importePesos
+            acc[cost.inversor] = (acc[cost.inversor] || 0) + Number(cost.importePesos)
           }
           return acc
-        }, {} as Record<string, number>)}	
+        }, {} as Record<string, number>)}
       />
 
       {/* Sección de gráficos */}
