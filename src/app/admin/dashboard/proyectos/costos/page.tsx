@@ -704,12 +704,15 @@ export default function CostosProyectoPage() {
       <div className="my-6">
         <h2 className="text-xl font-medium text-slate-800 mb-4">
           Costos del proyecto
-        </h2>
-        <CostosTable
+        </h2>        <CostosTable
           costs={costsToShow}
           showDeleteConfirmation={showDeleteConfirmation}
           formatting={formatting}
           isFiltered={isFiltered}
+          currentProyect={currentProyect}
+          onCostUpdated={() => fetchCostsByProyectSlug(slug as string)}
+          rubros={rubros}
+          inversores={inversores}
         />
       </div>
       {/* Lista de compensaciones */}

@@ -775,12 +775,15 @@ export default function CostosProyectoPage() {
         <CostosCharts costs={costsToShow} formatting={formatting} />
       )}
 
-      {/* Lista de costos */}
-      <CostosTable
+      {/* Lista de costos */}      <CostosTable
         costs={costsToShow}
         showDeleteConfirmation={(id) => showDeleteConfirmation(id, 'costo')}
         formatting={formatting}
         isFiltered={isFiltered}
+        currentProyect={currentProyect}
+        onCostUpdated={() => fetchCostsByProyectSlug(slug as string)}
+        rubros={rubros}
+        inversores={inversores}
       />
 
       {/* Lista de compensaciones entre inversores */}
