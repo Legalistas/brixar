@@ -8,12 +8,12 @@ import { es } from 'date-fns/locale'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { AlertCircle, ArrowLeft, Loader2 } from 'lucide-react'
+import { AlertCircle, ArrowLeft, ExternalLink, Loader2 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
 
 // Componente para mostrar el resumen de la compra
-function PurchaseSummary({ sale }) {
+function PurchaseSummary({ sale }: { sale: any }) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>

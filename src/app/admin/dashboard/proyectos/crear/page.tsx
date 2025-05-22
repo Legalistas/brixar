@@ -16,12 +16,15 @@ import BotonesAcciones from './components/BotonesAcciones'
 export default function CrearProyectoPage() {
   const router = useRouter()
   const { createProyect, isLoading, error: storeError } = useProyectStore()
-  
+
   // Valores predeterminados para Argentina y Santa Fe
   const defaultCountryId = 1 // Argentina
   const defaultStateId = 21 // Santa Fe
   const defaultCity = 'Rafaela'
-  
+
+  // Estados para los inversores
+  const [selectedInvestors, setSelectedInvestors] = useState<string[]>([])
+
   // Estados para los campos del formulario
   const [title, setTitle] = useState('')
   const [slug, setSlug] = useState('')
@@ -34,7 +37,7 @@ export default function CrearProyectoPage() {
   const [daysToEnd, setDaysToEnd] = useState<number>(0)
   const [daysToStart, setDaysToStart] = useState<number>(0)
   const [openingDate, setOpeningDate] = useState<Date | null>(null)
-  
+
   // Estados para dirección
   const [city, setCity] = useState(defaultCity)
   const [postalCode, setPostalCode] = useState('')
@@ -44,23 +47,23 @@ export default function CrearProyectoPage() {
   const [addressDescription, setAddressDescription] = useState('')
   const [latitude, setLatitude] = useState('')
   const [longitude, setLongitude] = useState('')
-  
+
   // Estados para medios del proyecto
-  const [mediaItems, setMediaItems] = useState<{link: string, type: string, title: string, description: string}[]>([])
-  
+  const [mediaItems, setMediaItems] = useState<{ link: string, type: string, title: string, description: string }[]>([])
+
   // Estados para detalles del proyecto
-  const [details, setDetails] = useState<{[key: string]: any}>({})
-  const [timeline, setTimeline] = useState<{[key: string]: any}>({})
+  const [details, setDetails] = useState<{ [key: string]: any }>({})
+  const [timeline, setTimeline] = useState<{ [key: string]: any }>({})
   const [proyectType, setProyectType] = useState('')
   const [investmentPeriod, setInvestmentPeriod] = useState<number>(12)
   const [surface, setSurface] = useState<number>(0)
   const [rooms, setRooms] = useState<number>(0)
   const [floors, setFloors] = useState<number>(0)
-  const [features, setFeatures] = useState<{[key: string]: any}>({})
+  const [features, setFeatures] = useState<{ [key: string]: any }>({})
   const [buildingYear, setBuildingYear] = useState<number | null>(null)
   const [riskScore, setRiskScore] = useState<number>(0)
   const [profitabilityScore, setProfitabilityScore] = useState<number>(0)
-  
+
   // Estados para financiación
   const [startInvestDate, setStartInvestDate] = useState('')
   const [endInvestDate, setEndInvestDate] = useState('')
@@ -72,11 +75,11 @@ export default function CrearProyectoPage() {
   const [totalNetProfitability, setTotalNetProfitability] = useState<number>(0)
   const [totalNetProfitabilityToShow, setTotalNetProfitabilityToShow] = useState<number>(0)
   const [apreciationProfitability, setApreciationProfitability] = useState<number>(0)
-  
+
   // Estados para la UI
   const [error, setError] = useState('')
-  const [countries, setCountries] = useState<{id: number, name: string}[]>([])
-  const [states, setStates] = useState<{id: number, name: string}[]>([])
+  const [countries, setCountries] = useState<{ id: number, name: string }[]>([])
+  const [states, setStates] = useState<{ id: number, name: string }[]>([])
   const [showMediaForm, setShowMediaForm] = useState(false)
   const [tempMedia, setTempMedia] = useState({
     link: '',
@@ -84,7 +87,7 @@ export default function CrearProyectoPage() {
     title: '',
     description: ''
   })
-  
+
   // Cargar países y estados al montar el componente
   useEffect(() => {
     const fetchCountries = async () => {
@@ -98,10 +101,10 @@ export default function CrearProyectoPage() {
         console.error('Error al cargar países:', error)
       }
     }
-    
+
     fetchCountries()
   }, [])
-  
+
   // Cargar estados cuando se selecciona un país
   useEffect(() => {
     if (countryId) {
@@ -116,36 +119,36 @@ export default function CrearProyectoPage() {
           console.error('Error al cargar estados/provincias:', error)
         }
       }
-      
+
       fetchStates()
     } else {
       setStates([])
     }
   }, [countryId])
-  
+
   // Actualizar el slug cuando cambia el título
   useEffect(() => {
     setSlug(slugify(title))
   }, [title])
-  
+
   // Actualizar el error local si hay error en el store
   useEffect(() => {
     if (storeError) {
       setError(storeError)
     }
   }, [storeError])
-  
+
   // Manejar envío del formulario
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     try {
       // Validar campos obligatorios
       if (!title || !slug || !phase || !businessModel) {
         setError('Por favor, complete los campos obligatorios: título, fase y modelo de negocio.')
         return
       }
-      
+
       // Preparar datos del proyecto
       const proyectData = {
         title,
@@ -160,7 +163,7 @@ export default function CrearProyectoPage() {
         daysToStart,
         details,
         timeline,
-        
+
         // Incluir dirección si hay datos de dirección
         address: city || postalCode || streetName || countryId || stateId ? {
           city,
@@ -176,10 +179,10 @@ export default function CrearProyectoPage() {
             }
           ] : undefined
         } : undefined,
-        
+
         // Incluir medios si existen
         projectMedia: mediaItems.length > 0 ? mediaItems : undefined,
-        
+
         // Incluir detalles del proyecto si hay datos relevantes
         proyectDetails: proyectType || investmentPeriod || surface || rooms || floors ? {
           type: proyectType,
@@ -192,7 +195,7 @@ export default function CrearProyectoPage() {
           riskScore,
           profitabilityScore
         } : undefined,
-        
+
         // Incluir datos de financiación si hay datos relevantes
         proyectFound: quantityToFund > 0 ? {
           startInvestDate: startInvestDate ? new Date(startInvestDate).toISOString() : undefined,
@@ -207,9 +210,9 @@ export default function CrearProyectoPage() {
           apreciationProfitability
         } : undefined
       }
-      
+
       const result = await createProyect(proyectData)
-      
+
       if (result) {
         router.push('/admin/dashboard/proyectos')
       } else {
@@ -220,7 +223,7 @@ export default function CrearProyectoPage() {
       console.error('Error al crear proyecto:', err)
     }
   }
-  
+
   return (
     <div className="container mx-auto py-8 px-4 bg-white">
       <div className="flex items-center mb-6">
@@ -234,17 +237,17 @@ export default function CrearProyectoPage() {
           Crear Nuevo Proyecto
         </h1>
       </div>
-      
+
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-6 flex items-center">
           <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
-      
+
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Información básica del proyecto */}
-        <InformacionBasica 
+        <InformacionBasica
           title={title}
           setTitle={setTitle}
           slug={slug}
@@ -270,9 +273,9 @@ export default function CrearProyectoPage() {
           openingDate={openingDate || new Date()}
           setOpeningDate={setOpeningDate}
         />
-        
+
         {/* Ubicación del proyecto */}
-        <Ubicacion 
+        <Ubicacion
           city={city}
           setCity={setCity}
           postalCode={postalCode}
@@ -292,9 +295,9 @@ export default function CrearProyectoPage() {
           countries={countries}
           states={states}
         />
-        
+
         {/* Medios del proyecto */}
-        <MediaItems 
+        <MediaItems
           mediaItems={mediaItems}
           setMediaItems={setMediaItems}
           showMediaForm={showMediaForm}
@@ -302,9 +305,36 @@ export default function CrearProyectoPage() {
           tempMedia={tempMedia}
           setTempMedia={setTempMedia}
         />
-        
+
+        {/* Asignar inversores del proyecto */}
+        <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
+          <div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
+            <h2 className="text-lg font-medium text-slate-800">Inversores del Proyecto</h2>
+            <p className="text-sm text-slate-500">
+              Asigna inversores a este proyecto. Puedes seleccionar uno o más inversores de la lista.
+            </p>
+          </div>
+
+          <div className="px-6 py-4">
+            <label htmlFor="investors" className="block text-sm font-medium text-slate-700">
+              Selecciona Inversores
+            </label>
+            <select
+              id="investors"
+              name="investors"
+              className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500"
+              multiple
+              value={selectedInvestors}
+              onChange={(e) => { setSelectedInvestors(Array.from(e.target.selectedOptions, option => option.value)) }}
+            >
+              <option value="1">Agustín Andereggen</option>
+              <option value="2">Oscar Andereggen</option>
+            </select>
+          </div>
+        </div>
+
         {/* Botones de acción */}
-        <BotonesAcciones 
+        <BotonesAcciones
           isLoading={isLoading}
           onCancel={() => router.back()}
         />
