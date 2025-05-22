@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Proyect } from '@/store/proyectStore'
 import { ProyectCost } from '@/store/costStore'
-import { useCompensationStore, type CreateProyectCompensationInput } from '@/store/compensationStore'
 import { useCostStore } from '@/store/costStore'
 
 interface EditCostPopupProps {
@@ -47,7 +46,7 @@ export const EditCostPopup: React.FC<EditCostPopupProps> = ({
 
     // Si el inversor no está en la lista de inversores predefinidos, es personalizado
     if (!inversores.includes(cost.inversor || '') && cost.inversor) {
-      setFormData(prev => ({ ...prev, inversor: 'Otro', inversorPersonalizado: cost.inversor }))
+      setFormData(prev => ({ ...prev, inversor: 'Otro', inversorPersonalizado: cost.inversor || '' }))
     }
   }, [cost, rubros, inversores])
 
