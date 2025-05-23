@@ -128,6 +128,7 @@ export default function CostosProyectoPage() {
   const rubros = [
     'Materiales',
     'Mano Obra',
+    'Servicios',
     'Remuneraciones',
     'Seguros',
     'Planos / Escrituras',
