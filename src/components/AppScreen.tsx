@@ -32,7 +32,13 @@ export function AppScreen({ children, className, ...props }: AppScreenProps) {
         <div className={clsx('flex flex-col', className)} {...props}>
             <div className="flex justify-between px-2.5 pt-4">
                 <MenuIcon className="h-6 w-6 flex-none" />
-                <IconBrixarSingle className="h-12 w-12 flex-none" />
+                <Image
+                    src="/images/logos/BRIXAR_png-isologo-08.png"
+                    alt="Logo"
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 flex-none"
+                />
                 <UserIcon className="h-6 w-6 flex-none" />
             </div>
             {children}

@@ -22,7 +22,7 @@ import { ChevronDown, LogOut, User } from 'lucide-react'
 import { useSession, signOut } from 'next-auth/react'
 import { useCurrency } from '@/context/CurrencyContext'
 
-interface IconProps extends React.SVGProps<SVGSVGElement> {}
+interface IconProps extends React.SVGProps<SVGSVGElement> { }
 
 const MenuIcon: React.FC<IconProps> = (props) => {
   return (
@@ -51,7 +51,7 @@ const ChevronUpIcon: React.FC<IconProps> = (props) => {
 }
 
 interface MobileNavLinkProps
-  extends React.ComponentPropsWithoutRef<typeof Link> {}
+  extends React.ComponentPropsWithoutRef<typeof Link> { }
 
 const MobileNavLink: React.FC<MobileNavLinkProps> = ({
   href,
@@ -130,9 +130,8 @@ const ProfileDropdown: React.FC<{
           {user.name}
         </span>
         <ChevronDown
-          className={`hidden sm:block h-4 w-4 text-gray-400 transition-transform duration-200 ${
-            isOpen ? 'rotate-180' : ''
-          }`}
+          className={`hidden sm:block h-4 w-4 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''
+            }`}
         />
       </div>
 
@@ -180,19 +179,15 @@ export const Header: React.FC = () => {
         <Container className="relative z-50 flex justify-between py-8  rounded-e-md">
           <div className="relative z-10 flex items-center gap-16">
             <Link href="/" aria-label="Home">
-              <LogoBrixar className="h-8 w-auto hidden lg:flex" />
-              <Popover className="lg:hidden">
-                {({ open }) => (
-                  <>
-                    <LogoBrixar
-                      className={`h-8 w-auto transition-colors duration-200 ${
-                        open ? '[&>path]:fill-white' : '[&>path]:fill-black'
-                      }`}
-                      data-headlessui-state={open ? 'open' : undefined}
-                    />
-                  </>
-                )}
-              </Popover>
+              <Image
+              src="/images/logos/BRIXAR_png-Logo-02.png"
+              alt="Logo"
+              width={96}
+              height={96}
+              className="h-10 w-auto lg:h-16"
+              quality={100}
+              priority
+              />
             </Link>
             <div className="hidden lg:flex lg:gap-10">
               <NavLinks />

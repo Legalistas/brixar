@@ -10,7 +10,7 @@ import { NavLinks } from '@/components/NavLinks'
 import qrCode from '@/images/qr-code.svg'
 import IconBrixarSingle from './IconBrixarSingle'
 
-interface QrCodeBorderProps extends React.SVGProps<SVGSVGElement> {}
+interface QrCodeBorderProps extends React.SVGProps<SVGSVGElement> { }
 
 function QrCodeBorder(props: QrCodeBorderProps) {
   return (
@@ -31,7 +31,13 @@ export function Footer(): JSX.Element {
         <div className="flex flex-col items-start justify-between gap-y-12 pb-6 pt-16 lg:flex-row lg:items-center lg:py-16">
           <div>
             <div className="flex items-center text-gray-900">
-              <IconBrixarSingle className="h-12 w-auto" />
+              <Image
+                src="/images/logos/BRIXAR_png-isologo-07_black.png"
+                alt="Logo"
+                width={48}
+                height={48}
+                className="w-12 h-12 flex-none"
+              />
               <div className="ml-4">
                 <p className="text-base font-semibold">Brixar</p>
                 <p className="mt-1 text-sm">El hogar de tus sueños.</p>

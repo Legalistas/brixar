@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import LogoBrixar from "../LogoBrixar";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -121,7 +122,15 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           } lg:translate-x-0 lg:static lg:z-auto`}
       >
         <div className="p-4 flex justify-center">
-          <LogoBrixar className="h-10 w-auto fill-white" />
+          <Image
+            src="/images/logos/BRIXAR_png-Logo-02.png"
+            alt="Logo"
+            width={96}
+            height={96}
+            className="h-10 w-auto lg:h-16"
+            quality={100}
+            priority
+          />
         </div>
         <div className="p-4">
           <h2 className="px-3 text-xs font-semibold text-gray-400 uppercase">Menu</h2>
