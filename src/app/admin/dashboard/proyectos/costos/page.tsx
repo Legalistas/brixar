@@ -375,8 +375,6 @@ export default function CostosProyectoPage() {
 
       const dolarInfo = data[1];
 
-      console.log('DolarInfo:', dolarInfo)
-
       if (dolarInfo) {
         // Actualizar el estado del formulario con la cotización actual
         setFormData((prev) => {

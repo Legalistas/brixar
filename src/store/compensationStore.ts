@@ -173,11 +173,15 @@ export const useCompensationStore = create<CompensationStore>((set, get) => ({
       })
     }
   },
-
   createCompensation: async (compensationData: CreateProyectCompensationInput) => {
     try {
       set({ isLoading: true, error: null })
-      const response = await fetch(API_ENDPOINTS.COMPENSATIONS_CREATE, {
+      console.log('URL de la API:', API_ENDPOINTS.COMPENSATIONS_CREATE)
+      
+      // Corregimos la ruta para asegurarnos de que sea /api/compensations
+      const apiUrl = '/api/compensations'
+      
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

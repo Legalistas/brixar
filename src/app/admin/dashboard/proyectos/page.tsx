@@ -370,8 +370,6 @@ export default function ProyectosPage() {
     )
   }
 
-  console.log('Proyectos:', proyects)
-
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-white">
