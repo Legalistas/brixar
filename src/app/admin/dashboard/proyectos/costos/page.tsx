@@ -464,7 +464,7 @@ export default function CostosProyectoPage() {
     } catch (err) {
       setError(
         'Error al guardar el costo: ' +
-          (err instanceof Error ? err.message : 'Error desconocido')
+        (err instanceof Error ? err.message : 'Error desconocido')
       )
     }
   }
@@ -509,7 +509,7 @@ export default function CostosProyectoPage() {
     } catch (err) {
       setError(
         `Error al eliminar el ${deleteConfirmation.type}: ` +
-          (err instanceof Error ? err.message : 'Error desconocido')
+        (err instanceof Error ? err.message : 'Error desconocido')
       )
     } finally {
       setIsDeleting(false)
@@ -566,9 +566,8 @@ export default function CostosProyectoPage() {
     XLSX.utils.book_append_sheet(wb, ws, 'Costos')
 
     // Generar un nombre para el archivo
-    const fileName = `Costos_${
-      currentProyect?.title.replace(/\s+/g, '_') || 'Proyecto'
-    }_${new Date().toISOString().split('T')[0]}.xlsx`
+    const fileName = `Costos_${currentProyect?.title.replace(/\s+/g, '_') || 'Proyecto'
+      }_${new Date().toISOString().split('T')[0]}.xlsx`
 
     // Escribir el libro y descargar
     XLSX.writeFile(wb, fileName)
@@ -664,12 +663,14 @@ export default function CostosProyectoPage() {
           </button>
         </div>
       </div>
+
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4 flex items-center">
           <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
+
       {/* Panel de filtros (mostrar/ocultar) */}
       {showFilters && (
         <FilterPanel
@@ -682,23 +683,21 @@ export default function CostosProyectoPage() {
           totalCount={projectCosts?.length || 0}
         />
       )}
+
       {/* Sección de resumen de costos */}
       <CostosMetrics
         metrics={metricsToShow}
         formatting={formatting}
         isFiltered={isFiltered}
         totalCount={costsToShow.length}
-        metrosConstruidos={currentProyect.proyectDetails?.surface}        gastosPorInversor={costsToShow.reduce((acc, cost) => {
+        metrosConstruidos={currentProyect.proyectDetails?.surface} gastosPorInversor={costsToShow.reduce((acc, cost) => {
           if (cost.inversor) {
             acc[cost.inversor] = (acc[cost.inversor] || 0) + Number(cost.importePesos)
           }
           return acc
         }, {} as Record<string, number>)}
       />
-      {/* Sección de gráficos */}
-      {costsToShow.length > 0 && (
-        <CostosCharts costs={costsToShow} formatting={formatting} />
-      )}{' '}
+
       {/* Lista de costos */}
       <div className="my-6">
         <h2 className="text-xl font-medium text-slate-800 mb-4">
@@ -730,6 +729,12 @@ export default function CostosProyectoPage() {
           isFiltered={isFiltered}
         />
       )}
+
+      {/* Sección de gráficos */}
+      {costsToShow.length > 0 && (
+        <CostosCharts costs={costsToShow} formatting={formatting} />
+      )}
+
       {/* Popup para añadir un nuevo costo */}
       {showAddCostPopup && currentProyect && (
         <AddCostPopup
