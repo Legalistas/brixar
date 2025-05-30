@@ -182,8 +182,8 @@ export const Header: React.FC = () => {
               <Image
               src="/images/logos/BRIXAR_png-Logo-02.png"
               alt="Logo"
-              width={96}
-              height={96}
+              width={1000}
+              height={300}
               className="h-10 w-auto lg:h-16"
               quality={100}
               priority
