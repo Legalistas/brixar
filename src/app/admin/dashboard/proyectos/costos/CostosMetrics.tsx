@@ -114,6 +114,9 @@ const CostosMetrics = ({
                   <div className="font-semibold text-lg text-slate-800">
                     ${(Number(gasto)).toLocaleString('es-AR')}
                   </div>
+                  <div className="text-xs text-slate-500">
+                    Gastos totales
+                  </div>
                 </div>
               ))}
             </div>

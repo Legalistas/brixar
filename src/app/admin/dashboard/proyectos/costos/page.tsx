@@ -18,6 +18,7 @@ import {
   Filter,
   X,
   Download,
+  ChevronDown,
 } from 'lucide-react'
 import { useProyectStore } from '@/store/proyectStore'
 import { useCostStore } from '@/store/costStore'
@@ -69,11 +70,11 @@ export default function CostosProyectoPage() {
     createCompensation,
     deleteCompensation,
   } = useCompensationStore()
-
   // Estado local
   const [error, setError] = useState('')
   const [showAddCostPopup, setShowAddCostPopup] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
+  const [showExportDropdown, setShowExportDropdown] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
     show: boolean
@@ -163,13 +164,20 @@ export default function CostosProyectoPage() {
       setError(costError)
     }
   }, [storeError, costError])
-
   // Cargar cotización del dólar blue cuando se abre el popup
   useEffect(() => {
     if (showAddCostPopup) {
       fetchDolarBlueRate()
     }
   }, [showAddCostPopup])
+
+  // Función para refrescar los datos después de agregar una compensación
+  const handleDataRefresh = () => {
+    if (slug) {
+      fetchCostsByProyectSlug(slug)
+      fetchCompensationsByProyectSlug(slug)
+    }
+  }
 
   // Formato de fechas y monedas (compartido entre componentes)
   const formatting: FormattingFunctions = {
@@ -537,7 +545,6 @@ export default function CostosProyectoPage() {
       type: 'costo',
     })
   }
-
   // Función para exportar costos a Excel
   const exportToExcel = () => {
     // Datos que se exportarán
@@ -572,6 +579,119 @@ export default function CostosProyectoPage() {
     // Escribir el libro y descargar
     XLSX.writeFile(wb, fileName)
   }
+  // Función para exportar compensaciones a Excel
+  const exportCompensationsToExcel = () => {
+    const dataToExport = (projectCompensations || []).map((compensation: ProyectCompensation) => ({
+      Fecha: formatting.formatDate(compensation.fecha),
+      'Inversor Origen': compensation.inversorOrigen || '-',
+      'Inversor Destino': compensation.inversorDestino || '-',
+      'Importe ARS': compensation.importePesos,
+      'Cotización USD': compensation.precioDolarBlue,
+      'Importe USD': compensation.importeDolar,
+      Detalle: compensation.detalle || '-',
+      Usuario: compensation.usuario?.name || compensation.usuario?.email || '-',
+    }))
+
+    const wb = XLSX.utils.book_new()
+    const ws = XLSX.utils.json_to_sheet(dataToExport)
+    XLSX.utils.book_append_sheet(wb, ws, 'Compensaciones')
+
+    const fileName = `Compensaciones_${currentProyect?.title.replace(/\s+/g, '_') || 'Proyecto'
+      }_${new Date().toISOString().split('T')[0]}.xlsx`
+
+    XLSX.writeFile(wb, fileName)
+  }
+
+  // Función para exportar ambos (costos y compensaciones) a Excel
+  const exportBothToExcel = () => {
+    // Datos de costos
+    const costsDataToExport = (
+      Object.values(filters).some((v) => v !== '')
+        ? filteredCosts
+        : projectCosts || []
+    ).map((cost: ProyectCost) => ({
+      Fecha: formatting.formatDate(cost.fecha),
+      Rubro: cost.rubro,
+      Proveedor: cost.proveedor || '-',
+      Detalle: cost.detalle || '-',
+      'Importe ARS': cost.importePesos,
+      'Cotización USD': cost.precioDolarBlue,
+      'Importe USD': cost.importeDolar,
+      Inversor: cost.inversor || '-',
+      Usuario: cost.usuario?.name || cost.usuario?.email || '-',
+    }))
+
+    // Datos de compensaciones
+    const compensationsDataToExport = (projectCompensations || []).map((compensation: ProyectCompensation) => ({
+      Fecha: formatting.formatDate(compensation.fecha),
+      'Inversor Origen': compensation.inversorOrigen || '-',
+      'Inversor Destino': compensation.inversorDestino || '-',
+      'Importe ARS': compensation.importePesos,
+      'Cotización USD': compensation.precioDolarBlue,
+      'Importe USD': compensation.importeDolar,
+      Detalle: compensation.detalle || '-',
+      Usuario: compensation.usuario?.name || compensation.usuario?.email || '-',
+    }))
+
+    // Crear un nuevo libro de trabajo
+    const wb = XLSX.utils.book_new()
+    
+    // Agregar hoja de costos
+    const wsCosts = XLSX.utils.json_to_sheet(costsDataToExport)
+    XLSX.utils.book_append_sheet(wb, wsCosts, 'Costos')
+    
+    // Agregar hoja de compensaciones
+    const wsCompensations = XLSX.utils.json_to_sheet(compensationsDataToExport)
+    XLSX.utils.book_append_sheet(wb, wsCompensations, 'Compensaciones')    // Generar un nombre para el archivo
+    const fileName = `Costos_y_Compensaciones_${currentProyect?.title.replace(/\s+/g, '_') || 'Proyecto'
+      }_${new Date().toISOString().split('T')[0]}.xlsx`
+
+    // Escribir el libro y descargar
+    XLSX.writeFile(wb, fileName)
+  }
+
+  // Función para calcular la equalización entre inversores
+  const calculateEqualization = useMemo(() => {
+    if (!projectCosts || !projectCompensations) return null
+
+    // Calcular gastos totales por inversor
+    const expensesByInvestor: { [key: string]: number } = {}
+    
+    // Sumar costos por inversor
+    projectCosts.forEach((cost) => {
+      const investor = cost.inversor || 'Sin especificar'
+      expensesByInvestor[investor] = (expensesByInvestor[investor] || 0) + cost.importePesos
+    })
+
+    // Ajustar con compensaciones
+    projectCompensations.forEach((compensation) => {
+      const origen = compensation.inversorOrigen || 'Sin especificar'
+      const destino = compensation.inversorDestino || 'Sin especificar'
+      
+      // El inversor origen "paga" la compensación (reduce su gasto neto)
+      expensesByInvestor[origen] = (expensesByInvestor[origen] || 0) - compensation.importePesos
+      // El inversor destino "recibe" la compensación (aumenta su gasto neto)
+      expensesByInvestor[destino] = (expensesByInvestor[destino] || 0) + compensation.importePesos
+    })
+
+    // Calcular gasto promedio
+    const investors = Object.keys(expensesByInvestor).filter(inv => inv !== 'Sin especificar')
+    if (investors.length < 2) return null
+
+    const totalExpenses = investors.reduce((sum, inv) => sum + expensesByInvestor[inv], 0)
+    const averageExpense = totalExpenses / investors.length
+
+    // Calcular cuánto debe pagar/recibir cada inversor para equalizar
+    const equalization = investors.map(investor => ({
+      investor,
+      currentExpense: expensesByInvestor[investor],
+      targetExpense: averageExpense,
+      difference: expensesByInvestor[investor] - averageExpense,
+      shouldPay: expensesByInvestor[investor] > averageExpense,
+    }))
+
+    return equalization
+  }, [projectCosts, projectCompensations])
 
   // Verificar estado de carga
   const isLoading = isLoadingProyect || isLoadingCosts
@@ -737,9 +857,7 @@ export default function CostosProyectoPage() {
       {/* Sección de gráficos */}
       {costsToShow.length > 0 && (
         <CostosCharts costs={costsToShow} formatting={formatting} />
-      )}
-
-      {/* Popup para añadir un nuevo costo */}
+      )}      {/* Popup para añadir un nuevo costo */}
       {showAddCostPopup && currentProyect && (
         <AddCostPopup
           currentProyect={currentProyect}
@@ -749,6 +867,7 @@ export default function CostosProyectoPage() {
           setShowAddCostPopup={setShowAddCostPopup}
           rubros={rubros}
           inversores={inversores}
+          onCompensationAdded={handleDataRefresh}
         />
       )}
       {/* Modal de confirmación de eliminación */}

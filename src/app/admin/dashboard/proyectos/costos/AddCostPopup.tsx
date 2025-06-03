@@ -28,6 +28,7 @@ interface AddCostPopupProps {
   setShowAddCostPopup: (show: boolean) => void
   rubros: string[]
   inversores: string[]
+  onCompensationAdded: () => void
 }
 
 export const AddCostPopup: React.FC<AddCostPopupProps> = ({
@@ -38,6 +39,7 @@ export const AddCostPopup: React.FC<AddCostPopupProps> = ({
   setShowAddCostPopup,
   rubros,
   inversores,
+  onCompensationAdded,
 }) => {
   // Usamos el store de compensaciones
   const createCompensation = useCompensationStore(state => state.createCompensation)
@@ -69,11 +71,12 @@ export const AddCostPopup: React.FC<AddCostPopupProps> = ({
           inversorOrigen: formData.inversor === 'Otro' ? formData.inversorPersonalizado : formData.inversor,
           inversorDestino: formData.inversorDestino === 'Otro' ? formData.inversorDestinoPersonalizado : formData.inversorDestino
         }
-        
-        // Enviar la compensación utilizando el store de compensaciones
+          // Enviar la compensación utilizando el store de compensaciones
         const success = await createCompensation(compensationData)
         
         if (success) {
+          // Llamar a la función para actualizar los datos
+          onCompensationAdded()
           // Cerrar el popup si la operación fue exitosa
           setShowAddCostPopup(false)
         } else {
