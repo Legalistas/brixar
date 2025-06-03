@@ -652,7 +652,7 @@ export default function CostosProyectoPage() {
             className="bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 px-4 rounded-md transition-colors flex items-center"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Añadir Costo
+            Añadir
           </button>
           <button
             onClick={exportToExcel}
@@ -682,20 +682,24 @@ export default function CostosProyectoPage() {
           filteredCount={filteredCosts.length}
           totalCount={projectCosts?.length || 0}
         />
-      )}
-
-      {/* Sección de resumen de costos */}
+      )}      {/* Sección de resumen de costos */}
       <CostosMetrics
         metrics={metricsToShow}
         formatting={formatting}
         isFiltered={isFiltered}
         totalCount={costsToShow.length}
-        metrosConstruidos={currentProyect.proyectDetails?.surface} gastosPorInversor={costsToShow.reduce((acc, cost) => {
+        metrosConstruidos={currentProyect.proyectDetails?.surface}
+        gastosPorInversor={costsToShow.reduce((acc, cost) => {
           if (cost.inversor) {
             acc[cost.inversor] = (acc[cost.inversor] || 0) + Number(cost.importePesos)
           }
           return acc
         }, {} as Record<string, number>)}
+        compensations={projectCompensations}
+        compensationMetrics={compensationMetrics ? {
+          totalPesos: compensationMetrics.totalPesos,
+          totalDolares: compensationMetrics.totalDolares
+        } : undefined}
       />
 
       {/* Lista de costos */}

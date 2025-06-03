@@ -520,7 +520,7 @@ export default function ProyectosPage() {
                       href={`/admin/dashboard/proyectos/costos?slug=${project.slug}`}
                       className="bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs py-1 px-2 rounded-md transition-colors"
                     >
-                      Agregar Costos
+                      Agregar
                     </Link>
                   </td>
                 </tr>
