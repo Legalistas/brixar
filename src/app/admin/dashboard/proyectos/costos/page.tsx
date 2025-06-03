@@ -170,7 +170,6 @@ export default function CostosProyectoPage() {
       fetchDolarBlueRate()
     }
   }, [showAddCostPopup])
-
   // Función para refrescar los datos después de agregar una compensación
   const handleDataRefresh = () => {
     if (slug) {
@@ -178,6 +177,21 @@ export default function CostosProyectoPage() {
       fetchCompensationsByProyectSlug(slug)
     }
   }
+
+  // Cerrar dropdown al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element
+      if (showExportDropdown && !target.closest('.export-dropdown-container')) {
+        setShowExportDropdown(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showExportDropdown])
 
   // Formato de fechas y monedas (compartido entre componentes)
   const formatting: FormattingFunctions = {
@@ -773,14 +787,53 @@ export default function CostosProyectoPage() {
           >
             <Plus className="h-4 w-4 mr-2" />
             Añadir
-          </button>
-          <button
-            onClick={exportToExcel}
-            className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors flex items-center"
-          >
-            <Download className="h-4 w-4 mr-2" />
-            Exportar a Excel
-          </button>
+          </button>          <div className="relative export-dropdown-container">
+            <button
+              onClick={() => setShowExportDropdown(!showExportDropdown)}
+              className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors flex items-center"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Exportar a Excel
+              <ChevronDown className="h-4 w-4 ml-2" />
+            </button>
+            
+            {showExportDropdown && (
+              <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-md shadow-lg z-10">
+                <div className="py-1">
+                  <button
+                    onClick={() => {
+                      exportToExcel()
+                      setShowExportDropdown(false)
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                  >
+                    <Download className="h-4 w-4 mr-3" />
+                    Exportar solo costos
+                  </button>
+                  <button
+                    onClick={() => {
+                      exportCompensationsToExcel()
+                      setShowExportDropdown(false)
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                  >
+                    <Download className="h-4 w-4 mr-3" />
+                    Exportar solo compensaciones
+                  </button>
+                  <button
+                    onClick={() => {
+                      exportBothToExcel()
+                      setShowExportDropdown(false)
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                  >
+                    <Download className="h-4 w-4 mr-3" />
+                    Exportar costos y compensaciones
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
