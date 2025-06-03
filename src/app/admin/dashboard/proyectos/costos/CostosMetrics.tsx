@@ -44,7 +44,6 @@ const CostosMetrics = ({
     totalPesos: metrics.totalPesos + (compensationMetrics?.totalPesos || 0),
     totalDolares: metrics.totalDolares + (compensationMetrics?.totalDolares || 0)
   };
-
   // Calcular total combinado por inversor (gastos + compensaciones)
   const totalCombinadoPorInversor = Object.keys({ ...gastosPorInversor, ...compensacionesPorInversor }).reduce((acc, inversor) => {
     const gastos = gastosPorInversor[inversor] || 0;
@@ -52,6 +51,70 @@ const CostosMetrics = ({
     acc[inversor] = gastos - compensaciones;
     return acc;
   }, {} as Record<string, number>);
+  // Calcular compensaciones necesarias para igualar costos
+  const calcularCompensacionesParaIgualar = () => {
+    const inversores = Object.keys(totalCombinadoPorInversor);
+    if (inversores.length < 2) return [];
+
+    const totalGastos = Object.values(totalCombinadoPorInversor).reduce((sum, gasto) => sum + gasto, 0);
+    const gastoPromedio = totalGastos / inversores.length;
+
+    const compensacionesNecesarias: { origen: string; destino: string; monto: number }[] = [];
+    const inversoresPagadores: { inversor: string; monto: number }[] = [];
+    const inversoresReceptores: { inversor: string; monto: number }[] = [];
+
+    // Separar inversores que deben pagar y recibir
+    inversores.forEach(inversor => {
+      const gastoActual = totalCombinadoPorInversor[inversor];
+      const diferencia = gastoActual - gastoPromedio;
+      
+      if (diferencia > 0) {
+        // Este inversor gastó más, debe recibir compensación
+        inversoresReceptores.push({ inversor, monto: diferencia });
+      } else if (diferencia < 0) {
+        // Este inversor gastó menos, debe pagar compensación
+        inversoresPagadores.push({ inversor, monto: Math.abs(diferencia) });
+      }
+    });
+
+    // Calcular las compensaciones específicas
+    let indicePagador = 0;
+    let indiceReceptor = 0;
+    let montoPendientePagador = inversoresPagadores[indicePagador]?.monto || 0;
+    let montoPendienteReceptor = inversoresReceptores[indiceReceptor]?.monto || 0;
+
+    while (indicePagador < inversoresPagadores.length && indiceReceptor < inversoresReceptores.length) {
+      const pagador = inversoresPagadores[indicePagador];
+      const receptor = inversoresReceptores[indiceReceptor];
+
+      const montoATransferir = Math.min(montoPendientePagador, montoPendienteReceptor);
+
+      if (montoATransferir > 1) { // Solo mostrar si es mayor a $1 para evitar diferencias mínimas
+        compensacionesNecesarias.push({
+          origen: pagador.inversor,
+          destino: receptor.inversor,
+          monto: montoATransferir
+        });
+      }
+
+      montoPendientePagador -= montoATransferir;
+      montoPendienteReceptor -= montoATransferir;
+
+      if (montoPendientePagador <= 1) {
+        indicePagador++;
+        montoPendientePagador = inversoresPagadores[indicePagador]?.monto || 0;
+      }
+
+      if (montoPendienteReceptor <= 1) {
+        indiceReceptor++;
+        montoPendienteReceptor = inversoresReceptores[indiceReceptor]?.monto || 0;
+      }
+    }
+
+    return compensacionesNecesarias;
+  };
+
+  const compensacionesNecesarias = calcularCompensacionesParaIgualar();
 
   return (
     <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">      <h2 className="text-lg font-medium text-slate-800 mb-4">
@@ -176,10 +239,47 @@ const CostosMetrics = ({
           ) : (
             <p className="text-lg font-medium text-slate-800">
               No hay datos
-            </p>
-          )}
+            </p>          )}
         </div>
       </div>
+
+      {/* Sección de compensaciones para igualar costos */}
+      {compensacionesNecesarias.length > 0 && (
+        <div className="mt-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
+          <h3 className="text-lg font-medium text-amber-800 mb-3 flex items-center">
+            <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            Compensaciones recomendadas para igualar costos
+          </h3>
+          <div className="space-y-2">
+            {compensacionesNecesarias.map((comp, index) => (
+              <div key={index} className="flex items-center justify-between bg-white rounded-md p-3 border border-amber-300">
+                <div className="flex items-center space-x-3">
+                  <div className="bg-amber-100 rounded-full p-2">
+                    <svg className="h-4 w-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </div>
+                  <span className="text-amber-800 font-medium">
+                    <span className="font-semibold">{comp.origen}</span> debe pagar{' '}
+                    <span className="font-bold text-amber-900">
+                      ${comp.monto.toLocaleString('es-AR')}
+                    </span>{' '}
+                    a <span className="font-semibold">{comp.destino}</span>
+                  </span>
+                </div>
+                <div className="text-xs text-amber-600 bg-amber-100 px-2 py-1 rounded">
+                  Para igualar gastos
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 text-sm text-amber-700">
+            💡 <strong>Sugerencia:</strong> Después de registrar estas compensaciones, todos los inversores tendrán gastos equivalentes en el proyecto.
+          </div>
+        </div>
+      )}
     </div>
   );
 };
