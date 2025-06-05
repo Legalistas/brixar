@@ -44,7 +44,7 @@ export async function PUT() {
       const response = await axios.get('https://dolarapi.com/v1/dolares/blue');
       const dollarData = response.data;
       
-      console.log('Datos del dólar blue obtenidos:', dollarData);
+      console.log('Datos del dólar obtenidos:', dollarData);
       
       // Usar el precio de venta del dólar blue
       const dollarRate = dollarData.venta;
@@ -61,7 +61,7 @@ export async function PUT() {
       console.log(`Peso argentino actualizado con tasa: ${dollarRate}`);
       
     } catch (error) {
-      console.error('Error obteniendo cotización del dólar blue:', error);
+      console.error('Error obteniendo cotización del dólar:', error);
     }
 
     // Actualizar otras monedas si tienen apiUrl configurada

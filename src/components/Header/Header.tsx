@@ -40,12 +40,6 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {  const router = use
         </button>
         <div className="lg:hidden">
           <LogoBrixar className="w-28 h-28" />
-          {/* <Logo
-            color={"#000"}
-            colorSecondary={"transparent"}
-            stroke={"#000"}
-            className={"w-36 h-36"}
-          /> */}
         </div>
       </div>
 
@@ -87,7 +81,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {  const router = use
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
               <div className="flex flex-col">
-                <span className="text-xs text-blue-600 font-medium">Dólar Blue</span>
+                <span className="text-xs text-blue-600 font-medium">Dólar</span>
                 <span className="text-sm font-bold text-blue-700">
                   {isLoading ? (
                     <div className="flex items-center gap-1">
@@ -105,7 +99,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {  const router = use
                 onClick={updateDollarRate}
                 disabled={isLoading}
                 className="text-blue-600 hover:text-blue-700 disabled:opacity-50 p-1 rounded hover:bg-blue-100"
-                title="Actualizar cotización del dólar blue"
+                title="Actualizar cotización del dólar"
               >
                 <RefreshCw className={`h-3 w-3 ${isLoading ? 'animate-spin' : ''}`} />
               </button>

@@ -418,7 +418,7 @@ export default function CostosProyectoPage() {
         })
       }
     } catch (error) {
-      console.error('Error al obtener la cotización del dólar blue:', error)
+      console.error('Error al obtener la cotización del dólar:', error)
       // No mostramos error en UI para no interrumpir la experiencia
     }
   }

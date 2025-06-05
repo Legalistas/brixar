@@ -252,7 +252,7 @@ export const EditCostPopup: React.FC<EditCostPopupProps> = ({
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Cotización dólar blue
+                  Cotización dólar
                 </label>
                 <input
                   type="number"

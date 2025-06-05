@@ -11,7 +11,7 @@ export async function POST() {
     const response = await axios.get('https://dolarapi.com/v1/dolares/blue');
     const dollarData = response.data;
     
-    console.log('Datos del dólar blue:', dollarData);
+    console.log('Datos del dólar:', dollarData);
     
     // Usar el precio de venta del dólar blue
     const dollarRate = dollarData.venta;
