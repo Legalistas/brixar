@@ -6,6 +6,47 @@ async function main() {
   // Limpia la tabla de países por si necesitamos reiniciar
   await prisma.country.deleteMany({});
   
+  // Limpia y crea las monedas
+  await prisma.currency.deleteMany({});
+  
+  console.log('🌱 Iniciando semilla de monedas...');
+  
+  // Crear monedas principales
+  const currencies = [
+    {
+      code: 'USD',
+      name: 'Dólar Estadounidense',
+      symbol: '$',
+      rate: 1000.0, // Tasa inicial en pesos argentinos (deberás actualizarla)
+      flagCode: 'us',
+      apiUrl: 'https://api.exchangerate-api.com/v4/latest/USD' // URL de ejemplo
+    },
+    {
+      code: 'EUR',
+      name: 'Euro',
+      symbol: '€',
+      rate: 1100.0, // Tasa inicial
+      flagCode: 'eu',
+      apiUrl: 'https://api.exchangerate-api.com/v4/latest/EUR'
+    },
+    {
+      code: 'ARS',
+      name: 'Peso Argentino',
+      symbol: '$',
+      rate: 1.0, // Moneda base
+      flagCode: 'ar',
+      apiUrl: null
+    }
+  ];
+
+  for (const currency of currencies) {
+    await prisma.currency.create({
+      data: currency
+    });
+  }
+  
+  console.log('✅ Semilla de monedas completada exitosamente');
+  
   // Lista de países a insertar (enfocados en Latinoamérica, España y otros relevantes)
   const countries = [
     { name: 'Argentina', prefix: '+54', code: 'AR' },
