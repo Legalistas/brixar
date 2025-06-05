@@ -3,6 +3,17 @@ import { prisma } from '@/libs/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/auth'
 
+// Función auxiliar para crear fechas sin conversión de zona horaria
+function createLocalDate(dateString: string): Date {
+  // Si la fecha viene en formato YYYY-MM-DD, la parseamos como fecha local
+  if (typeof dateString === 'string' && dateString.includes('-')) {
+    const [year, month, day] = dateString.split('-').map(Number)
+    return new Date(year, month - 1, day) // month - 1 porque Date usa índices basados en 0
+  }
+  // Si viene en otro formato, usar el constructor normal
+  return new Date(dateString)
+}
+
 // Obtener todas las compensaciones (se pueden filtrar por proyecto)
 export async function GET(request: Request) {
   try {
@@ -85,13 +96,11 @@ export async function POST(request: Request) {
         { error: 'El proyecto especificado no existe' },
         { status: 404 }
       )
-    }
-
-    // Crear la nueva compensación
+    }    // Crear la nueva compensación
     const newCompensation = await prisma.proyectCompensation.create({
       data: {
         proyectId: data.proyectId,
-        fecha: new Date(data.fecha),
+        fecha: createLocalDate(data.fecha),
         mes: data.mes,
         detalle: data.detalle,
         importePesos: data.importePesos,

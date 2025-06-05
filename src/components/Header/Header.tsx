@@ -1,22 +1,23 @@
 import { useState } from 'react'
-import { Menu, ChevronDown, HelpCircle, LogOut } from 'lucide-react'
+import { Menu, ChevronDown, HelpCircle, LogOut, DollarSign, RefreshCw } from 'lucide-react'
 import { signOut, useSession } from 'next-auth/react'
 import { usePathname, useRouter } from 'next/navigation'
 import ProfileDropdown from '@/components/ui/Dropdowns/ProfileDropdown'
 import LogoBrixar from '../LogoBrixar'
 import { useCurrency } from '@/context/CurrencyContext'
+import { useDollarRate } from '@/hooks/useDollarRate'
 
 interface HeaderProps {
   onMenuClick: () => void
 }
 
-const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
-  const router = useRouter()
+const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {  const router = useRouter()
   const pathname = usePathname()
   const { data: session } = useSession()
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [isOpenCurrency, setIsOpenCurrency] = useState(false)
   const { currencies, currentCurrency, setCurrentCurrency } = useCurrency()
+  const { dollarRate, isLoading, lastUpdated, updateDollarRate } = useDollarRate()
 
   const handleLogout = async () => {
     await signOut({ redirect: false })
@@ -79,9 +80,47 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                   </button>
                 ))}
               </div>
+            </div>          )}
+        </div>        {/* Valor del Dólar */}
+        <div className="flex items-center bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 min-w-[160px]">
+          <DollarSign className="h-4 w-4 text-blue-600 mr-2" />
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2">
+              <div className="flex flex-col">
+                <span className="text-xs text-blue-600 font-medium">Dólar Blue</span>
+                <span className="text-sm font-bold text-blue-700">
+                  {isLoading ? (
+                    <div className="flex items-center gap-1">
+                      <RefreshCw className="h-3 w-3 animate-spin" />
+                      <span className="text-xs">Actualizando...</span>
+                    </div>
+                  ) : dollarRate ? (
+                    `$${dollarRate.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
+                  ) : (
+                    'N/A'
+                  )}
+                </span>
+              </div>
+              <button
+                onClick={updateDollarRate}
+                disabled={isLoading}
+                className="text-blue-600 hover:text-blue-700 disabled:opacity-50 p-1 rounded hover:bg-blue-100"
+                title="Actualizar cotización del dólar blue"
+              >
+                <RefreshCw className={`h-3 w-3 ${isLoading ? 'animate-spin' : ''}`} />
+              </button>
             </div>
-          )}
+            {lastUpdated && (
+              <span className="text-xs text-blue-500">
+                {lastUpdated.toLocaleTimeString('es-AR', { 
+                  hour: '2-digit', 
+                  minute: '2-digit' 
+                })}
+              </span>
+            )}
+          </div>
         </div>
+        
         <button className="hidden sm:flex items-center gap-2 text-gray-600 hover:text-gray-900 rounded-md hover:bg-gray-100 px-3 py-2 text-sm">
           <HelpCircle className="h-5 w-5" />
         </button>
