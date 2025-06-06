@@ -32,6 +32,7 @@ import * as XLSX from 'xlsx'
 
 // Componentes
 import { AddCostPopup } from './AddCostPopup'
+import { EditCompensationPopup } from './EditCompensationPopup'
 import FilterPanel from './FilterPanel'
 import CostosTable from './CostosTable'
 import CostosMetrics from './CostosMetrics'
@@ -69,10 +70,11 @@ export default function CostosProyectoPage() {
     fetchCompensationsByProyectSlug,
     createCompensation,
     deleteCompensation,
-  } = useCompensationStore()
-  // Estado local
+  } = useCompensationStore()  // Estado local
   const [error, setError] = useState('')
   const [showAddCostPopup, setShowAddCostPopup] = useState(false)
+  const [showEditCompensationPopup, setShowEditCompensationPopup] = useState(false)
+  const [selectedCompensation, setSelectedCompensation] = useState<ProyectCompensation | null>(null)
   const [showFilters, setShowFilters] = useState(false)
   const [showExportDropdown, setShowExportDropdown] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -487,9 +489,15 @@ export default function CostosProyectoPage() {
       setError(
         'Error al guardar el costo: ' +
         (err instanceof Error ? err.message : 'Error desconocido')
-      )
-    }
+      )    }
   }
+
+  // Función para mostrar el popup de edición de compensación
+  const showEditCompensation = (compensation: ProyectCompensation) => {
+    setSelectedCompensation(compensation)
+    setShowEditCompensationPopup(true)
+  }
+
   // Manejar la eliminación de un costo o compensación
   const handleDelete = async () => {
     try {
@@ -889,8 +897,7 @@ export default function CostosProyectoPage() {
           rubros={rubros}
           inversores={inversores}
         />
-      </div>
-      {/* Lista de compensaciones */}
+      </div>      {/* Lista de compensaciones */}
       {projectCompensations.length > 0 && (
         <CompensacionesTable
           compensations={projectCompensations}
@@ -902,6 +909,7 @@ export default function CostosProyectoPage() {
               type: 'compensacion',
             })
           }
+          showEditCompensation={showEditCompensation}
           formatting={formatting}
           isFiltered={isFiltered}
         />
@@ -921,8 +929,19 @@ export default function CostosProyectoPage() {
           rubros={rubros}
           inversores={inversores}
           onCompensationAdded={handleDataRefresh}
+        />      )}
+
+      {/* Popup para editar compensación */}
+      {showEditCompensationPopup && currentProyect && selectedCompensation && (
+        <EditCompensationPopup
+          currentProyect={currentProyect}
+          compensation={selectedCompensation}
+          setShowEditCompensationPopup={setShowEditCompensationPopup}
+          inversores={inversores}
+          onUpdate={handleDataRefresh}
         />
       )}
+
       {/* Modal de confirmación de eliminación */}
       <DeleteConfirmationModal
         isOpen={deleteConfirmation.show}

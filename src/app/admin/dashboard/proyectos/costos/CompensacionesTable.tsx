@@ -5,6 +5,7 @@ import { FormattingFunctions } from './types';
 interface CompensacionesTableProps {
   compensations: ProyectCompensation[];
   showDeleteConfirmation: (compensationId: number, type: 'compensacion') => void;
+  showEditCompensation: (compensation: ProyectCompensation) => void;
   formatting: FormattingFunctions;
   isFiltered?: boolean;
 }
@@ -12,6 +13,7 @@ interface CompensacionesTableProps {
 const CompensacionesTable = ({ 
   compensations, 
   showDeleteConfirmation,
+  showEditCompensation,
   formatting,
   isFiltered = false
 }: CompensacionesTableProps) => {
@@ -92,15 +94,19 @@ const CompensacionesTable = ({
                 </td>
                 <td className="py-3 px-4">{formatCurrency(compensation.importePesos)}</td>
                 <td className="py-3 px-4">{formatCurrency(compensation.precioDolarBlue)}</td>
-                <td className="py-3 px-4">{formatCurrencyUSD(compensation.importeDolar)}</td>
-                <td className="py-3 px-4 text-center">
+                <td className="py-3 px-4">{formatCurrencyUSD(compensation.importeDolar)}</td>                <td className="py-3 px-4 text-center">
                   <div className="flex justify-center gap-2">
-                    <button className="text-blue-600 hover:text-blue-800">
+                    <button 
+                      className="text-blue-600 hover:text-blue-800"
+                      onClick={() => showEditCompensation(compensation)}
+                      title="Editar compensación"
+                    >
                       <Edit className="h-4 w-4" />
                     </button>
                     <button
                       className="text-red-600 hover:text-red-800"
                       onClick={() => showDeleteConfirmation(compensation.id, 'compensacion')}
+                      title="Eliminar compensación"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
