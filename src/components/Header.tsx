@@ -167,17 +167,36 @@ const ProfileDropdown: React.FC<{
 
 export const Header: React.FC = () => {
   const { data: session, status } = useSession()
+   const [isScrolled, setIsScrolled] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
-  const [isOpenCurrency, setIsOpenCurrency] = useState(false)
-  const { currencies, currentCurrency, setCurrentCurrency } = useCurrency()
-  const { dollarRate, isLoading, lastUpdated, updateDollarRate } = useDollarRate()
+  const [isLoading, setIsLoading] = useState(false)
+  const [dollarRate, setDollarRate] = useState(1250)
 
-  const handleLogout = async () => {
-    await signOut()
+  // Estados simulados de autenticación
+
+  // Detectar scroll para cambiar el fondo del header
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY
+      setIsScrolled(scrollTop > 0)
+    }
+
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  const handleLogout = () => {
+    console.log("Logout")
   }
+
   return (
     <>
-      <header className="bg-white/95 backdrop-blur-sm border-b border-gray-100 sticky top-0 z-50 shadow-sm">
+      <header
+        className={`
+          sticky top-0 z-50 transition-all duration-300 ease-in-out
+          ${isScrolled ? "bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-200" : "bg-transparent"}
+        `}
+      >
         <nav>
           <Container className="relative z-50 flex justify-between items-center py-4 lg:py-6">
             <div className="relative z-10 flex items-center gap-8 lg:gap-16">
@@ -195,21 +214,21 @@ export const Header: React.FC = () => {
               <div className="hidden lg:flex lg:gap-8">
                 <NavLinks />
               </div>
-            </div><div className="flex items-center gap-3 lg:gap-6">
+            </div>
+
+            <div className="flex items-center gap-3 lg:gap-6">
+              {/* Menú móvil */}
               <Popover className="lg:hidden">
                 {({ open }) => (
                   <>
                     <PopoverButton
-                      className="relative z-10 -m-2 inline-flex items-center text-black rounded-lg stroke-gray-900 p-2 hover:bg-gray-200/50 hover:stroke-gray-600 active:stroke-gray-900 ui-not-focus-visible:outline-none"
+                      className={`
+                        relative z-10 -m-2 inline-flex items-center rounded-lg p-2 transition-colors
+                        ${isScrolled ? "text-gray-900 hover:bg-gray-100" : "text-white hover:bg-white/20"}
+                      `}
                       aria-label="Toggle site navigation"
                     >
-                      {({ open }: { open: boolean }) =>
-                        open ? (
-                          <ChevronUpIcon className="h-6 w-6" />
-                        ) : (
-                          <MenuIcon className="h-6 w-6" />
-                        )
-                      }
+                      {open ? <ChevronUpIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
                     </PopoverButton>
                     <AnimatePresence initial={false}>
                       {open && (
@@ -221,7 +240,8 @@ export const Header: React.FC = () => {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             className="fixed inset-0 z-0 bg-gray-300/60 backdrop-blur"
-                          />                        <PopoverPanel
+                          />
+                          <PopoverPanel
                             static
                             as={motion.div}
                             initial={{ opacity: 0, y: -32 }}
@@ -233,12 +253,13 @@ export const Header: React.FC = () => {
                             }}
                             className="absolute inset-x-0 top-0 z-0 origin-top bg-white px-0 pb-6 pt-24 shadow-2xl shadow-gray-900/20 border-b border-gray-100"
                           >
-                            <div className="flex flex-col divide-y divide-gray-100">                            <MobileNavLink
-                              href="/"
-                              className="w-full px-6 py-4 text-left bg-white text-gray-800 hover:bg-blue-50 hover:text-blue-700 transition-colors font-medium"
-                            >
-                              Inicio
-                            </MobileNavLink>
+                            <div className="flex flex-col divide-y divide-gray-100">
+                              <MobileNavLink
+                                href="/"
+                                className="w-full px-6 py-4 text-left bg-white text-gray-800 hover:bg-blue-50 hover:text-blue-700 transition-colors font-medium"
+                              >
+                                Inicio
+                              </MobileNavLink>
                               <MobileNavLink
                                 href="/propiedades"
                                 className="w-full px-6 py-4 text-left bg-white text-gray-800 hover:bg-blue-50 hover:text-blue-700 transition-colors font-medium"
@@ -270,8 +291,9 @@ export const Header: React.FC = () => {
                                 Contacto
                               </MobileNavLink>
                             </div>
+
+                            {/* Widget del Dólar en móvil */}
                             <div className="mt-6 px-4">
-                              {/* Widget del Dólar en móvil */}
                               <div className="flex items-center justify-center bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg px-3 py-3 mb-4 shadow-sm">
                                 <DollarSign className="h-4 w-4 text-blue-600 mr-3 flex-shrink-0" />
                                 <div className="flex flex-col items-center">
@@ -283,34 +305,33 @@ export const Header: React.FC = () => {
                                     </div>
                                   ) : dollarRate ? (
                                     <span className="text-lg font-bold text-blue-700">
-                                      ${dollarRate.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                                      $
+                                      {dollarRate.toLocaleString("es-AR", {
+                                        minimumFractionDigits: 0,
+                                        maximumFractionDigits: 0,
+                                      })}
                                     </span>
                                   ) : (
                                     <span className="text-lg font-bold text-gray-500">N/A</span>
                                   )}
-                                  {lastUpdated && !isLoading && (
-                                    <span className="text-xs text-blue-500 mt-1">
-                                      Actualizado: {lastUpdated.toLocaleTimeString('es-AR', {
-                                        hour: '2-digit',
-                                        minute: '2-digit'
-                                      })}
-                                    </span>
-                                  )}
                                 </div>
                               </div>
                             </div>
+
+                            {/* Botones de autenticación móvil */}
                             <div className="mt-4 flex flex-col gap-4 p-4">
-                              {status === 'authenticated' ? (
+                              {status === "authenticated" ? (
                                 <ProfileDropdown
                                   user={session.user}
                                   onClose={() => setDropdownOpen(false)}
                                   handleLogout={handleLogout}
-                                />) : (
+                                />
+                              ) : (
                                 <div className="flex flex-col gap-3 w-full">
                                   <Button
                                     href="/login"
                                     variant="outline"
-                                    className="text-gray-700 border-gray-300 hover:bg-gray-50 justify-center"
+                                    className="text-sm text-gray-600 border border-gray-300 hover:bg-gray-100 hover:border-gray-400 justify-center shadow-sm transition-colors"
                                   >
                                     Ingresar
                                   </Button>
@@ -330,42 +351,48 @@ export const Header: React.FC = () => {
                     </AnimatePresence>
                   </>
                 )}
-              </Popover>            <div className="hidden lg:flex items-center space-x-4">
+              </Popover>
 
+              {/* Contenido desktop */}
+              <div className="hidden lg:flex items-center space-x-4">
                 {/* Widget del Dólar Blue */}
-                <div className="flex items-center bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg px-3 py-2 min-w-[140px] shadow-sm">
-                  <DollarSign className="h-4 w-4 text-blue-600 mr-2 flex-shrink-0" />
+                <div
+                  className={`
+                  flex items-center rounded-lg px-3 py-2 min-w-[140px] shadow-sm transition-colors
+                  ${isScrolled
+                      ? "bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 text-black"
+                      : "bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 text-black"
+                    }
+                `}
+                >
                   <div className="flex flex-col min-w-0">
-                    <span className="text-xs text-blue-600 font-medium">Dólar</span>
                     <div className="flex items-center gap-1">
                       {isLoading ? (
                         <div className="flex items-center gap-1">
-                          <RefreshCw className="h-3 w-3 animate-spin text-blue-600" />
-                          <span className="text-xs text-blue-600">...</span>
+                          <RefreshCw
+                            className={`h-3 w-3 animate-spin ${isScrolled ? "text-blue-600" : "text-black"}`}
+                          />
+                          <span className={`text-xs ${isScrolled ? "text-blue-600" : "text-black"}`}>...</span>
                         </div>
                       ) : dollarRate ? (
-                        <span className="text-sm font-bold text-blue-700 truncate">
-                          ${dollarRate.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                        <span className={`text-sm font-bold truncate ${isScrolled ? "text-blue-700" : "text-black"}`}>
+                          <span className={`text-xs font-medium ${isScrolled ? "text-blue-600" : "text-black"}`}>
+                            Dólar{" "}
+                          </span>
+                          ${dollarRate.toLocaleString("es-AR", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                         </span>
                       ) : (
                         <span className="text-sm font-bold text-gray-500">N/A</span>
                       )}
                     </div>
-                    {lastUpdated && !isLoading && (
-                      <span className="text-xs text-blue-500 truncate">
-                        {lastUpdated.toLocaleTimeString('es-AR', {
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </span>
-                    )}
                   </div>
                 </div>
 
                 {/* Separador visual */}
-                <div className="h-8 w-px bg-gray-200" />
+                <div className={`h-8 w-px ${isScrolled ? "bg-gray-300" : "bg-gray-300"}`} />
 
-                {/* Botones de autenticación */}              {status === 'authenticated' ? (
+                {/* Botones de autenticación */}
+                {status === "authenticated" ? (
                   <ProfileDropdown
                     user={session.user}
                     onClose={() => setDropdownOpen(false)}
@@ -376,7 +403,13 @@ export const Header: React.FC = () => {
                     <Button
                       variant="outline"
                       href="/login"
-                      className="text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition-colors"
+                      className={`
+                        transition-colors
+                        ${isScrolled
+                          ? "bg-gray-800 text-white hover:bg-gray-900 active:bg-gray-800 active:text-white/80 shadow-sm"
+                          : "text-sm text-gray-600 border border-gray-300 hover:bg-gray-100 hover:border-gray-400 hover:bg-gray-900 hover:text-white justify-center shadow-sm"
+                        }
+                      `}
                     >
                       Ingresar
                     </Button>
@@ -393,7 +426,7 @@ export const Header: React.FC = () => {
           </Container>
         </nav>
       </header>
-      <CurrencyFloatingBubble />
+      {/* <CurrencyFloatingBubble /> */}
     </>
   )
 }
