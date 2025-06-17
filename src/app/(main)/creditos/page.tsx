@@ -1,4 +1,5 @@
 "use client"
+import { useState } from 'react';
 import { motion } from 'framer-motion'
 import type { LucideIcon } from "lucide-react"
 import { Users, Briefcase, BotIcon as Robot, CheckCircle, FileText, Calculator } from 'lucide-react'
@@ -16,6 +17,7 @@ import Link from 'next/link';
 import WhatsappIcon from '@/components/Icons/WhatsappIcon';
 import { TikTok } from '@/components/TikTok/TikTok';
 import { Reviews } from '@/components/Reviews';
+
 
 interface FeatureCardProps {
     Icon: LucideIcon
@@ -66,6 +68,13 @@ const FeatureCard = ({ Icon, title, description }: FeatureCardProps) => {
 }
 
 export default function Page() {
+
+    const [activeIndex, setActiveIndex] = useState<number | null>(null)
+
+    const toggleIndex = (index: number) => {
+        setActiveIndex(activeIndex === index ? null : index)
+    }
+
     return (
         <>
             <HeroSection />
@@ -151,48 +160,59 @@ export default function Page() {
             <section className="mx-auto mb-16 max-w-7xl space-y-6 text-center pt-12">
                 <div className="grid md:grid-cols-2 gap-8">
                     {/* Calculator CTA */}
-                    <Card className="shadow-2xl border-0 bg-gradient-to-br from-blue-600 to-blue-700 text-white overflow-hidden relative">
+                    <Card className="shadow-2xl border-0 bg-gradient-to-br from-blue-600 to-blue-700 text-white overflow-hidden relative flex flex-col">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
-                        <CardContent className="p-8 relative z-10">
-                            <div className="flex items-center gap-4 mb-6">
-                                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                                    <Calculator className="h-6 w-6" />
-                                </div>
-                                <div>
-                                    <h3 className="text-2xl font-bold">Calculá tu cuota</h3>
-                                    <p className="text-blue-100">Descubre cuánto puedes pagar mensualmente</p>
+                        <CardContent className="p-8 relative z-10 flex flex-col justify-between flex-1">
+                            <div className="flex flex-col gap-6">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                                        <Calculator className="h-6 w-6" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-2xl font-bold">Calculá tu cuota</h3>
+                                        <p className="text-blue-100">Descubre cuánto puedes pagar mensualmente</p>
+                                    </div>
                                 </div>
                             </div>
-                            <Button
-                                className="w-full bg-black text-blue-700 hover:bg-blue-300 font-semibold py-3 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
-                            >
-                                Ir al simulador
-                            </Button>
+                            <div className="mt-8">
+                                <Button className="w-full bg-black text-blue-700 hover:bg-blue-300 font-semibold py-3 text-lg shadow-lg hover:shadow-xl transition-all duration-300">
+                                    <Link href="/creditos/calculadora-uva">
+                                        Ir a la calculadora
+                                    </Link>
+                                </Button>
+                            </div>
                         </CardContent>
                     </Card>
 
                     {/* Application CTA */}
-                    <Card className="shadow-2xl border-0 bg-gradient-to-br from-orange-500 to-red-500 text-white overflow-hidden relative">
+                    <Card className="shadow-2xl border-0 bg-gradient-to-br from-orange-500 to-red-500 text-white overflow-hidden relative flex flex-col">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
-                        <CardContent className="p-8 relative z-10">
-                            <div className="flex items-center gap-4 mb-6">
-                                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                                    <FileText className="h-6 w-6" />
-                                </div>
-                                <div>
-                                    <h3 className="text-2xl font-bold">¡Comprá, construí, ampliá o terminá tu próximo hogar!</h3>
-                                    <p className="text-orange-100">Inicia tu solicitud ahora mismo</p>
+                        <CardContent className="p-8 relative z-10 flex flex-col justify-between flex-1">
+                            <div className="flex flex-col gap-6">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                                        <FileText className="h-6 w-6" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-2xl font-bold">
+                                            ¡Comprá, construí, ampliá o terminá tu próximo hogar!
+                                        </h3>
+                                        <p className="text-orange-100">Inicia tu solicitud ahora mismo</p>
+                                    </div>
                                 </div>
                             </div>
-                            <Button
-                                className="w-full bg-black text-orange-700 hover:bg-orange-300 font-semibold py-3 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
-                            >
-                                Iniciar solicitud
-                            </Button>
+                            <div className="mt-8">
+                                <Button className="w-full bg-black text-orange-700 hover:bg-orange-300 font-semibold py-3 text-lg shadow-lg hover:shadow-xl transition-all duration-300">
+                                    <Link href="/contacto">
+                                        Iniciar solicitud
+                                    </Link>
+                                </Button>
+                            </div>
                         </CardContent>
                     </Card>
                 </div>
             </section>
+
 
 
             {/* Loan Conditions - Simplified
@@ -233,42 +253,6 @@ export default function Page() {
 
             <DestinationsSection data={destinationData} />
 
-            <section className="mx-auto mb-16 max-w-7xl space-y-6 text-center pt-12">
-                <h1 className="text-4xl font-bold tracking-tight md:text-5xl">¿Quiénes pueden solicitarlo?</h1>
-                <p className=" mx-auto max-w-3xl text-md leading-relaxed">Conoce los requisitos y condiciones para acceder a nuestro crédito hipotecario</p>
-
-                <motion.div
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="visible"
-                    className="mx-auto grid max-w-6xl grid-cols-3 gap-12 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3"
-                >
-                    <motion.div variants={itemVariants} className="h-full">
-                        <FeatureCard
-                            Icon={Users}
-                            title="Adquisición o cambio"
-                            description={`Adquisición o cambio de vivienda única de ocupación permanente o de segunda vivienda`}
-                        />
-                    </motion.div>
-
-                    <motion.div variants={itemVariants} className="h-full">
-                        <FeatureCard
-                            Icon={Briefcase}
-                            title="Construcción"
-                            description={`Construcción de vivienda única de ocupación permanente y de segunda vivienda sobre terreno propio`}
-                        />
-                    </motion.div>
-
-                    <motion.div variants={itemVariants} className="h-full">
-                        <FeatureCard
-                            Icon={Briefcase}
-                            title="Ampliación, refacción o terminación"
-                            description={`Ampliación, refacción o terminación de vivienda única de ocupación permanente y de segunda vivienda sobre terreno propio`}
-                        />
-                    </motion.div>
-                </motion.div>
-            </section>
-
 
             <section
                 id="faqs"
@@ -276,43 +260,27 @@ export default function Page() {
                 className="border-t border-gray-200 py-20 sm:py-32"
             >
                 <Container>
-                    <div className="mx-auto max-w-2xl lg:mx-0">
-                        <h2
-                            id="faqs-title"
-                            className="text-3xl font-medium tracking-tight text-gray-900"
-                        >
-                            Preguntas frecuentes
-                        </h2>
-                        <p className="mt-2 text-lg text-gray-600">
-                            Si hay algo más que quieras consultar,{' '}
-                            <a
-                                href="mailto:sembrar.construcciones@gmail.com"
-                                className="text-gray-900 underline"
-                            >
-                                contactanos
-                            </a>
-                            .
-                        </p>
-                    </div>
-                    <ul
-                        role="list"
-                        className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-8 sm:mt-20 lg:max-w-none lg:grid-cols-3"
-                    >
-                        {faqs.map((column, columnIndex) => (
-                            <li key={columnIndex}>
-                                <ul role="list" className="space-y-10">
-                                    {column.map((faq, faqIndex) => (
-                                        <li key={faqIndex}>
-                                            <h3 className="text-lg font-semibold leading-6 text-gray-900">
-                                                {faq.question}
-                                            </h3>
-                                            <p className="mt-4 text-sm text-gray-700">{faq.answer}</p>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </li>
-                        ))}
-                    </ul>
+                    <section className="max-w-4xl mx-auto py-10 px-4">
+                        <h2 className="text-3xl font-bold text-center mb-8">Condiciones del crédito</h2>
+                        <div className="space-y-4">
+                            {faqs.map((faq, index) => (
+                                <div key={faq.id} className="border rounded-xl overflow-hidden">
+                                    <button
+                                        onClick={() => toggleIndex(index)}
+                                        className="w-full text-left px-6 py-4 bg-gray-100 hover:bg-gray-200 focus:outline-none flex justify-between items-center"
+                                    >
+                                        <span className="font-medium">{faq.title}</span>
+                                        <span className="text-xl">{activeIndex === index ? "−" : "+"}</span>
+                                    </button>
+                                    {activeIndex === index && (
+                                        <div className="px-6 py-4 text-gray-700 bg-white">
+                                            {faq.description}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </section>
                 </Container>
             </section>
 
@@ -350,55 +318,29 @@ export default function Page() {
 }
 
 
-export const faqs = [
-    [
-        {
-            question: '¿Quienes pueden solicitar el crédito Hipotecario Banco Nación?',
-            answer: `
-                Pueden solicitarlo:
-                - Empleados planta permanente.
-                - Jubilados o pensionados.
-                - Autónomos o monotributistas.
-                - Contratados con codeudor familiar
-                Edad máxima: Hasta 85 años para cancelar.
-            `,
-        },
-        {
-            question: '¿Se pueden sumar ingresos para solicitar el crédito?',
-            answer:
-                'En todos los casos se admite la participación de hasta dos usuarios titulares y hasta dos codeudores en la solicitud del crédito. Los codeudores deberán ser familiares directos del o los titulares (padres, hijos o hermanos) y cumplir con los requisitos establecidos para la obtención del presente crédito hipotecario. Esta modalidad está pensada para facilitar el acceso al financiamiento, permitiendo sumar ingresos entre los participantes y mejorar la evaluación crediticia del grupo. La inclusión de codeudores amplía la capacidad de pago, lo que puede impactar positivamente en el monto aprobado o en las condiciones del préstamo.',
-        },
-        {
-            question: '¿A qué tasa de interés?',
-            answer:
-                'Préstamo en Unidades de Valor Adquisitivo (UVA), actualizables por el Coeficiente de Estabilización de Referencia (CER), según lo establecido por la Ley 25.827. Este crédito hipotecario se otorga con garantía real en primer grado y está diseñado para acompañar la evolución de la inflación. Las cuotas se abonan de forma mensual y se calculan mediante el sistema francés de amortización, permitiendo pagos iniciales más bajos que aumentan progresivamente con el tiempo.',
-        },
-    ],
-    [
-        {
-            question: '¿Cuál es el plazo y el monto máximo que puedo obtener?',
-            answer:
-                'El financiamiento puede extenderse hasta un plazo máximo de 30 años, dependiendo del destino del crédito, ya sea para compra o construcción de vivienda. En términos generales, se podrá cubrir hasta el 75% del valor de la propiedad a adquirir o del proyecto a construir, lo que permite acceder al préstamo con una inversión inicial moderada. No obstante, para empleados públicos o personas adheridas al régimen CERA, el monto financiable se amplía hasta el 90% del valor, facilitando aún más el acceso a la vivienda propia con un menor requerimiento de ahorro previo.',
-        },
-
-    ],
-    [
-        {
-            question: '¿Cómo es el proceso?',
-            answer:
-                `
-1. Primero, acercate a la sucursal del Banco Nación en Rafaela, ubicada en San Martín 175, para iniciar el trámite de precalificación y conocer si calificás para el crédito hipotecario. Allí evaluarán tu situación financiera y te informarán el monto que podrías obtener.
-
-2. Luego, elegí la casa que más te guste de nuestro catálogo de viviendas disponibles. Podés acercarte a nuestras oficinas en Aconcagua 697, donde te vamos a asesorar personalmente, mostrarte opciones, y ayudarte a elegir la propiedad ideal para vos y tu familia.
-
-3. Una vez elegida la propiedad, firmás un acuerdo de reserva con nosotros, lo cual asegura que la unidad se mantenga disponible mientras avanzás con el trámite bancario.
-
-4. El Banco Nación realiza la tasación de la vivienda, para confirmar que el valor coincide con el monto del crédito solicitado y validar las condiciones del inmueble.
-
-5. Si todo está en orden, se procede a la firma de la escritura en la escribanía designada por el banco. En ese acto se otorga el crédito y se transfiere oficialmente la propiedad.
-
-6. ¡Y listo! Llegó el momento de mudarte y disfrutar de tu nueva casa. Te acompañamos en todo el proceso para que vivas esta experiencia de forma simple, segura y transparente.
-                `,
-        },
-    ],
+const faqs = [
+    {
+        id: 1,
+        title: "Modalidad",
+        description:
+            'Préstamo en Unidades de Valor Adquisitivo actualizables por Coeficiente de Estabilización de Referencia "CER" Ley 25.827 ("UVA") con garantía hipotecaria en primer grado.',
+    },
+    {
+        id: 2,
+        title: "Amortización",
+        description:
+            "Las cuotas se liquidarán en forma mensual y por sistema francés.",
+    },
+    {
+        id: 3,
+        title: "Comisiones",
+        description:
+            "Se acepta la cancelación total o parcial en cualquier momento de la vigencia del préstamo. Comisión equivalente al 4% del monto a cancelar.",
+    },
+    {
+        id: 4,
+        title: "Interés",
+        description:
+            "Para vivienda única y de ocupación permanente que perciban sus haberes a través del BNA: 4.50% TNA fijo. El resto: 8.00% TNA fijo.",
+    },
 ]
