@@ -121,7 +121,7 @@ export function HeroSection(): JSX.Element {
                 </Link>
               </div> */}
               <Button
-                href="/simulador-hipotecarios-uva"
+                href="/creditos/calculadora-uva"
                 variant="outline"
               >
                 <PlayIcon className="h-6 w-6 flex-none" />

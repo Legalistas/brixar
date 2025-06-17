@@ -157,8 +157,8 @@ export default function Page() {
                 </motion.div>
             </section>
 
-            <section className="mx-auto mb-16 max-w-7xl space-y-6 text-center pt-12">
-                <div className="grid md:grid-cols-2 gap-8">
+            <section className="mx-auto mb-16 max-w-2xl space-y-6 text-center pt-12">
+                <div className="grid md:grid-cols-1 gap-8">
                     {/* Calculator CTA */}
                     <Card className="shadow-2xl border-0 bg-gradient-to-br from-blue-600 to-blue-700 text-white overflow-hidden relative flex flex-col">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
@@ -169,7 +169,7 @@ export default function Page() {
                                         <Calculator className="h-6 w-6" />
                                     </div>
                                     <div>
-                                        <h3 className="text-2xl font-bold">Calculá tu cuota</h3>
+                                        <h3 className="text-2xl font-bold text-left">Calculá tu cuota</h3>
                                         <p className="text-blue-100">Descubre cuánto puedes pagar mensualmente</p>
                                     </div>
                                 </div>
@@ -178,33 +178,6 @@ export default function Page() {
                                 <Button className="w-full bg-black text-blue-700 hover:bg-blue-300 font-semibold py-3 text-lg shadow-lg hover:shadow-xl transition-all duration-300">
                                     <Link href="/creditos/calculadora-uva">
                                         Ir a la calculadora
-                                    </Link>
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Application CTA */}
-                    <Card className="shadow-2xl border-0 bg-gradient-to-br from-orange-500 to-red-500 text-white overflow-hidden relative flex flex-col">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
-                        <CardContent className="p-8 relative z-10 flex flex-col justify-between flex-1">
-                            <div className="flex flex-col gap-6">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                                        <FileText className="h-6 w-6" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-2xl font-bold">
-                                            ¡Comprá, construí, ampliá o terminá tu próximo hogar!
-                                        </h3>
-                                        <p className="text-orange-100">Inicia tu solicitud ahora mismo</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="mt-8">
-                                <Button className="w-full bg-black text-orange-700 hover:bg-orange-300 font-semibold py-3 text-lg shadow-lg hover:shadow-xl transition-all duration-300">
-                                    <Link href="/contacto">
-                                        Iniciar solicitud
                                     </Link>
                                 </Button>
                             </div>
