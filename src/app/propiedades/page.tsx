@@ -5,6 +5,7 @@ import { Header } from '@/components/Header'
 import Properties from '@/components/Property/PropertyContainer'
 import { useState } from 'react'
 import Sidebar from './sidebar'
+import { Propiedades } from '@/components/Property/Propiedades';
 
 export default function Home() {
   const [filters, setFilters] = useState({})
@@ -18,7 +19,8 @@ export default function Home() {
       <Header />
       <div className="flex">
         <Sidebar onFilterChange={handleFilterChange} />
-        <Properties filters={filters} separateByStatus={true} />
+        {/* <Properties filters={filters} separateByStatus={true} /> */}
+        <Propiedades />
       </div>
       <Footer />
     </>

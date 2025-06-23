@@ -1,5 +1,8 @@
+'use client'
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ReactNode, useRef } from 'react'
  
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -22,3 +25,16 @@ export const generatePropertySku = (id: number, title: string): string => {
   // Formatea el SKU combinando el ID con el título normalizado
   return `BX-${id}-${normalizedTitle}`;
 };
+
+// export const queryClient = new QueryClient({
+//   defaultOptions: {
+//     queries: {
+//       //staleTime: 1000 * 60 * 5, // 5 minutos
+//       retry: 1,
+//       refetchOnWindowFocus: false,
+//     },
+//     mutations: {
+//       retry: 1,
+//     },
+//   },
+// })

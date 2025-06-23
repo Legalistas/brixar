@@ -1,3 +1,9 @@
+interface PropertyImage {
+  id: number
+  url: string
+  propertyId: number
+}
+
 export interface Property {
   id: number
   slug: string
@@ -7,16 +13,16 @@ export interface Property {
   bedrooms: number
   bathrooms: number
   squareMeters: number
-  propertyType: PropertyType
-  listingType: ListingType
+  propertyType: string
+  listingType: string
   isAvailable: boolean
   yearBuilt: number
   parkingSpaces: number
-  amenities: null | any
-  quantity: number
-  createdAt: string
-  updatedAt: string
-  images: any[]
+  amenities: {
+    [key: string]: boolean
+  }
+  status: string
+  images: PropertyImage[]
   address: Address[]
 }
 

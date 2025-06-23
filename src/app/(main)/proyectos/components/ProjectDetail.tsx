@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Share2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { getAllProyects } from "@/services/proyects-service";
-import { ProjectHero } from "../components/ProjectHero";
-import { ProjectOverview } from "../components/ProjectOverview";
-import { ProjectLocation } from "../components/ProjectLocation";
-import { ProjectInvestment } from "../components/ProjectInvestment";
+import { ProjectHero } from "./ProjectHero";
+import { ProjectOverview } from "./ProjectOverview";
+import { ProjectLocation } from "./ProjectLocation";
+import { ProjectInvestment } from "./ProjectInvestment";
 
 
 const ProjectDetail = () => {

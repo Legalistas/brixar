@@ -23,7 +23,7 @@ interface PropertyAddress {
   }
 }
 
-interface PropertyProps {
+export interface PropertyProps {
   property: {
     id: number
     slug: string

@@ -1,56 +1,57 @@
-import type React from "react"
-import type { Metadata } from "next"
-import "@/styles/globals.css"
-import "react-toastify/dist/ReactToastify.css"
-import "flag-icons/css/flag-icons.min.css"
-import { ToastContainer } from "react-toastify"
-import { Providers } from "./Providers"
-import { Inter, Ubuntu } from "next/font/google"
-import { GoogleAnalytics } from "@next/third-parties/google"
-import Script from "next/script"
-import { ChatbotBubble } from "@/components/ChatbotBubble"
-import { Analytics } from "@vercel/analytics/react"
-import WhatsAppButton from "@/components/wspBubble"
-import { Suspense } from "react"
+import type React from 'react'
+import type { Metadata } from 'next'
+import '@/styles/globals.css'
+import 'react-toastify/dist/ReactToastify.css'
+import 'flag-icons/css/flag-icons.min.css'
+import { ToastContainer } from 'react-toastify'
+import { Providers } from './Providers'
+import { Inter, Ubuntu } from 'next/font/google'
+import { GoogleAnalytics } from '@next/third-parties/google'
+import Script from 'next/script'
+import { ChatbotBubble } from '@/components/ChatbotBubble'
+import { Analytics } from '@vercel/analytics/react'
+import WhatsAppButton from '@/components/wspBubble'
+import { Suspense } from 'react'
+import QueryProvider from "@/components/QueryProvider"
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ['latin'] })
 const ubuntu = Ubuntu({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "700"],
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '700'],
 })
 
 export const metadata: Metadata = {
-  title: "Brixar | Propiedades y Financiación en Argentina",
+  title: 'Brixar | Propiedades y Financiación en Argentina',
   description:
-    "Cumplí el sueño del hogar propio con Brixar. Accedé a tu vivienda con financiamiento flexible y proyectos de calidad en Argentina.",
+    'Cumplí el sueño del hogar propio con Brixar. Accedé a tu vivienda con financiamiento flexible y proyectos de calidad en Argentina.',
   keywords: [
-    "Brixar",
-    "propiedades en Argentina",
-    "financiamiento inmobiliario",
-    "vivienda propia",
-    "proyectos habitacionales",
-    "plataforma inmobiliaria",
-    "compra de inmuebles",
-    "créditos hipotecarios",
-    "construcción de viviendas",
-    "inversiones inmobiliarias",
+    'Brixar',
+    'propiedades en Argentina',
+    'financiamiento inmobiliario',
+    'vivienda propia',
+    'proyectos habitacionales',
+    'plataforma inmobiliaria',
+    'compra de inmuebles',
+    'créditos hipotecarios',
+    'construcción de viviendas',
+    'inversiones inmobiliarias',
   ],
-  authors: [{ name: "Brixar Team", url: "https://www.brixar.ar" }],
+  authors: [{ name: 'Brixar Team', url: 'https://www.brixar.ar' }],
   openGraph: {
-    type: "website",
-    title: "Brixar | Propiedades y Financiación",
+    type: 'website',
+    title: 'Brixar | Propiedades y Financiación',
     description:
-      "Cumplí el sueño del hogar propio con Brixar. Accedé a tu vivienda con financiamiento flexible y proyectos de calidad en Argentina.",
-    url: "https://www.brixar.ar",
-    images: ["https://www.brixar.ar/images/og-image.jpg"],
-    siteName: "Brixar",
+      'Cumplí el sueño del hogar propio con Brixar. Accedé a tu vivienda con financiamiento flexible y proyectos de calidad en Argentina.',
+    url: 'https://www.brixar.ar',
+    images: ['https://www.brixar.ar/images/og-image.jpg'],
+    siteName: 'Brixar',
   },
   icons: {
-    icon: ["/favicon.ico"],
-    apple: ["/images/apple-touch-icon.png"],
-    shortcut: ["/images/favicon-32x32.png"],
+    icon: ['/favicon.ico'],
+    apple: ['/images/apple-touch-icon.png'],
+    shortcut: ['/images/favicon-32x32.png'],
   },
-  manifest: "/site.webmanifest",
+  manifest: '/site.webmanifest',
 }
 
 export default function RootLayout({
@@ -97,7 +98,7 @@ export default function RootLayout({
             src="https://www.googletagmanager.com/ns.html?id=GTM-5ZMJCRMC"
             height="0"
             width="0"
-            style={{ display: "none", visibility: "hidden" }}
+            style={{ display: 'none', visibility: 'hidden' }}
           />
         </noscript>
 
@@ -106,21 +107,22 @@ export default function RootLayout({
           <img
             height="1"
             width="1"
-            style={{ display: "none" }}
+            style={{ display: 'none' }}
             src="https://www.facebook.com/tr?id=699843239439100&ev=PageView&noscript=1"
             alt=""
           />
         </noscript>
 
-        <Providers>
-          <Suspense fallback={null}>
-            {children}
-            <ToastContainer />
-            <WhatsAppButton />
-            <ChatbotBubble />
-          </Suspense>
-        </Providers>
-
+        <QueryProvider>
+          <Providers>
+            <Suspense fallback={null}>
+              {children}
+              <ToastContainer />
+              <WhatsAppButton />
+              <ChatbotBubble />
+            </Suspense>
+          </Providers>
+        </QueryProvider>
         {/* Google Analytics - usando solo el componente de Next.js */}
         <GoogleAnalytics gaId="G-TKDYP32F6F" />
 
