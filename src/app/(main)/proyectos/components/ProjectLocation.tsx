@@ -1,13 +1,14 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, Navigation } from "lucide-react";
-import { Proyect } from "@/types/proyect";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { MapPin, Navigation } from 'lucide-react'
+import { Proyect } from '@/types/proyect'
+import { GoogleMap } from '@/components/GoogleMap'
 
 interface ProjectLocationProps {
-  project: Proyect;
+  project: Proyect
 }
 
 export const ProjectLocation = ({ project }: ProjectLocationProps) => {
-  const address = project.address[0];
+  const address = project.address[0]
 
   return (
     <Card>
@@ -23,48 +24,44 @@ export const ProjectLocation = ({ project }: ProjectLocationProps) => {
           <div>
             <h4 className="font-semibold text-gray-900 mb-2">Dirección</h4>
             <p className="text-gray-600">
-              {address?.streetName}<br />
-              {address?.city}, {address?.state?.name}<br />
+              {address?.streetName}
+              <br />
+              {address?.city}, {address?.state?.name}
+              <br />
               {address?.country?.name} {/* {address?.postalCode} */}
             </p>
           </div>
           <div>
             <h4 className="font-semibold text-gray-900 mb-2">Área</h4>
             <p className="text-gray-600">
-              Ciudad: {address?.city}<br />
-              Provincia: {address?.state?.name}<br />
+              Ciudad: {address?.city}
+              <br />
+              Provincia: {address?.state?.name}
+              <br />
               País: {address?.country?.name}
             </p>
           </div>
         </div>
 
         {/* Map Placeholder */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h4 className="font-semibold text-gray-900">Mapa de ubicación</h4>
-            <button className="flex items-center gap-2 text-orange-600 hover:text-orange-700 font-medium">
-              <Navigation className="w-4 h-4" />
-              Ver en mapa
-            </button>
+        {address.positions.length > 0 ? (
+          <div className="mt-4">
+            {address.positions[0].latitude &&
+              address.positions[0].longitude && (
+                <div className="aspect-video rounded-lg overflow-hidden">
+                  <GoogleMap
+                    latitude={Number(address.positions[0].latitude)}
+                    longitude={Number(address.positions[0].longitude)}
+                  />
+                </div>
+              )}
           </div>
-          
-          <div className="aspect-[4/3] bg-gray-200 rounded-lg overflow-hidden border">
-            <div className="w-full h-full bg-gradient-to-br from-green-100 to-blue-100 flex items-center justify-center relative">
-              {/* Simple map mockup */}
-              <div className="absolute inset-4 bg-white/20 rounded border-2 border-dashed border-white/40"></div>
-              <div className="text-center">
-                <MapPin className="w-12 h-12 text-orange-500 mx-auto mb-2" />
-                <div className="text-gray-700 font-medium">{address?.city}</div>
-                <div className="text-sm text-gray-600">{address?.state?.name}</div>
-              </div>
-            </div>
+        ) : (
+          <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
+            <p className="text-gray-500">Mapa no disponible en esta vista</p>
           </div>
-          
-          <p className="text-sm text-gray-500 text-center">
-            Ubicación aproximada del proyecto en {address?.city}, {address?.state?.name}
-          </p>
-        </div>
+        )}
       </CardContent>
     </Card>
-  );
-};
+  )
+}

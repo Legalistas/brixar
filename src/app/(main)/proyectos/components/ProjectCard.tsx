@@ -38,7 +38,7 @@ export const ProjectCard = ({ project, onViewDetails }: ProjectCardProps) => {
 
   const address = project.address[0];
   const location = `${address?.city}, ${address?.state?.name}`;
-  console.log('project', project)
+
   return (
     <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-white border border-gray-200">
       <CardHeader className="relative pb-2">

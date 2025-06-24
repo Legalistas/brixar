@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/ui/card'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import {
   ChevronLeft,
   ChevronRight,
@@ -25,74 +25,79 @@ import {
   Flame,
   WashingMachine,
   Building,
-} from "lucide-react"
-import Image from "next/image"
-import { Property } from "@/types/property"
-import { getPorpertiesBySlug } from "@/services/properties-service"
-import { useQuery } from "@tanstack/react-query"
-import PropertyDetailSkeleton from "./PropertyDetailSkeleton"
+} from 'lucide-react'
+import Image from 'next/image'
+import { Property } from '@/types/property'
+import { getPorpertiesBySlug } from '@/services/properties-service'
+import { useQuery } from '@tanstack/react-query'
+import PropertyDetailSkeleton from './PropertyDetailSkeleton'
 import { useRouter } from 'next/navigation'
+import { GoogleMap } from '../GoogleMap'
 
 const getAmenityConfig = () => {
   return {
     airConditioning: {
       icon: Snowflake,
-      label: "Aire Acondicionado",
+      label: 'Aire Acondicionado',
     },
     balcony: {
       icon: Wind,
-      label: "Balcón",
+      label: 'Balcón',
     },
     elevator: {
       icon: Building,
-      label: "Ascensor",
+      label: 'Ascensor',
     },
     garden: {
       icon: Trees,
-      label: "Jardín",
+      label: 'Jardín',
     },
     heating: {
       icon: Flame,
-      label: "Calefacción",
+      label: 'Calefacción',
     },
     laundry: {
       icon: WashingMachine,
-      label: "Lavandería",
+      label: 'Lavandería',
     },
     petFriendly: {
       icon: Heart,
-      label: "Pet Friendly",
+      label: 'Pet Friendly',
     },
     security: {
       icon: Shield,
-      label: "Seguridad",
+      label: 'Seguridad',
     },
     terrace: {
       icon: Wind,
-      label: "Terraza",
+      label: 'Terraza',
     },
     wifi: {
       icon: Wifi,
-      label: "WiFi",
+      label: 'WiFi',
     },
     parking: {
       icon: Car,
-      label: "Estacionamiento",
+      label: 'Estacionamiento',
     },
   }
 }
 
 interface PropertyDetailProps {
-  slug: string;
+  slug: string
 }
 
 export default function PropertyDetail({ slug }: PropertyDetailProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isImageModalOpen, setIsImageModalOpen] = useState(false)
   const [modalImageIndex, setModalImageIndex] = useState(0)
-  const router = useRouter();
+  const router = useRouter()
 
-  const { data: propiedad, isLoading, error } = useQuery<Property>({
+  const {
+    data: propiedad,
+    isLoading,
+    error,
+  } = useQuery<Property>({
     queryKey: ['propiedad', slug],
     queryFn: () => getPorpertiesBySlug(slug),
     enabled: !!slug,
@@ -108,8 +113,12 @@ export default function PropertyDetail({ slug }: PropertyDetailProps) {
     return (
       <div className="max-w-6xl mx-auto p-4">
         <div className="text-center py-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Error al cargar la propiedad</h2>
-          <p className="text-gray-600">No se pudo cargar la información de la propiedad.</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Error al cargar la propiedad
+          </h2>
+          <p className="text-gray-600">
+            No se pudo cargar la información de la propiedad.
+          </p>
         </div>
       </div>
     )
@@ -150,19 +159,19 @@ export default function PropertyDetail({ slug }: PropertyDetailProps) {
 
   const getPropertyTypeLabel = (type: string) => {
     const types: { [key: string]: string } = {
-      HOUSE: "Casa",
-      APARTMENT: "Departamento",
-      LAND: "Terreno",
-      COMMERCIAL: "Comercial",
+      HOUSE: 'Casa',
+      APARTMENT: 'Departamento',
+      LAND: 'Terreno',
+      COMMERCIAL: 'Comercial',
     }
     return types[type] || type
   }
 
   const getStatusLabel = (status: string) => {
     const statuses: { [key: string]: string } = {
-      EN_VENTA: "En Venta",
-      VENDIDO: "Vendido",
-      RESERVADO: "Reservado",
+      EN_VENTA: 'En Venta',
+      VENDIDO: 'Vendido',
+      RESERVADO: 'Reservado',
     }
     return statuses[status] || status
   }
@@ -173,18 +182,25 @@ export default function PropertyDetail({ slug }: PropertyDetailProps) {
     <div className="max-w-6xl mx-auto p-4 space-y-6">
       {/* Botón volver */}
       <div className="mb-2">
-        <Button variant="outline" onClick={() => router.push('/propiedades')} className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          onClick={() => router.push('/propiedades')}
+          className="flex items-center gap-2"
+        >
           <ChevronLeft className="w-4 h-4" /> Volver a propiedades
         </Button>
       </div>
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{propiedad.title}</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            {propiedad.title}
+          </h1>
           <div className="flex items-center gap-2 text-gray-600 mt-2">
             <MapPin className="w-4 h-4" />
             <span>
-              {address.streetName}, {address.city}, {address.state.name}
+              {address.streetName}, {address.city},{' '}
+              {address.state?.name ? address.state.name : ''}
             </span>
           </div>
         </div>
@@ -193,7 +209,9 @@ export default function PropertyDetail({ slug }: PropertyDetailProps) {
             {getStatusLabel(propiedad.status)}
           </Badge>
           <div className="text-right">
-            <div className="text-3xl font-bold text-gray-900">{formatPrice(propiedad.price)}</div>
+            <div className="text-3xl font-bold text-gray-900">
+              {formatPrice(propiedad.price)}
+            </div>
             <div className="text-sm text-gray-500">SKU: {propiedad.slug}</div>
           </div>
         </div>
@@ -204,7 +222,10 @@ export default function PropertyDetail({ slug }: PropertyDetailProps) {
         <div className="relative">
           <div className="aspect-video relative">
             <Image
-              src={propiedad.images[currentImageIndex]?.url || "/placeholder.svg?height=400&width=800"}
+              src={
+                propiedad.images[currentImageIndex]?.url ||
+                '/placeholder.svg?height=400&width=800'
+              }
               alt={`${propiedad.title} - Imagen ${currentImageIndex + 1}`}
               fill
               className="object-cover cursor-pointer"
@@ -256,12 +277,14 @@ export default function PropertyDetail({ slug }: PropertyDetailProps) {
               <button
                 key={image.id}
                 className={`flex-shrink-0 w-20 h-16 rounded-lg overflow-hidden border-2 transition-colors ${
-                  index === currentImageIndex ? "border-orange-500" : "border-gray-200 hover:border-gray-300"
+                  index === currentImageIndex
+                    ? 'border-orange-500'
+                    : 'border-gray-200 hover:border-gray-300'
                 }`}
                 onClick={() => setCurrentImageIndex(index)}
               >
                 <Image
-                  src={image.url || "/placeholder.svg"}
+                  src={image.url || '/placeholder.svg'}
                   alt={`Thumbnail ${index + 1}`}
                   width={80}
                   height={64}
@@ -278,7 +301,9 @@ export default function PropertyDetail({ slug }: PropertyDetailProps) {
         {/* Main Details */}
         <Card className="md:col-span-2">
           <CardContent className="p-6">
-            <h2 className="text-xl font-semibold mb-4">Detalles de la propiedad</h2>
+            <h2 className="text-xl font-semibold mb-4">
+              Detalles de la propiedad
+            </h2>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div className="flex items-center gap-2">
@@ -287,7 +312,9 @@ export default function PropertyDetail({ slug }: PropertyDetailProps) {
                 </div>
                 <div>
                   <div className="text-sm text-gray-500">Superficie</div>
-                  <div className="font-semibold">{propiedad.squareMeters} m²</div>
+                  <div className="font-semibold">
+                    {propiedad.squareMeters} m²
+                  </div>
                 </div>
               </div>
 
@@ -297,7 +324,9 @@ export default function PropertyDetail({ slug }: PropertyDetailProps) {
                 </div>
                 <div>
                   <div className="text-sm text-gray-500">Tipo</div>
-                  <div className="font-semibold">{getPropertyTypeLabel(propiedad.propertyType)}</div>
+                  <div className="font-semibold">
+                    {getPropertyTypeLabel(propiedad.propertyType)}
+                  </div>
                 </div>
               </div>
 
@@ -344,8 +373,54 @@ export default function PropertyDetail({ slug }: PropertyDetailProps) {
 
             <div className="border-t pt-4">
               <h3 className="font-semibold mb-3">Descripción</h3>
-              <div className="text-gray-700 whitespace-pre-line leading-relaxed">{propiedad.description}</div>
+              <div className="text-gray-700 whitespace-pre-line leading-relaxed">
+                {propiedad.description}
+              </div>
             </div>
+
+            {/* Location */}
+            <section className="mt-12">
+              <Card>
+                <CardContent className="p-6">
+                  <div className="mb-6">
+                    <h3 className="text-xl font-semibold mb-3">Dirección</h3>
+                    <div className="space-y-1 text-gray-700">
+                      <p>{propiedad.address[0].streetName}</p>
+                      <p>
+                        {propiedad.address[0].city},{' '}
+                        {propiedad?.address[0]?.state?.name}{' '}
+                        {propiedad.address[0].postalCode}
+                      </p>
+                      <p>{propiedad?.address[0]?.country?.name}</p>
+                    </div>
+                  </div>
+
+                  {propiedad.address[0].positions.length > 0 ? (
+                    <div className="mt-4">
+                      {propiedad.address[0].positions[0].latitude &&
+                        propiedad.address[0].positions[0].longitude && (
+                          <div className="aspect-video rounded-lg overflow-hidden">
+                            <GoogleMap
+                              latitude={Number(
+                                propiedad.address[0].positions[0].latitude
+                              )}
+                              longitude={Number(
+                                propiedad.address[0].positions[0].longitude
+                              )}
+                            />
+                          </div>
+                        )}
+                    </div>
+                  ) : (
+                    <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
+                      <p className="text-gray-500">
+                        Mapa no disponible en esta vista
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </section>
           </CardContent>
         </Card>
 
@@ -360,7 +435,8 @@ export default function PropertyDetail({ slug }: PropertyDetailProps) {
                   .filter(([_, value]) => value === true)
                   .map(([key, _]) => {
                     const amenityConfig = getAmenityConfig()
-                    const config = amenityConfig[key as keyof typeof amenityConfig]
+                    const config =
+                      amenityConfig[key as keyof typeof amenityConfig]
 
                     if (!config) return null
 
@@ -373,14 +449,17 @@ export default function PropertyDetail({ slug }: PropertyDetailProps) {
                       </div>
                     )
                   })}
-                {Object.values(propiedad.amenities).every((value) => !value) && (
-                  <div className="text-sm text-gray-500">No hay comodidades especificadas</div>
+                {Object.values(propiedad.amenities).every(
+                  (value) => !value
+                ) && (
+                  <div className="text-sm text-gray-500">
+                    No hay comodidades especificadas
+                  </div>
                 )}
               </div>
             </CardContent>
           </Card>
 
-          {/* Location */}
           <Card>
             <CardContent className="p-6">
               <h3 className="font-semibold mb-4">Ubicación</h3>
@@ -392,10 +471,12 @@ export default function PropertyDetail({ slug }: PropertyDetailProps) {
                   <strong>Ciudad:</strong> {address.city}
                 </div>
                 <div>
-                  <strong>Provincia:</strong> {address.state.name}
+                  <strong>Provincia:</strong>{' '}
+                  {address.state?.name ? address.state.name : ''}
                 </div>
                 <div>
-                  <strong>País:</strong> {address.country.name}
+                  <strong>País:</strong>{' '}
+                  {address.country?.name ? address.country.name : ''}
                 </div>
                 <div>
                   <strong>Código Postal:</strong> {address.postalCode}
@@ -407,8 +488,18 @@ export default function PropertyDetail({ slug }: PropertyDetailProps) {
           {/* Contact */}
           <Card>
             <CardContent className="p-6">
-              <h3 className="font-semibold mb-4">¿Interesado en esta propiedad?</h3>
-              <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">Contactar Agente</Button>
+              <a
+                href="https://wa.me/5493492282324"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <h3 className="font-semibold mb-4">
+                  ¿Interesado en esta propiedad?
+                </h3>
+                <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">
+                  Contactar Agente
+                </Button>
+              </a>
             </CardContent>
           </Card>
         </div>
@@ -429,7 +520,10 @@ export default function PropertyDetail({ slug }: PropertyDetailProps) {
 
             <div className="aspect-video relative">
               <Image
-                src={propiedad.images[modalImageIndex]?.url || "/placeholder.svg?height=600&width=800"}
+                src={
+                  propiedad.images[modalImageIndex]?.url ||
+                  '/placeholder.svg?height=600&width=800'
+                }
                 alt={`${propiedad.title} - Imagen ${modalImageIndex + 1}`}
                 fill
                 className="object-contain"

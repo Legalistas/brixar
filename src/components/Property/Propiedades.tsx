@@ -31,6 +31,7 @@ import { Property } from '@prisma/client'
 import { PropertyProps } from './PropertyCard'
 import { useCurrency } from '@/context/CurrencyContext'
 import { useRouter } from 'next/navigation'
+import PropertySkeleton, { PropertyListItemSkeleton } from './PropertySkeleton'
 
 function formatPrice(price: number | string) {
   const numPrice = typeof price === 'string' ? Number.parseInt(price) : price
@@ -360,7 +361,7 @@ export const Propiedades = () => {
     queryKey: ['propiedades'],
     queryFn: () => getAllProperties(),
   })
-  console.log(propiedades)
+  const isLoading = !propiedades
 
   const propiedadesEnVenta = propiedades?.filter(
     (propiedad) => propiedad.status === 'EN_VENTA'
@@ -450,7 +451,21 @@ export const Propiedades = () => {
             </Badge>
           </div>
 
-          {viewMode === 'grid' ? (
+          {isLoading ? (
+            viewMode === 'grid' ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <PropertySkeleton key={i} />
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <PropertyListItemSkeleton key={i} />
+                ))}
+              </div>
+            )
+          ) : viewMode === 'grid' ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {propiedadesEnVenta?.map((propiedad) => (
                 // @ts-expect-error ignore
@@ -478,7 +493,21 @@ export const Propiedades = () => {
             </Badge>
           </div>
 
-          {viewMode === 'grid' ? (
+          {isLoading ? (
+            viewMode === 'grid' ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <PropertySkeleton key={i} />
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <PropertyListItemSkeleton key={i} />
+                ))}
+              </div>
+            )
+          ) : viewMode === 'grid' ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {propiedadesVendidas?.map((propiedad) => (
                 // @ts-expect-error ignore

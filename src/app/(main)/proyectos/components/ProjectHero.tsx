@@ -40,9 +40,7 @@ export const ProjectHero = ({ project }: ProjectHeroProps) => {
 
   const address = project.address[0]
   const location = `${address?.streetName}, ${address?.city}, ${address?.state?.name}`
-  console.log('location', location)
-  console.log('project', project)
-  console.log('address', address)
+
   // Mock images for demonstration - in real app these would come from project.projectMedia
   const images =
     project.projectMedia && project.projectMedia.length > 0
