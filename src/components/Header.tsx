@@ -18,13 +18,13 @@ import { Button } from '@/components/Button'
 import { Container } from '@/components/Container'
 import { NavLinks } from '@/components/NavLinks'
 import LogoBrixar from './LogoBrixar'
-import { ChevronDown, LogOut, User, DollarSign, RefreshCw } from 'lucide-react'
+import { ChevronDown, LogOut, User, DollarSign, RefreshCw, Menu, ChevronUp } from 'lucide-react'
 import { useSession, signOut } from 'next-auth/react'
 import { useCurrency } from '@/context/CurrencyContext'
 import { useDollarRate } from '@/hooks/useDollarRate'
 import CurrencyFloatingBubble from './CurrencyFloatingBubble'
 
-interface IconProps extends React.SVGProps<SVGSVGElement> { }
+interface IconProps extends React.SVGProps<SVGSVGElement> {}
 
 const MenuIcon: React.FC<IconProps> = (props) => {
   return (
@@ -53,7 +53,7 @@ const ChevronUpIcon: React.FC<IconProps> = (props) => {
 }
 
 interface MobileNavLinkProps
-  extends React.ComponentPropsWithoutRef<typeof Link> { }
+  extends React.ComponentPropsWithoutRef<typeof Link> {}
 
 const MobileNavLink: React.FC<MobileNavLinkProps> = ({
   href,
@@ -132,8 +132,9 @@ const ProfileDropdown: React.FC<{
           {user.name}
         </span>
         <ChevronDown
-          className={`hidden sm:block h-4 w-4 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''
-            }`}
+          className={`hidden sm:block h-4 w-4 text-gray-400 transition-transform duration-200 ${
+            isOpen ? 'rotate-180' : ''
+          }`}
         />
       </div>
 
@@ -167,7 +168,7 @@ const ProfileDropdown: React.FC<{
 
 export const Header: React.FC = () => {
   const { data: session, status } = useSession()
-   const [isScrolled, setIsScrolled] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [dollarRate, setDollarRate] = useState(1250)
@@ -181,12 +182,12 @@ export const Header: React.FC = () => {
       setIsScrolled(scrollTop > 0)
     }
 
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   const handleLogout = () => {
-    console.log("Logout")
+    console.log('Logout')
   }
 
   return (
@@ -194,7 +195,11 @@ export const Header: React.FC = () => {
       <header
         className={`
           sticky top-0 z-50 transition-all duration-300 ease-in-out
-          ${isScrolled ? "bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-200" : "bg-transparent"}
+          ${
+            isScrolled
+              ? 'bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-200'
+              : 'bg-transparent'
+          }
         `}
       >
         <nav>
@@ -224,11 +229,15 @@ export const Header: React.FC = () => {
                     <PopoverButton
                       className={`
                         relative z-10 -m-2 inline-flex items-center rounded-lg p-2 transition-colors
-                        ${isScrolled ? "text-gray-900 hover:bg-gray-100" : "text-white hover:bg-white/20"}
+                        text-black bg-gray-200 hover:bg-gray-500
                       `}
                       aria-label="Toggle site navigation"
                     >
-                      {open ? <ChevronUpIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
+                      {open ? (
+                        <ChevronUp className="h-6 w-6 text-black" />
+                      ) : (
+                        <Menu className="h-6 w-6 text-black" />
+                      )}
                     </PopoverButton>
                     <AnimatePresence initial={false}>
                       {open && (
@@ -297,22 +306,28 @@ export const Header: React.FC = () => {
                               <div className="flex items-center justify-center bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg px-3 py-3 mb-4 shadow-sm">
                                 <DollarSign className="h-4 w-4 text-blue-600 mr-3 flex-shrink-0" />
                                 <div className="flex flex-col items-center">
-                                  <span className="text-xs text-blue-600 font-medium">Dólar</span>
+                                  <span className="text-xs text-blue-600 font-medium">
+                                    Dólar
+                                  </span>
                                   {isLoading ? (
                                     <div className="flex items-center gap-2">
                                       <RefreshCw className="h-3 w-3 animate-spin text-blue-600" />
-                                      <span className="text-sm text-blue-600">Actualizando...</span>
+                                      <span className="text-sm text-blue-600">
+                                        Actualizando...
+                                      </span>
                                     </div>
                                   ) : dollarRate ? (
                                     <span className="text-lg font-bold text-blue-700">
                                       $
-                                      {dollarRate.toLocaleString("es-AR", {
+                                      {dollarRate.toLocaleString('es-AR', {
                                         minimumFractionDigits: 0,
                                         maximumFractionDigits: 0,
                                       })}
                                     </span>
                                   ) : (
-                                    <span className="text-lg font-bold text-gray-500">N/A</span>
+                                    <span className="text-lg font-bold text-gray-500">
+                                      N/A
+                                    </span>
                                   )}
                                 </div>
                               </div>
@@ -320,7 +335,7 @@ export const Header: React.FC = () => {
 
                             {/* Botones de autenticación móvil */}
                             <div className="mt-4 flex flex-col gap-4 p-4">
-                              {status === "authenticated" ? (
+                              {status === 'authenticated' ? (
                                 <ProfileDropdown
                                   user={session.user}
                                   onClose={() => setDropdownOpen(false)}
@@ -359,10 +374,11 @@ export const Header: React.FC = () => {
                 <div
                   className={`
                   flex items-center rounded-lg px-3 py-2 min-w-[140px] shadow-sm transition-colors
-                  ${isScrolled
-                      ? "bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 text-black"
-                      : "bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 text-black"
-                    }
+                  ${
+                    isScrolled
+                      ? 'bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 text-black'
+                      : 'bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 text-black'
+                  }
                 `}
                 >
                   <div className="flex flex-col min-w-0">
@@ -370,29 +386,55 @@ export const Header: React.FC = () => {
                       {isLoading ? (
                         <div className="flex items-center gap-1">
                           <RefreshCw
-                            className={`h-3 w-3 animate-spin ${isScrolled ? "text-blue-600" : "text-black"}`}
+                            className={`h-3 w-3 animate-spin ${
+                              isScrolled ? 'text-blue-600' : 'text-black'
+                            }`}
                           />
-                          <span className={`text-xs ${isScrolled ? "text-blue-600" : "text-black"}`}>...</span>
+                          <span
+                            className={`text-xs ${
+                              isScrolled ? 'text-blue-600' : 'text-black'
+                            }`}
+                          >
+                            ...
+                          </span>
                         </div>
                       ) : dollarRate ? (
-                        <span className={`text-sm font-bold truncate ${isScrolled ? "text-blue-700" : "text-black"}`}>
-                          <span className={`text-xs font-medium ${isScrolled ? "text-blue-600" : "text-black"}`}>
-                            Dólar{" "}
+                        <span
+                          className={`text-sm font-bold truncate ${
+                            isScrolled ? 'text-blue-700' : 'text-black'
+                          }`}
+                        >
+                          <span
+                            className={`text-xs font-medium ${
+                              isScrolled ? 'text-blue-600' : 'text-black'
+                            }`}
+                          >
+                            Dólar{' '}
                           </span>
-                          ${dollarRate.toLocaleString("es-AR", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                          $
+                          {dollarRate.toLocaleString('es-AR', {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0,
+                          })}
                         </span>
                       ) : (
-                        <span className="text-sm font-bold text-gray-500">N/A</span>
+                        <span className="text-sm font-bold text-gray-500">
+                          N/A
+                        </span>
                       )}
                     </div>
                   </div>
                 </div>
 
                 {/* Separador visual */}
-                <div className={`h-8 w-px ${isScrolled ? "bg-gray-300" : "bg-gray-300"}`} />
+                <div
+                  className={`h-8 w-px ${
+                    isScrolled ? 'bg-gray-300' : 'bg-gray-300'
+                  }`}
+                />
 
                 {/* Botones de autenticación */}
-                {status === "authenticated" ? (
+                {status === 'authenticated' ? (
                   <ProfileDropdown
                     user={session.user}
                     onClose={() => setDropdownOpen(false)}
@@ -405,9 +447,10 @@ export const Header: React.FC = () => {
                       href="/login"
                       className={`
                         transition-colors
-                        ${isScrolled
-                          ? "bg-gray-800 text-white hover:bg-gray-900 active:bg-gray-800 active:text-white/80 shadow-sm"
-                          : "text-sm text-gray-600 border border-gray-300 hover:bg-gray-100 hover:border-gray-400 hover:bg-gray-900 hover:text-white justify-center shadow-sm"
+                        ${
+                          isScrolled
+                            ? 'bg-gray-800 text-white hover:bg-gray-900 active:bg-gray-800 active:text-white/80 shadow-sm'
+                            : 'text-sm text-gray-600 border border-gray-300 hover:bg-gray-100 hover:border-gray-400 hover:bg-gray-900 hover:text-white justify-center shadow-sm'
                         }
                       `}
                     >
