@@ -61,8 +61,8 @@ export default function PropertyCard({ property, visitDate }: { property: Proper
 
                     {/* Property Type */}
                     <div className="flex items-center gap-2 text-gray-600">
-                        {React.createElement(propertyTypeIcons[property.propertyType] || Home, { className: "h-4 w-4" })}
-                        <span className="text-sm">{formatPropertyType(property.propertyType)}</span>
+                        {React.createElement(propertyTypeIcons[property.propertyType as PropertyType] ?? Home, { className: "h-4 w-4" })}
+                        <span className="text-sm">{formatPropertyType(property.propertyType as PropertyType)}</span>
                     </div>
 
                     {/* Bathrooms */}
@@ -86,7 +86,7 @@ export default function PropertyCard({ property, visitDate }: { property: Proper
 
                 {/* Listing Type */}
                 <div className="mt-2 inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">
-                    {formatListingType(property.listingType)}
+                    {formatListingType(property.listingType as ListingType)}
                 </div>
             </div>
             <div className="p-4 border-t border-gray-200 flex justify-between items-center">

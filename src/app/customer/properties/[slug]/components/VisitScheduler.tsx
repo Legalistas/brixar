@@ -52,6 +52,7 @@ const VisitScheduler = ({ slug, propertyId }: VisitSchedulerProps) => {
 
   const { data: visits } = useQuery({
     queryKey: ['visits', propertyId],
+    // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
     queryFn: () => checkExistingVisit(propertyId, session?.user?.id!),
   });
 

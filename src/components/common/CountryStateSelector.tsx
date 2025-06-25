@@ -34,7 +34,7 @@ const countries: Country[] = [
   { id: 7, name: 'Perú', code: 'PE' },
   { id: 8, name: 'Brasil', code: 'BR' },
   { id: 9, name: 'Estados Unidos', code: 'US' },
-  { id: 10, name: 'Canadá', code: 'CA' }
+  { id: 10, name: 'Canadá', code: 'CA' },
 ]
 
 const states: State[] = [
@@ -63,7 +63,7 @@ const states: State[] = [
   { id: 22, countryId: 1, name: 'Santiago del Estero' },
   { id: 23, countryId: 1, name: 'Tierra del Fuego' },
   { id: 24, countryId: 1, name: 'Tucumán' },
-  
+
   // España - comunidades autónomas principales
   { id: 25, countryId: 2, name: 'Madrid' },
   { id: 26, countryId: 2, name: 'Cataluña' },
@@ -71,49 +71,49 @@ const states: State[] = [
   { id: 28, countryId: 2, name: 'Valencia' },
   { id: 29, countryId: 2, name: 'Galicia' },
   { id: 30, countryId: 2, name: 'País Vasco' },
-  
+
   // México - estados principales
   { id: 31, countryId: 3, name: 'Ciudad de México' },
   { id: 32, countryId: 3, name: 'Jalisco' },
   { id: 33, countryId: 3, name: 'Nuevo León' },
   { id: 34, countryId: 3, name: 'Puebla' },
   { id: 35, countryId: 3, name: 'Querétaro' },
-  
+
   // Colombia - departamentos principales
   { id: 36, countryId: 4, name: 'Bogotá' },
   { id: 37, countryId: 4, name: 'Antioquia' },
   { id: 38, countryId: 4, name: 'Valle del Cauca' },
-  
+
   // Chile - regiones principales
   { id: 39, countryId: 5, name: 'Región Metropolitana' },
   { id: 40, countryId: 5, name: 'Valparaíso' },
   { id: 41, countryId: 5, name: 'Biobío' },
-  
+
   // Uruguay - departamentos principales
   { id: 42, countryId: 6, name: 'Montevideo' },
   { id: 43, countryId: 6, name: 'Canelones' },
   { id: 44, countryId: 6, name: 'Maldonado' },
-  
+
   // Perú - departamentos principales
   { id: 45, countryId: 7, name: 'Lima' },
   { id: 46, countryId: 7, name: 'Arequipa' },
   { id: 47, countryId: 7, name: 'Cusco' },
-  
+
   // Brasil - estados principales
   { id: 48, countryId: 8, name: 'São Paulo' },
   { id: 49, countryId: 8, name: 'Rio de Janeiro' },
   { id: 50, countryId: 8, name: 'Minas Gerais' },
-  
+
   // Estados Unidos - estados principales
   { id: 51, countryId: 9, name: 'California' },
   { id: 52, countryId: 9, name: 'New York' },
   { id: 53, countryId: 9, name: 'Texas' },
   { id: 54, countryId: 9, name: 'Florida' },
-  
+
   // Canadá - provincias principales
   { id: 55, countryId: 10, name: 'Ontario' },
   { id: 56, countryId: 10, name: 'Quebec' },
-  { id: 57, countryId: 10, name: 'British Columbia' }
+  { id: 57, countryId: 10, name: 'British Columbia' },
 ]
 
 export default function CountryStateSelector({
@@ -122,7 +122,7 @@ export default function CountryStateSelector({
   onCountryChange,
   onStateChange,
   defaultCity,
-  onCityChange
+  onCityChange,
 }: CountryStateSelectorProps) {
   const [availableStates, setAvailableStates] = useState<State[]>([])
   const [city, setCity] = useState(defaultCity || '')
@@ -130,13 +130,18 @@ export default function CountryStateSelector({
   // Actualizar estados disponibles cuando cambia el país seleccionado
   useEffect(() => {
     if (selectedCountryId) {
-      const filteredStates = states.filter(state => state.countryId === selectedCountryId)
+      const filteredStates = states.filter(
+        (state) => state.countryId === selectedCountryId
+      )
       setAvailableStates(filteredStates)
-      
+
       // Si no hay un estado seleccionado o el estado seleccionado no pertenece al país actual,
       // seleccionamos el primer estado disponible o 0 si no hay estados
-      if (filteredStates.length > 0 && 
-          (!selectedStateId || !filteredStates.some(state => state.id === selectedStateId))) {
+      if (
+        filteredStates.length > 0 &&
+        (!selectedStateId ||
+          !filteredStates.some((state) => state.id === selectedStateId))
+      ) {
         onStateChange(filteredStates[0].id)
       } else if (filteredStates.length === 0 && selectedStateId) {
         onStateChange(0)
@@ -147,6 +152,7 @@ export default function CountryStateSelector({
         onStateChange(0)
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCountryId])
 
   // Manejar cambios en el campo de ciudad
@@ -164,6 +170,7 @@ export default function CountryStateSelector({
       setCity(defaultCity)
       onCityChange(defaultCity)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultCity])
 
   return (

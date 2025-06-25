@@ -19,15 +19,20 @@ interface PropertyContainerProps {
   separateByStatus?: boolean
 }
 
-const PropertyContainer = ({ filters = {} as Filters, separateByStatus = false }: PropertyContainerProps) => {  
+const PropertyContainer = ({
+  filters = {} as Filters,
+  separateByStatus = false,
+}: PropertyContainerProps) => {
   const [properties, setProperties] = useState<Property[]>([])
   const [filteredProperties, setFilteredProperties] = useState<Property[]>([])
   const [enVentaProperties, setEnVentaProperties] = useState<Property[]>([])
-  const [reservadasProperties, setReservadasProperties] = useState<Property[]>([])
+  const [reservadasProperties, setReservadasProperties] = useState<Property[]>(
+    []
+  )
   const [vendidasProperties, setVendidasProperties] = useState<Property[]>([])
   const [enVentaLimited, setEnVentaLimited] = useState<Property[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  
+
   useEffect(() => {
     const fetchProperties = async () => {
       setIsLoading(true)
@@ -79,7 +84,9 @@ const PropertyContainer = ({ filters = {} as Filters, separateByStatus = false }
 
     // Si no estamos separando por estado, filtramos solo las propiedades en venta
     if (!separateByStatus) {
-      const enVenta = filtered.filter(property => property.status === 'EN_VENTA')
+      const enVenta = filtered.filter(
+        (property) => property.status === 'EN_VENTA'
+      )
       // Ordenamos por ID en orden descendente para obtener las más recientes primero (asumiendo que el ID aumenta con cada nueva propiedad)
       const sortedProperties = [...enVenta].sort((a, b) => b.id - a.id)
       setFilteredProperties(sortedProperties)
@@ -91,10 +98,17 @@ const PropertyContainer = ({ filters = {} as Filters, separateByStatus = false }
 
     // Si separateByStatus está activado, separamos las propiedades por estado
     if (separateByStatus) {
-      setEnVentaProperties(filtered.filter(property => property.status === 'EN_VENTA'))
-      setReservadasProperties(filtered.filter(property => property.status === 'RESERVADA'))
-      setVendidasProperties(filtered.filter(property => property.status === 'VENDIDA'))
+      setEnVentaProperties(
+        filtered.filter((property) => property.status === 'EN_VENTA')
+      )
+      setReservadasProperties(
+        filtered.filter((property) => property.status === 'RESERVADA')
+      )
+      setVendidasProperties(
+        filtered.filter((property) => property.status === 'VENDIDA')
+      )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [properties])
 
   // Crear array de esqueletos
@@ -135,7 +149,9 @@ const PropertyContainer = ({ filters = {} as Filters, separateByStatus = false }
           {/* Propiedades reservadas */}
           {!isLoading && reservadasProperties.length > 0 && (
             <>
-              <h2 className="text-2xl font-bold mb-6 mt-8">Propiedades reservadas</h2>
+              <h2 className="text-2xl font-bold mb-6 mt-8">
+                Propiedades reservadas
+              </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mb-10">
                 {reservadasProperties.map((property) => (
                   <PropertyCard
@@ -151,7 +167,9 @@ const PropertyContainer = ({ filters = {} as Filters, separateByStatus = false }
           {/* Propiedades vendidas */}
           {!isLoading && vendidasProperties.length > 0 && (
             <>
-              <h2 className="text-2xl font-bold mb-6 mt-8">Propiedades vendidas</h2>
+              <h2 className="text-2xl font-bold mb-6 mt-8">
+                Propiedades vendidas
+              </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
                 {vendidasProperties.map((property) => (
                   <PropertyCard
@@ -192,10 +210,10 @@ const PropertyContainer = ({ filters = {} as Filters, separateByStatus = false }
               </>
             )}
           </div>
-          
+
           {!isLoading && filteredProperties.length > 8 && (
             <div className="flex justify-center mt-10">
-              <Link 
+              <Link
                 href="/propiedades"
                 className="px-6 py-3 bg-[#FB6107] hover:bg-[#FB6107]/90 text-white font-medium rounded-md transition-colors"
               >

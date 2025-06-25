@@ -73,7 +73,7 @@ export default function AdminInquiryDetailPage({
     return () => {
       useInquiryStore.getState().resetState()
     }
-  }, [inquiryId])
+  }, [inquiryId, fetchInquiryById, fetchInquiryMessages])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })

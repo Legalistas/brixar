@@ -23,13 +23,12 @@ export const useDollarRate = () => {
   const updateDollarRate = async () => {
     try {
       setIsLoading(true)
-      
+
       // Primero actualizar desde la API externa
       await updateDollarFromAPI()
-      
+
       // Luego obtener el valor actualizado
       await fetchDollarRate()
-      
     } catch (error) {
       console.error('Error updating dollar rate:', error)
       setIsLoading(false)
@@ -59,6 +58,7 @@ export const useDollarRate = () => {
     }, 30 * 60 * 1000) // 30 minutos
 
     return () => clearInterval(interval)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return {
@@ -66,6 +66,6 @@ export const useDollarRate = () => {
     isLoading,
     lastUpdated,
     updateDollarRate,
-    refreshRate: fetchDollarRate
+    refreshRate: fetchDollarRate,
   }
 }

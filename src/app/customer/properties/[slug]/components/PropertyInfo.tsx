@@ -26,7 +26,7 @@ export default function PropertyInfo({ property }: { property: Property }) {
                 </div>
                 <div className="flex items-center gap-2">
                     <Home className="h-5 w-5 text-gray-500" />
-                    <span>{formatPropertyType(property.propertyType)}</span>
+                    <span>{formatPropertyType(property.propertyType as PropertyType)}</span>
                 </div>
                 <div className="flex items-center gap-2">
                     <Bath className="h-5 w-5 text-gray-500" />
@@ -50,7 +50,7 @@ export default function PropertyInfo({ property }: { property: Property }) {
             </div>
             <div className="mt-4">
                 <span className="inline-block bg-blue-100 text-blue-800 text-sm font-semibold px-2.5 py-0.5 rounded">
-                    {formatListingType(property.listingType)}
+                    {formatListingType(property.listingType as ListingType)}
                 </span>
             </div>
         </div>
