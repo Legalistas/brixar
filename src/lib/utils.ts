@@ -1,11 +1,12 @@
 'use client'
-import { type ClassValue, clsx } from "clsx"
+import { type ClassValue } from "class-variance-authority/types"
+import clsx from "clsx"
 import { twMerge } from "tailwind-merge"
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactNode, useRef } from 'react'
  
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+export function cn(...inputs: any[]) {
+  return twMerge(clsx(...inputs))
 }
 
 /**
