@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { prisma } from '@/libs/prisma'
-import { authOptions } from '@/auth'
+import { NextResponse } from "next/server"
+import { prisma } from "@/libs/prisma"
+import { authOptions } from "@/auth"
+import { getServerSession } from "next-auth"
 
 // GET consultas del usuario actual
-export async function GET(req: NextRequest) {
+export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions)
     
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     }
 
     const inquiries = await prisma.inquiry.findMany({
-      where: { userId: parseInt(session.user.id) },
+      where: { userId: parseInt(session?.user.id) },
       include: {
         property: {
           select: {

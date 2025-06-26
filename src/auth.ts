@@ -2,8 +2,7 @@ import { NextAuthOptions } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { PrismaAdapter } from '@auth/prisma-adapter'
-import bcrypt from 'bcrypt'
-import { getSession } from 'next-auth/react'
+import { compare } from 'bcryptjs'
 import { prisma } from '@/libs/prisma'
 
 declare module 'next-auth' {
@@ -44,10 +43,10 @@ export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: process.env.GOOGLE_CLIENT_ID ?? '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? '',
       allowDangerousEmailAccountLinking: true,
-    }),
+    }) as any,
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
@@ -72,7 +71,7 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        const isPasswordValid = await bcrypt.compare(
+        const isPasswordValid = await compare(
           credentials.password,
           user.password
         )
