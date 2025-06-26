@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/auth'
 import { prisma } from '@/libs/prisma'
 
+export const dynamic = 'force-dynamic';
+
 // Obtener ventas del usuario
 export async function GET() {
   try {

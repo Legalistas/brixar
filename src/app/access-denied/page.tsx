@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ShieldAlert, ArrowLeft } from "lucide-react";
@@ -14,15 +16,19 @@ export default function AccessDenied() {
           Lo sentimos, no tienes permiso para acceder a esta página.
         </p>
         <div className="space-x-4">
-          <Link href="/" passHref>
-            <Button variant="default" className="inline-flex items-center">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Volver
+          <Link href="/">
+            <Button asChild>
+              <span className="inline-flex items-center">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Volver
+              </span>
             </Button>
           </Link>
-          <Link href="/login" passHref>
-            <Button variant="outline" className="inline-flex items-center">
-              Iniciar sesión
+          <Link href="/login">
+            <Button variant="outline" asChild>
+              <span className="inline-flex items-center">
+                Iniciar sesión
+              </span>
             </Button>
           </Link>
         </div>
