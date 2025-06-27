@@ -37,6 +37,14 @@ export const API_ENDPOINTS = {
   PROYECT_EDIT: (slug: string) => `${API_BASE_URL}/proyects/${slug}`,
   PROYECT_DELETE: (slug: string) => `${API_BASE_URL}/proyects/${slug}`,
 
+  // Unidades de un proyecto (ProjectUnit)
+  PROYECT_UNITS_INDEX: (slug: string) => `${API_BASE_URL}/projects/${slug}/unit`,
+  PROYECT_UNITS_CREATE: (slug: string) => `${API_BASE_URL}/projects/${slug}/unit`,
+  PROYECT_UNITS_UPDATE: (slug: string, id: number) =>
+    `${API_BASE_URL}/projects/${slug}/unit/${id}`,
+  PROYECT_UNITS_DELETE: (slug: string, id: number) =>
+    `${API_BASE_URL}/projects/${slug}/unit/${id}`,
+
   SCHEDULE_VISIT: `${API_BASE_URL}/visits/schedule`,
   VISITS_INDEX: `${API_BASE_URL}/visits/user`,
   CHECK_EXISTING_VISIT: (propertyId: number, userId: string) =>

@@ -13,7 +13,6 @@ const Properties = () => {
     queryKey: ['propiedades'],
     queryFn: () => getAllProperties(),
   })
-  console.log('propiedades', propiedades)
 
   const availableProperties = propiedades?.filter(p => p.status === 'EN_VENTA');
   const soldProperties = propiedades?.filter(p => p.status === 'VENDIDA');

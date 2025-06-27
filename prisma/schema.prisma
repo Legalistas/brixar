@@ -146,7 +146,20 @@ model Proyect {
   priority       Int?
   daysToStart    Int?
   createdAt      DateTime             @default(now())
-  updatedAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  estimatedDeadline DateTime?         @map("estimated_deadline")
+  startDate        DateTime?          @map("start_date")
+  endDate          DateTime?          @map("end_date")
+  annualReturn     Float?             @map("annual_return")
+  totalReturn      Float?             @map("total_return")
+  fundingGoal      Decimal?           @map("funding_goal")
+  fundedAmount     Decimal?           @default(0) @map("funded_amount")
+  type             String?            // préstamo / equity
+  propertyType     String?            @map("property_type") // residencial, comercial
+  promotorName     String?            @map("promotor_name")
+  regulationCompliance String?        @map("regulation_compliance")
+  riskWarning      String?            @map("risk_warning")
+  visible          Boolean            @default(true)
   address        Address[]
   // Relación opcional con User
   promotor       User?                @relation(fields: [promotorId], references: [id], onDelete: Cascade)
@@ -155,7 +168,34 @@ model Proyect {
   costs          ProyectCost[]        // Relación con los costos del proyecto
   compensations  ProyectCompensation[] // Relación con las compensaciones entre inversores
 
+  projectUnits   ProjectUnit[]      @relation("ProjectToUnits")
+
   @@map("proyects")
+}
+
+model ProjectUnit {
+  id               Int       @id @default(autoincrement())
+  proyectId        Int
+  proyect          Proyect   @relation("ProjectToUnits", fields: [proyectId], references: [id], onDelete: Cascade)
+
+  sku              String    @unique
+  surface          Float
+  priceUsd         Decimal   @map("price_usd")
+  floor            Int?
+  rooms            Int?
+  bathrooms        Int?
+  parking          Boolean   @default(false)
+  status           String?
+  type             String?   // departamento, casa, etc.
+  description      String?
+  features         Json?
+  unitNumber       String?   @map("unit_number")
+  availabilityDate DateTime? @map("availability_date")
+  isPublished      Boolean   @default(true) @map("is_published")
+
+  createdAt        DateTime  @default(now()) @map("created_at")
+
+  @@map("proyect_units")
 }
 
 model ProyectDetails {

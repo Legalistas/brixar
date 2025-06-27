@@ -4,14 +4,12 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/auth'
 
 export async function GET(
-  request: Request,
+  _: Request,
   { params }: { params: { slug: string } }
 ) {
   try {
     const project = await prisma.proyect.findUnique({
-      where: {
-        slug: params.slug,
-      },
+      where: { slug: params.slug },
       include: {
         address: {
           include: {
@@ -24,23 +22,18 @@ export async function GET(
         proyectDetails: true,
         proyectFound: true,
         promotor: true,
+        projectUnits: true,
       },
     })
 
     if (!project) {
-      return NextResponse.json(
-        { error: 'Proyecto no encontrado' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Proyecto no encontrado' }, { status: 404 })
     }
 
     return NextResponse.json(project)
   } catch (error) {
     console.error('Error fetching project:', error)
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }
 
@@ -49,18 +42,12 @@ export async function PUT(
   { params }: { params: { slug: string } }
 ) {
   try {
-    // Verificar autenticación y rol de administrador
     const session = await getServerSession(authOptions)
     if (!session || session.user.role !== 'ADMIN') {
-      return NextResponse.json(
-        { error: 'No autorizado. Se requiere rol de administrador' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
 
     const data = await request.json()
-    
-    // Verificar si el proyecto existe
     const existingProyect = await prisma.proyect.findUnique({
       where: { slug: params.slug },
       include: {
@@ -68,22 +55,18 @@ export async function PUT(
         projectMedia: true,
         proyectDetails: true,
         proyectFound: true,
-      }
+      },
     })
-    
+
     if (!existingProyect) {
-      return NextResponse.json(
-        { error: 'Proyecto no encontrado' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Proyecto no encontrado' }, { status: 404 })
     }
 
-    // Actualizar la información básica del proyecto
     const updatedProyect = await prisma.proyect.update({
       where: { slug: params.slug },
       data: {
         title: data.title,
-        slug: data.slug, // Permitir actualizar el slug
+        slug: data.slug,
         openingLine: data.openingLine,
         description: data.description,
         promotorId: data.promotorId,
@@ -96,28 +79,28 @@ export async function PUT(
         daysToEnd: data.daysToEnd,
         daysToStart: data.daysToStart,
         priority: data.priority,
-      },
-      include: {
-        address: {
-          include: {
-            state: true,
-            country: true,
-            positions: true,
-          },
-        },
-        projectMedia: true,
-        proyectDetails: true,
-        proyectFound: true,
-        promotor: true,
+        estimatedDeadline: data.estimatedDeadline ? new Date(data.estimatedDeadline) : null,
+        startDate: data.startDate ? new Date(data.startDate) : null,
+        endDate: data.endDate ? new Date(data.endDate) : null,
+        annualReturn: data.annualReturn,
+        totalReturn: data.totalReturn,
+        fundingGoal: data.fundingGoal,
+        fundedAmount: data.fundedAmount,
+        type: data.type,
+        propertyType: data.propertyType,
+        promotorName: data.promotorName,
+        regulationCompliance: data.regulationCompliance,
+        riskWarning: data.riskWarning,
+        visible: data.visible ?? true,
       },
     })
 
-    // Si hay datos de dirección para actualizar
+    // DIRECCIÓN
     if (data.address) {
-      // Si el proyecto ya tiene una dirección, actualizarla
-      if (existingProyect.address && existingProyect.address.length > 0) {
+      const currentAddress = existingProyect.address?.[0]
+      if (currentAddress) {
         await prisma.address.update({
-          where: { id: existingProyect.address[0].id },
+          where: { id: currentAddress.id },
           data: {
             city: data.address.city,
             postalCode: data.address.postalCode,
@@ -125,29 +108,20 @@ export async function PUT(
             description: data.address.description,
             countryId: data.address.countryId,
             stateId: data.address.stateId,
-          }
+          },
         })
 
-        // Gestionar posiciones si existen
         if (data.address.positions) {
-          // Eliminar posiciones existentes
-          await prisma.positions.deleteMany({
-            where: { addressId: existingProyect.address[0].id }
+          await prisma.positions.deleteMany({ where: { addressId: currentAddress.id } })
+          await prisma.positions.createMany({
+            data: data.address.positions.map((pos: any) => ({
+              addressId: currentAddress.id,
+              latitude: pos.latitude,
+              longitude: pos.longitude,
+            })),
           })
-
-          // Crear nuevas posiciones
-          for (const position of data.address.positions) {
-            await prisma.positions.create({
-              data: {
-                addressId: existingProyect.address[0].id,
-                longitude: position.longitude,
-                latitude: position.latitude,
-              }
-            })
-          }
         }
       } else {
-        // Si no tiene dirección, crear una nueva
         await prisma.address.create({
           data: {
             proyectId: existingProyect.id,
@@ -158,21 +132,16 @@ export async function PUT(
             countryId: data.address.countryId,
             stateId: data.address.stateId,
             positions: data.address.positions ? {
-              create: data.address.positions
-            } : undefined
-          }
+              create: data.address.positions,
+            } : undefined,
+          },
         })
       }
     }
 
-    // Actualizar medios del proyecto si se proporcionan
+    // MEDIA
     if (data.projectMedia) {
-      // Eliminar medios existentes
-      await prisma.proyectMedia.deleteMany({
-        where: { proyectId: existingProyect.id }
-      })
-
-      // Crear nuevos medios
+      await prisma.proyectMedia.deleteMany({ where: { proyectId: existingProyect.id } })
       for (const media of data.projectMedia) {
         await prisma.proyectMedia.create({
           data: {
@@ -181,92 +150,57 @@ export async function PUT(
             type: media.type,
             title: media.title,
             description: media.description,
-          }
+          },
         })
       }
     }
 
-    // Actualizar detalles del proyecto si se proporcionan
+    // DETALLES
     if (data.proyectDetails) {
       if (existingProyect.proyectDetails) {
         await prisma.proyectDetails.update({
           where: { proyectId: existingProyect.id },
-          data: {
-            type: data.proyectDetails.type,
-            investmentPeriod: data.proyectDetails.investmentPeriod,
-            surface: data.proyectDetails.surface,
-            rooms: data.proyectDetails.rooms,
-            floors: data.proyectDetails.floors,
-            features: data.proyectDetails.features,
-            buildingYear: data.proyectDetails.buildingYear,
-            riskScore: data.proyectDetails.riskScore,
-            profitabilityScore: data.proyectDetails.profitabilityScore,
-          }
+          data: data.proyectDetails,
         })
       } else {
         await prisma.proyectDetails.create({
-          data: {
-            proyectId: existingProyect.id,
-            type: data.proyectDetails.type,
-            investmentPeriod: data.proyectDetails.investmentPeriod,
-            surface: data.proyectDetails.surface,
-            rooms: data.proyectDetails.rooms,
-            floors: data.proyectDetails.floors,
-            features: data.proyectDetails.features,
-            buildingYear: data.proyectDetails.buildingYear,
-            riskScore: data.proyectDetails.riskScore,
-            profitabilityScore: data.proyectDetails.profitabilityScore,
-          }
+          data: { proyectId: existingProyect.id, ...data.proyectDetails },
         })
       }
     }
 
-    // Actualizar información de financiación si se proporciona
+    // FOUND
     if (data.proyectFound) {
+      const pf = data.proyectFound
+      const fields = {
+        startInvestDate: pf.startInvestDate ? new Date(pf.startInvestDate) : null,
+        endInvestDate: pf.endInvestDate ? new Date(pf.endInvestDate) : null,
+        startPreFundingDate: pf.startPreFundingDate ? new Date(pf.startPreFundingDate) : null,
+        endPreFundingDate: pf.endPreFundingDate ? new Date(pf.endPreFundingDate) : null,
+        companyCapital: pf.companyCapital,
+        quantityFunded: pf.quantityFunded,
+        quantityToFund: pf.quantityToFund,
+        maxOverfunding: pf.maxOverfunding,
+        investors: pf.investors,
+        fields: pf.fields,
+        rentProfitability: pf.rentProfitability,
+        totalNetProfitability: pf.totalNetProfitability,
+        totalNetProfitabilityToShow: pf.totalNetProfitabilityToShow,
+        apreciationProfitability: pf.apreciationProfitability,
+      }
+
       if (existingProyect.proyectFound) {
         await prisma.proyectFound.update({
           where: { proyectId: existingProyect.id },
-          data: {
-            startInvestDate: data.proyectFound.startInvestDate ? new Date(data.proyectFound.startInvestDate) : null,
-            endInvestDate: data.proyectFound.endInvestDate ? new Date(data.proyectFound.endInvestDate) : null,
-            startPreFundingDate: data.proyectFound.startPreFundingDate ? new Date(data.proyectFound.startPreFundingDate) : null,
-            endPreFundingDate: data.proyectFound.endPreFundingDate ? new Date(data.proyectFound.endPreFundingDate) : null,
-            companyCapital: data.proyectFound.companyCapital,
-            quantityFunded: data.proyectFound.quantityFunded,
-            quantityToFund: data.proyectFound.quantityToFund,
-            maxOverfunding: data.proyectFound.maxOverfunding,
-            investors: data.proyectFound.investors,
-            fields: data.proyectFound.fields,
-            rentProfitability: data.proyectFound.rentProfitability,
-            totalNetProfitability: data.proyectFound.totalNetProfitability,
-            totalNetProfitabilityToShow: data.proyectFound.totalNetProfitabilityToShow,
-            apreciationProfitability: data.proyectFound.apreciationProfitability,
-          }
+          data: fields,
         })
       } else {
         await prisma.proyectFound.create({
-          data: {
-            proyectId: existingProyect.id,
-            startInvestDate: data.proyectFound.startInvestDate ? new Date(data.proyectFound.startInvestDate) : null,
-            endInvestDate: data.proyectFound.endInvestDate ? new Date(data.proyectFound.endInvestDate) : null,
-            startPreFundingDate: data.proyectFound.startPreFundingDate ? new Date(data.proyectFound.startPreFundingDate) : null,
-            endPreFundingDate: data.proyectFound.endPreFundingDate ? new Date(data.proyectFound.endPreFundingDate) : null,
-            companyCapital: data.proyectFound.companyCapital,
-            quantityFunded: data.proyectFound.quantityFunded,
-            quantityToFund: data.proyectFound.quantityToFund,
-            maxOverfunding: data.proyectFound.maxOverfunding,
-            investors: data.proyectFound.investors,
-            fields: data.proyectFound.fields,
-            rentProfitability: data.proyectFound.rentProfitability,
-            totalNetProfitability: data.proyectFound.totalNetProfitability,
-            totalNetProfitabilityToShow: data.proyectFound.totalNetProfitabilityToShow,
-            apreciationProfitability: data.proyectFound.apreciationProfitability,
-          }
+          data: { proyectId: existingProyect.id, ...fields },
         })
       }
     }
 
-    // Cargar el proyecto actualizado con todas las relaciones para devolverlo
     const finalProyect = await prisma.proyect.findUnique({
       where: { slug: data.slug || params.slug },
       include: {
@@ -281,7 +215,8 @@ export async function PUT(
         proyectDetails: true,
         proyectFound: true,
         promotor: true,
-      }
+        projectUnits: true,
+      },
     })
 
     return NextResponse.json(finalProyect)
@@ -299,31 +234,20 @@ export async function DELETE(
   { params }: { params: { slug: string } }
 ) {
   try {
-    // Verificar autenticación y rol de administrador
     const session = await getServerSession(authOptions)
     if (!session || session.user.role !== 'ADMIN') {
-      return NextResponse.json(
-        { error: 'No autorizado. Se requiere rol de administrador' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
 
-    // Verificar si el proyecto existe
     const existingProyect = await prisma.proyect.findUnique({
-      where: { slug: params.slug }
+      where: { slug: params.slug },
     })
-    
+
     if (!existingProyect) {
-      return NextResponse.json(
-        { error: 'Proyecto no encontrado' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Proyecto no encontrado' }, { status: 404 })
     }
 
-    // Eliminar el proyecto (las relaciones se eliminarán en cascada según el esquema)
-    await prisma.proyect.delete({
-      where: { slug: params.slug }
-    })
+    await prisma.proyect.delete({ where: { slug: params.slug } })
 
     return NextResponse.json({ success: true, message: 'Proyecto eliminado correctamente' })
   } catch (error) {

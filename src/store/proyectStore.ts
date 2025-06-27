@@ -94,6 +94,26 @@ export interface Proyect {
   }
 }
 
+export interface ProjectUnit {
+  id: number
+  projectId: number
+  sku: string
+  surface: number
+  priceUsd: number
+  floor?: number
+  rooms?: number
+  bathrooms?: number
+  parking: boolean
+  status?: string
+  type?: string
+  description?: string
+  features?: any
+  unitNumber?: string
+  availabilityDate?: string
+  isPublished: boolean
+  createdAt: string
+}
+
 // Interfaz para crear un nuevo proyecto
 export interface CreateProyectInput {
   title: string
@@ -163,6 +183,7 @@ interface ProyectStore {
   currentProyect: Proyect | null
   isLoading: boolean
   error: string | null
+  projectUnits: ProjectUnit[]
   
   // Métodos para gestionar proyectos
   fetchProyects: () => Promise<void>
@@ -170,6 +191,12 @@ interface ProyectStore {
   createProyect: (proyectData: CreateProyectInput) => Promise<boolean>
   updateProyect: (slug: string, proyectData: Partial<CreateProyectInput>) => Promise<boolean>
   deleteProyect: (slug: string) => Promise<boolean>
+  
+  fetchProjectUnits: (slug: string) => Promise<void>
+  createProjectUnit: (slug: string, unitData: any) => Promise<boolean>
+  updateProjectUnit: (slug: string, unitId: number, unitData: any) => Promise<boolean>
+  deleteProjectUnit: (slug: string, unitId: number) => Promise<boolean>
+
   resetState: () => void
 }
 
@@ -178,6 +205,7 @@ export const useProyectStore = create<ProyectStore>((set, get) => ({
   currentProyect: null,
   isLoading: false,
   error: null,
+  projectUnits: [],
 
   fetchProyects: async () => {
     try {
@@ -216,7 +244,6 @@ export const useProyectStore = create<ProyectStore>((set, get) => ({
       })
     }
   },
-
   createProyect: async (proyectData: CreateProyectInput) => {
     try {
       set({ isLoading: true, error: null })
@@ -307,6 +334,88 @@ export const useProyectStore = create<ProyectStore>((set, get) => ({
       set({ 
         error: error instanceof Error ? error.message : 'Error desconocido', 
         isLoading: false 
+      })
+      return false
+    }
+  },
+  fetchProjectUnits: async (slug: string) => {
+    try {
+      set({ isLoading: true, error: null })
+      const res = await fetch(API_ENDPOINTS.PROYECT_UNITS_INDEX(slug))
+      if (!res.ok) throw new Error('Error al obtener unidades')
+      const data = await res.json()
+      set({ projectUnits: data, isLoading: false })
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Error desconocido',
+        isLoading: false,
+      })
+    }
+  },
+  createProjectUnit: async (slug: string, unitData: any) => {
+    try {
+      set({ isLoading: true, error: null })
+      const res = await fetch(API_ENDPOINTS.PROYECT_UNITS_CREATE(slug), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(unitData),
+      })
+      if (!res.ok) throw new Error('Error al crear unidad')
+      const newUnit = await res.json()
+      set((state) => ({
+        projectUnits: [...state.projectUnits, newUnit],
+        isLoading: false,
+      }))
+      return true
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Error desconocido',
+        isLoading: false,
+      })
+      return false
+    }
+  },
+  updateProjectUnit: async (slug: string, unitId: number, unitData: any) => {
+    try {
+      set({ isLoading: true, error: null })
+      const res = await fetch(API_ENDPOINTS.PROYECT_UNITS_UPDATE(slug, unitId), {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(unitData),
+      })
+      if (!res.ok) throw new Error('Error al actualizar unidad')
+      const updatedUnit = await res.json()
+      set((state) => ({
+        projectUnits: state.projectUnits.map((u) =>
+          u.id === unitId ? updatedUnit : u
+        ),
+        isLoading: false,
+      }))
+      return true
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Error desconocido',
+        isLoading: false,
+      })
+      return false
+    }
+  },
+  deleteProjectUnit: async (slug: string, unitId: number) => {
+    try {
+      set({ isLoading: true, error: null })
+      const res = await fetch(API_ENDPOINTS.PROYECT_UNITS_DELETE(slug, unitId), {
+        method: 'DELETE',
+      })
+      if (!res.ok) throw new Error('Error al eliminar unidad')
+      set((state) => ({
+        projectUnits: state.projectUnits.filter((u) => u.id !== unitId),
+        isLoading: false,
+      }))
+      return true
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Error desconocido',
+        isLoading: false,
       })
       return false
     }

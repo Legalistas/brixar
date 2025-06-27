@@ -18,55 +18,37 @@ export async function GET() {
         proyectDetails: true,
         proyectFound: true,
         promotor: true,
+        projectUnits: true,
       },
     })
     return NextResponse.json(proyects)
   } catch (error) {
     console.error('Error fetching proyects:', error)
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }
 
 export async function POST(request: Request) {
   try {
-    // Verificar autenticación y rol de administrador
     const session = await getServerSession(authOptions)
     if (!session || session.user.role !== 'ADMIN') {
-      return NextResponse.json(
-        { error: 'No autorizado. Se requiere rol de administrador' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
 
     const data = await request.json()
-    
-    // Preprocesar datos de la dirección para asegurarse que countryId y stateId sean valores válidos
-    let addressData = undefined
-    if (data.address) {
-      addressData = {
-        create: {
-          city: data.address.city,
-          postalCode: data.address.postalCode,
-          streetName: data.address.streetName,
-          description: data.address.description,
-          // Solo incluir estos campos si tienen valores válidos (números enteros)
-          ...(data.address.countryId && Number.isInteger(parseInt(data.address.countryId)) 
-              ? { countryId: parseInt(data.address.countryId) } 
-              : {}),
-          ...(data.address.stateId && Number.isInteger(parseInt(data.address.stateId)) 
-              ? { stateId: parseInt(data.address.stateId) } 
-              : {}),
-          positions: data.address.positions ? {
-            create: data.address.positions
-          } : undefined
-        }
+
+    const addressData = data.address ? {
+      create: {
+        city: data.address.city,
+        postalCode: data.address.postalCode,
+        streetName: data.address.streetName,
+        description: data.address.description,
+        ...(data.address.countryId ? { countryId: parseInt(data.address.countryId) } : {}),
+        ...(data.address.stateId ? { stateId: parseInt(data.address.stateId) } : {}),
+        positions: data.address.positions ? { create: data.address.positions } : undefined
       }
-    }
-    
-    // Crear el proyecto con datos relacionados
+    } : undefined
+
     const newProyect = await prisma.proyect.create({
       data: {
         slug: data.slug,
@@ -83,16 +65,26 @@ export async function POST(request: Request) {
         daysToEnd: data.daysToEnd,
         daysToStart: data.daysToStart,
         priority: data.priority,
-        
-        // Usar los datos de dirección preprocesados
+        estimatedDeadline: data.estimatedDeadline ? new Date(data.estimatedDeadline) : null,
+        startDate: data.startDate ? new Date(data.startDate) : null,
+        endDate: data.endDate ? new Date(data.endDate) : null,
+        annualReturn: data.annualReturn,
+        totalReturn: data.totalReturn,
+        fundingGoal: data.fundingGoal,
+        fundedAmount: data.fundedAmount,
+        type: data.type,
+        propertyType: data.propertyType,
+        promotorName: data.promotorName,
+        regulationCompliance: data.regulationCompliance,
+        riskWarning: data.riskWarning,
+        visible: data.visible ?? true,
+
         address: addressData,
-        
-        // Crear medios del proyecto si se proporciona
+
         projectMedia: data.projectMedia ? {
           create: data.projectMedia
         } : undefined,
-        
-        // Crear detalles del proyecto si se proporciona
+
         proyectDetails: data.proyectDetails ? {
           create: {
             type: data.proyectDetails.type,
@@ -106,8 +98,7 @@ export async function POST(request: Request) {
             profitabilityScore: data.proyectDetails.profitabilityScore,
           }
         } : undefined,
-        
-        // Crear información de financiación si se proporciona
+
         proyectFound: data.proyectFound ? {
           create: {
             startInvestDate: data.proyectFound.startInvestDate ? new Date(data.proyectFound.startInvestDate) : null,
@@ -126,6 +117,10 @@ export async function POST(request: Request) {
             apreciationProfitability: data.proyectFound.apreciationProfitability,
           }
         } : undefined,
+
+        projectUnits: data.projectUnits ? {
+          create: data.projectUnits
+        } : undefined,
       },
       include: {
         address: {
@@ -139,6 +134,7 @@ export async function POST(request: Request) {
         proyectDetails: true,
         proyectFound: true,
         promotor: true,
+        projectUnits: true,
       },
     })
 
