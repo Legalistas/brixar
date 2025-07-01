@@ -1,15 +1,16 @@
 import { create } from 'zustand'
 import { API_ENDPOINTS } from '@/constants/api-endpoint'
+import { ProjectMedia, ProjectPhase, ProjectType, Promotor } from '@/types/proyect'
 
 // Interfaces para las entidades relacionadas
-interface ProyectMedia {
-  id: number
-  proyectId: number
-  link: string
-  type: string
-  title: string
-  description?: string
-}
+// interface ProyectMedia {
+//   id: number
+//   proyectId: number
+//   link: string
+//   type: string
+//   title: string
+//   description?: string
+// }
 
 interface Address {
   id: number
@@ -36,7 +37,7 @@ interface Position {
 interface ProyectDetails {
   id: number
   proyectId: number
-  type?: string
+  type?: ProjectType
   investmentPeriod?: number
   surface?: number
   rooms?: number
@@ -72,8 +73,8 @@ export interface Proyect {
   description?: string
   promotorId?: number
   openingPhase?: number
-  phase: 'IN_STUDY' | 'FUNDING' | 'CONSTRUCTION' | 'COMPLETED'
-  businessModel: 'SOLD' | 'RENT' | 'LEADING'
+  phase: ProjectPhase
+  businessModel: string
   fundedDate?: string
   details?: any
   timeline?: any
@@ -83,19 +84,15 @@ export interface Proyect {
   createdAt: string
   updatedAt: string
   address?: Address[]
-  projectMedia?: ProyectMedia[]
+  projectMedia?: ProjectMedia[]
   proyectDetails?: ProyectDetails
   proyectFound?: ProyectFound
-  // Podemos añadir más relaciones si es necesario
-  promotor?: {
-    id: number
-    name: string
-    email: string
-  }
+  projectUnits: ProjectUnit[]
+  promotor?: Promotor
 }
 
 export interface ProjectUnit {
-  id: number
+  id?: number
   projectId: number
   sku: string
   surface: number
@@ -120,61 +117,19 @@ export interface CreateProyectInput {
   slug: string
   openingLine?: string
   description?: string
-  phase: 'IN_STUDY' | 'FUNDING' | 'CONSTRUCTION' | 'COMPLETED'
-  businessModel: 'SOLD' | 'RENT' | 'TRUST' | 'POZO'
+  phase: ProjectPhase
+  businessModel: string
   openingPhase?: number
   priority?: number
   daysToEnd?: number
   daysToStart?: number
   details?: any
   timeline?: any
-  address?: {
-    id?: number
-    city?: string
-    postalCode?: string
-    streetName?: string
-    description?: string
-    countryId?: number | null
-    stateId?: number | null
-    positions?: {
-      id?: number
-      latitude?: string
-      longitude?: string
-    }[]
-  }
-  projectMedia?: {
-    id?: number
-    link: string
-    type: string
-    title: string
-    description?: string
-  }[]
-  proyectDetails?: {
-    id?: number
-    type?: string
-    investmentPeriod?: number
-    surface?: number
-    rooms?: number
-    floors?: number
-    features?: any
-    buildingYear?: number | null
-    riskScore?: number
-    profitabilityScore?: number
-  }
-  proyectFound?: {
-    id?: number
-    startInvestDate?: string
-    endInvestDate?: string
-    companyCapital?: number
-    quantityFunded?: number
-    quantityToFund?: number
-    maxOverfunding?: number
-    rentProfitability?: number
-    totalNetProfitability?: number
-    totalNetProfitabilityToShow?: number
-    apreciationProfitability?: number
-    fields?: any
-  }
+  address?: Address[]
+  projectMedia?: ProjectMedia[]
+  proyectDetails?: ProyectDetails
+  proyectFound?: ProyectFound
+  projectUnits?: ProjectUnit[]
 }
 
 // Interfaz para la store
