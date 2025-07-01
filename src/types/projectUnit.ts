@@ -1,5 +1,5 @@
 export interface ProjectUnit {
-  id: number
+  id?: number
   projectId: number
   sku: string
   surface: number

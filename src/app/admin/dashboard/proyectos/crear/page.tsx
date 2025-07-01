@@ -12,6 +12,7 @@ import InformacionBasica from './components/InformacionBasica'
 import Ubicacion from './components/Ubicacion'
 import MediaItems from './components/MediaItems'
 import BotonesAcciones from './components/BotonesAcciones'
+import { ProjectUnit } from '@/types/projectUnit'
 
 export default function CrearProyectoPage() {
   const router = useRouter()
@@ -88,6 +89,29 @@ export default function CrearProyectoPage() {
     description: ''
   })
 
+  const defaultUnitForm: Partial<ProjectUnit> = {
+    sku: '',
+    surface: 0,
+    priceUsd: 0,
+    floor: 0,
+    rooms: 0,
+    bathrooms: 0,
+    parking: false,
+    status: '',
+    type: '',
+    description: '',
+    features: {},
+    unitNumber: '',
+    availabilityDate: '',
+    isPublished: true,
+  }
+
+  // Estados para unidades
+  const [projectUnits, setProjectUnits] = useState<Partial<ProjectUnit>[]>([])
+  const [showUnitForm, setShowUnitForm] = useState(false)
+  const [editingUnitIndex, setEditingUnitIndex] = useState<number | null>(null)
+  const [unitForm, setUnitForm] = useState<Partial<ProjectUnit>>(defaultUnitForm)
+
   // Cargar países y estados al montar el componente
   useEffect(() => {
     const fetchCountries = async () => {
@@ -163,6 +187,7 @@ export default function CrearProyectoPage() {
         daysToStart,
         details,
         timeline,
+        projectUnits: projectUnits.length > 0 ? projectUnits : undefined,
 
         // Incluir dirección si hay datos de dirección
         address: city || postalCode || streetName || countryId || stateId ? {
@@ -211,9 +236,10 @@ export default function CrearProyectoPage() {
         } : undefined
       }
 
-      const result = await createProyect(proyectData)
+      // const result = await createProyect(proyectData)
 
-      if (result) {
+      // if (result) {
+      if (true) {
         router.push('/admin/dashboard/proyectos')
       } else {
         setError('Ocurrió un error al crear el proyecto. Por favor, intente de nuevo.')
@@ -223,6 +249,35 @@ export default function CrearProyectoPage() {
       console.error('Error al crear proyecto:', err)
     }
   }
+
+  const handleSaveUnit = () => {
+    if (!unitForm.sku || !unitForm.surface || !unitForm.priceUsd) {
+      setError('Completa los campos obligatorios de la unidad: SKU, superficie y precio.');
+      return;
+    }
+    if (editingUnitIndex !== null) {
+      // Editar unidad existente
+      setProjectUnits(units =>
+        units.map((u, idx) => (idx === editingUnitIndex ? unitForm : u))
+      );
+    } else {
+      // Agregar nueva unidad
+      setProjectUnits(units => [...units, unitForm]);
+    }
+    setUnitForm(defaultUnitForm);
+    setShowUnitForm(false);
+    setEditingUnitIndex(null);
+  };
+
+  const handleEditUnit = (idx: number) => {
+    setUnitForm(projectUnits[idx]);
+    setShowUnitForm(true);
+    setEditingUnitIndex(idx);
+  };
+
+  const handleDeleteUnit = (idx: number) => {
+    setProjectUnits(units => units.filter((_, i) => i !== idx));
+  };
 
   return (
     <div className="container mx-auto py-8 px-4 bg-white">
@@ -331,6 +386,69 @@ export default function CrearProyectoPage() {
               <option value="2">Oscar Andereggen</option>
             </select>
           </div>
+        </div>
+
+        {showUnitForm && (
+          <div className="border p-4 rounded mb-4 bg-slate-50">
+            <h3 className="font-semibold mb-2">{editingUnitIndex !== null ? 'Editar Unidad' : 'Agregar Unidad'}</h3>
+            <div className="grid grid-cols-2 gap-2">
+              <input type="text" placeholder="SKU" value={unitForm.sku} onChange={e => setUnitForm({ ...unitForm, sku: e.target.value })} />
+              <input type="number" placeholder="Superficie" value={unitForm.surface} onChange={e => setUnitForm({ ...unitForm, surface: Number(e.target.value) })} />
+              <input type="number" placeholder="Precio USD" value={unitForm.priceUsd} onChange={e => setUnitForm({ ...unitForm, priceUsd: Number(e.target.value) })} />
+              <input type="number" placeholder="Piso" value={unitForm.floor} onChange={e => setUnitForm({ ...unitForm, floor: Number(e.target.value) })} />
+              <input type="number" placeholder="Ambientes" value={unitForm.rooms} onChange={e => setUnitForm({ ...unitForm, rooms: Number(e.target.value) })} />
+              <input type="number" placeholder="Baños" value={unitForm.bathrooms} onChange={e => setUnitForm({ ...unitForm, bathrooms: Number(e.target.value) })} />
+              <label>
+                <input type="checkbox" checked={unitForm.parking} onChange={e => setUnitForm({ ...unitForm, parking: e.target.checked })} />
+                Cochera
+              </label>
+              <input type="text" placeholder="Estado" value={unitForm.status} onChange={e => setUnitForm({ ...unitForm, status: e.target.value })} />
+              <input type="text" placeholder="Tipo" value={unitForm.type} onChange={e => setUnitForm({ ...unitForm, type: e.target.value })} />
+              <input type="text" placeholder="Descripción" value={unitForm.description} onChange={e => setUnitForm({ ...unitForm, description: e.target.value })} />
+              <input type="text" placeholder="Número de unidad" value={unitForm.unitNumber} onChange={e => setUnitForm({ ...unitForm, unitNumber: e.target.value })} />
+              <input type="date" placeholder="Fecha de disponibilidad" value={unitForm.availabilityDate} onChange={e => setUnitForm({ ...unitForm, availabilityDate: e.target.value })} />
+              <label>
+                <input type="checkbox" checked={unitForm.isPublished} onChange={e => setUnitForm({ ...unitForm, isPublished: e.target.checked })} />
+                Publicado
+              </label>
+            </div>
+            <div className="mt-2 flex gap-2">
+              <button type="button" onClick={handleSaveUnit} className="btn btn-primary">Guardar</button>
+              <button type="button" onClick={() => { setShowUnitForm(false); setEditingUnitIndex(null); }} className="btn btn-secondary">Cancelar</button>
+            </div>
+          </div>
+        )}
+
+        <div className="mb-4">
+          <h3 className="font-semibold mb-2">Unidades del Proyecto</h3>
+          <p className="text-sm text-slate-500 mb-2">
+            Un proyecto puede tener varias unidades (casas, departamentos, etc). Agrega cada unidad individualmente.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setShowUnitForm(true);
+              setUnitForm(defaultUnitForm);
+              setEditingUnitIndex(null);
+            }}
+            className="btn btn-success mb-2"
+          >
+            Agregar Unidad
+          </button>
+          {projectUnits.length === 0 && <p className="text-slate-400">No hay unidades agregadas.</p>}
+          <ul>
+            {projectUnits.map((unit, idx) => (
+              <li key={idx} className="border p-2 rounded mb-2 flex justify-between items-center">
+                <span>
+                  <b>{unit.sku}</b> - {unit.type} - {unit.surface} m² - USD {unit.priceUsd}
+                </span>
+                <div>
+                  <button type="button" onClick={() => handleEditUnit(idx)} className="btn btn-xs btn-warning mr-2">Editar</button>
+                  <button type="button" onClick={() => handleDeleteUnit(idx)} className="btn btn-xs btn-danger">Eliminar</button>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
 
         {/* Botones de acción */}

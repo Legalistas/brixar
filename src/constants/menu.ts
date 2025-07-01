@@ -54,6 +54,11 @@ export const MENU_DATA: MenuItem[] = [
     icon: ClipboardList,
     label: 'Proyectos',
     href: '/admin/dashboard/proyectos',
+  },
+  {
+    icon: ClipboardList,
+    label: 'Proyectos Nuevos',
+    href: '/admin/dashboard/proyectos/new',
   }
 ]
 

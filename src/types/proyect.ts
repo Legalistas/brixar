@@ -25,7 +25,7 @@ export interface Proyect {
   promotor: Promotor
 }
 
-interface Promotor {
+export interface Promotor {
   id: number
   name: string
   email: string
@@ -49,7 +49,7 @@ interface ProyectDetails {
   profitabilityScore: number | null
 }
 
-interface ProjectMedia {
+export interface ProjectMedia {
   id: number
   url: string
 }

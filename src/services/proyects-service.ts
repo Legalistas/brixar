@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { API_ENDPOINTS } from '@/constants/api-endpoint'
-import { Proyect } from '@/types/proyect'
 import { ProjectUnit } from '@/types/projectUnit'
+import { CreateProyectInput, Proyect } from '@/store/proyectStore'
 
 export const getAllProyects = async (): Promise<Proyect[]> => {
   try {
@@ -33,7 +33,7 @@ export const createProyect = async (data: Partial<Proyect>) => {
   }
 }
 
-export const updateProyect = async (slug: string, data: Partial<Proyect>) => {
+export const updateProyect = async (slug: string, data: CreateProyectInput) => {
   try {
     const response = await axios.put(API_ENDPOINTS.PROYECT_EDIT(slug), data)
     return response.data
