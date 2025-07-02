@@ -89,6 +89,7 @@ export interface Proyect {
   proyectFound?: ProyectFound
   projectUnits: ProjectUnit[]
   promotor?: Promotor
+  visible?: boolean
 }
 
 export interface ProjectUnit {

@@ -13,13 +13,17 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
-import { Building, Plus, Edit, Trash2, Save, ArrowLeft } from 'lucide-react'
+import { Building, Plus, Save, ArrowLeft } from 'lucide-react'
 import { CreateProyectInput, ProjectUnit, Proyect } from '@/store/proyectStore'
 import ProjectUnitsList from './ProjectUnitsList'
 import ProjectUnitForm from './ProjectUnitForm'
-import { getProjectUnits, createProjectUnit, updateProjectUnit, deleteProjectUnit } from '@/services/proyects-service'
+import {
+  getProjectUnits,
+  createProjectUnit,
+  updateProjectUnit,
+} from '@/services/proyects-service'
 import { useQuery } from '@tanstack/react-query'
+import RoadmapTab from './RoadmapTab'
 
 interface ProjectFormProps {
   initialData?: Proyect
@@ -36,10 +40,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
   onCancel,
   isLoading = false,
 }) => {
-  console.log('initial data', initialData)
   const [formData, setFormData] = useState<Proyect>(initialData!)
-  console.log('address', formData.projectUnits)
-
   const [showUnitForm, setShowUnitForm] = useState(false)
   const [editingUnit, setEditingUnit] = useState<ProjectUnit | null>(null)
 
@@ -50,11 +51,10 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
     }))
   }
 
-  const { data: units = [] } = useQuery({
+  const { data: units = [], refetch: refetchUnits } = useQuery({
     queryKey: ['project-units', initialData?.slug],
     queryFn: () => getProjectUnits(initialData?.slug!),
-  });
-  console.log('units ', units)
+  })
 
   const handleNestedInputChange = (
     parentField: keyof CreateProyectInput,
@@ -73,7 +73,6 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
   const handleAddUnit = (unit: ProjectUnit) => {
     const newUnit = {
       ...unit,
-    //   id: Date.now(),
       createdAt: new Date().toISOString(),
     }
 
@@ -104,7 +103,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
     const {
       title,
@@ -124,8 +123,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
       proyectDetails,
       proyectFound,
       projectUnits,
-    } = formData;
-    console.log('project u on submit', projectUnits)
+    } = formData
 
     // Ensure phase and businessModel are valid for CreateProyectInput
     const projectData: CreateProyectInput = {
@@ -133,7 +131,9 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
       slug,
       openingLine,
       description,
-      phase: (['IN_STUDY', 'FUNDING', 'CONSTRUCTION', 'COMPLETED'].includes(phase)
+      phase: (['IN_STUDY', 'FUNDING', 'CONSTRUCTION', 'COMPLETED'].includes(
+        phase
+      )
         ? phase
         : 'IN_STUDY') as CreateProyectInput['phase'],
       businessModel: (['SOLD', 'RENT', 'TRUST', 'POZO'].includes(businessModel)
@@ -150,24 +150,18 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
       proyectDetails,
       proyectFound,
       projectUnits,
-    };
-    console.log('projectData', projectData)
-    await onSubmit(projectData);
-    
-    console.log('projectUnits', projectUnits)
-    // 2. Sincroniza las unidades
-    // (aquí deberías tener el slug del proyecto)
+    }
+    await onSubmit(projectData)
+
     for (const unit of projectUnits) {
-        console.log('UNIT PRE PUT', unit)
+      console.log('UNIT PRE PUT', unit)
       if (unit.id) {
-        // Si la unidad ya existe, actualízala
-        await updateProjectUnit(formData.slug, unit.id, unit);
+        await updateProjectUnit(formData.slug, unit.id, unit)
       } else {
-        // Si es nueva, créala
-        await createProjectUnit(formData.slug, unit);
+        await createProjectUnit(formData.slug, unit)
       }
     }
-    // Si quieres manejar eliminaciones, deberías comparar con las originales y llamar a deleteProjectUnit para las que se eliminaron.
+    refetchUnits()
   }
 
   const generateSlug = (title: string) => {
@@ -227,7 +221,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <Tabs defaultValue="basic" className="w-full">
+        <Tabs defaultValue="diagram" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="diagram">Diagrama</TabsTrigger>
             <TabsTrigger value="basic">Información</TabsTrigger>
@@ -235,7 +229,9 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
             <TabsTrigger value="units">Unidades</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="diagram" className="space-y-6"></TabsContent>
+          <TabsContent value="diagram" className="space-y-6">
+            <RoadmapTab initialData={formData} />
+          </TabsContent>
 
           {/* Basic Information Tab */}
           <TabsContent value="basic" className="space-y-6">

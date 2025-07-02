@@ -2,6 +2,7 @@ import axios from 'axios'
 import { API_ENDPOINTS } from '@/constants/api-endpoint'
 import { ProjectUnit } from '@/types/projectUnit'
 import { CreateProyectInput, Proyect } from '@/store/proyectStore'
+import { Roadmap } from '@/types/roadmap'
 
 export const getAllProyects = async (): Promise<Proyect[]> => {
   try {
@@ -97,4 +98,21 @@ export const deleteProjectUnit = async (slug: string, id: number): Promise<{ suc
     console.error('Error deleting project unit:', error)
     throw error
   }
+}
+
+// -------- ROADMAP --------
+
+export const getProyectRoadmap = async (slug: string): Promise<Roadmap | null> => {
+  try {
+    const response = await axios.get(`/api/proyects/${slug}/roadmap`)
+    return response.data
+  } catch (error: any) {
+    if (error.response && error.response.status === 404) return null
+    throw error
+  }
+}
+
+export const saveProyectRoadmap = async (slug: string, tasks: any[]): Promise<Roadmap> => {
+  const response = await axios.put(`/api/proyects/${slug}/roadmap`, { tasks })
+  return response.data
 }

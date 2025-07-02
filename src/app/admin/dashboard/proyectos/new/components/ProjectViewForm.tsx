@@ -7,8 +7,9 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Building, Edit, ArrowLeft, MapPin } from 'lucide-react'
-import { CreateProyectInput } from '@/store/proyectStore'
+import { CreateProyectInput, Proyect } from '@/store/proyectStore'
 import ProjectUnitsList from './ProjectUnitsList'
+import RoadmapTab from './RoadmapTab'
 
 interface ProjectViewFormProps {
   project: CreateProyectInput & { id: number }
@@ -74,7 +75,7 @@ const ProjectViewForm: React.FC<ProjectViewFormProps> = ({
         </div>
       </div>
 
-      <Tabs defaultValue="basic" className="w-full">
+      <Tabs defaultValue="diagram" className="w-full">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="diagram">Diagrama</TabsTrigger>
           <TabsTrigger value="basic">Información</TabsTrigger>
@@ -83,7 +84,7 @@ const ProjectViewForm: React.FC<ProjectViewFormProps> = ({
         </TabsList>
 
         <TabsContent value="diagram" className="space-y-6">
-
+          <RoadmapTab initialData={project as Proyect} />
         </TabsContent>
 
         {/* Basic Information Tab */}

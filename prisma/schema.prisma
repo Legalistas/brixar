@@ -169,6 +169,7 @@ model Proyect {
   compensations  ProyectCompensation[] // Relación con las compensaciones entre inversores
 
   projectUnits   ProjectUnit[]      @relation("ProjectToUnits")
+  roadmap        Roadmap?          @relation("ProyectRoadmap")
 
   @@map("proyects")
 }
@@ -600,4 +601,16 @@ model CompensationsPercentages {
   updatedAt       DateTime  @updatedAt
 
   @@map("compensations_percentages")
+}
+
+model Roadmap {
+  id         Int      @id @default(autoincrement())
+  proyectId  Int      @unique
+  tasks      Json     // Array de tareas (Task[])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  proyect    Proyect  @relation("ProyectRoadmap", fields: [proyectId], references: [id], onDelete: Cascade)
+
+  @@map("roadmaps")
 }

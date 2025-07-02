@@ -1,7 +1,6 @@
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL_WP || 'http://localhost:3000/api'
 
-
 export const API_ENDPOINTS = {
   STATISTICS_DASHBOARD: `${API_BASE_URL}/statistics/dashboard`,
 
@@ -38,12 +37,14 @@ export const API_ENDPOINTS = {
   PROYECT_DELETE: (slug: string) => `${API_BASE_URL}/proyects/${slug}`,
 
   // Unidades de un proyecto (ProjectUnit)
-  PROYECT_UNITS_INDEX: (slug: string) => `${API_BASE_URL}/projects/${slug}/unit`,
-  PROYECT_UNITS_CREATE: (slug: string) => `${API_BASE_URL}/projects/${slug}/unit`,
+  PROYECT_UNITS_INDEX: (slug: string) =>
+    `${API_BASE_URL}/proyects/${slug}/units`,
+  PROYECT_UNITS_CREATE: (slug: string) =>
+    `${API_BASE_URL}/proyects/${slug}/units`,
   PROYECT_UNITS_UPDATE: (slug: string, id: number) =>
-    `${API_BASE_URL}/projects/${slug}/unit/${id}`,
+    `${API_BASE_URL}/proyects/${slug}/units/${id}`,
   PROYECT_UNITS_DELETE: (slug: string, id: number) =>
-    `${API_BASE_URL}/projects/${slug}/unit/${id}`,
+    `${API_BASE_URL}/proyects/${slug}/units/${id}`,
 
   SCHEDULE_VISIT: `${API_BASE_URL}/visits/schedule`,
   VISITS_INDEX: `${API_BASE_URL}/visits/user`,
@@ -90,21 +91,31 @@ export const API_ENDPOINTS = {
   PROYECT_SHOW: (slug: string) => `${API_BASE_URL}/proyects/${slug}`,
   PROYECTS_CREATE: `${API_BASE_URL}/proyects`,
   PROYECT_UPDATE: (slug: string) => `${API_BASE_URL}/proyects/${slug}`,
-    // Costos de proyectos
+  // Costos de proyectos
   COSTS_INDEX: `${API_BASE_URL}/costs`,
   COSTS_CREATE: `${API_BASE_URL}/costs`,
-  COSTS_BY_PROJECT_ID: (proyectId: number) => `${API_BASE_URL}/costs?proyectId=${proyectId}`,
-  COSTS_BY_PROJECT_SLUG: (slug: string) => `${API_BASE_URL}/costs/proyecto/${slug}`,
+  COSTS_BY_PROJECT_ID: (proyectId: number) =>
+    `${API_BASE_URL}/costs?proyectId=${proyectId}`,
+  COSTS_BY_PROJECT_SLUG: (slug: string) =>
+    `${API_BASE_URL}/costs/proyecto/${slug}`,
   COST_BY_ID: (id: number) => `${API_BASE_URL}/costs/${id}`,
   COST_UPDATE: (id: number) => `${API_BASE_URL}/costs/${id}`,
   COST_DELETE: (id: number) => `${API_BASE_URL}/costs/${id}`,
-  
+
   // Compensaciones entre inversores
   COMPENSATIONS_INDEX: `${API_BASE_URL}/compensations`,
   COMPENSATIONS_CREATE: `${API_BASE_URL}/compensations`,
-  COMPENSATIONS_BY_PROJECT_ID: (proyectId: number) => `${API_BASE_URL}/compensations?proyectId=${proyectId}`,
-  COMPENSATIONS_BY_PROJECT_SLUG: (slug: string) => `${API_BASE_URL}/compensations/proyecto/${slug}`,
+  COMPENSATIONS_BY_PROJECT_ID: (proyectId: number) =>
+    `${API_BASE_URL}/compensations?proyectId=${proyectId}`,
+  COMPENSATIONS_BY_PROJECT_SLUG: (slug: string) =>
+    `${API_BASE_URL}/compensations/proyecto/${slug}`,
   COMPENSATION_BY_ID: (id: number) => `${API_BASE_URL}/compensations/${id}`,
   COMPENSATION_UPDATE: (id: number) => `${API_BASE_URL}/compensations/${id}`,
   COMPENSATION_DELETE: (id: number) => `${API_BASE_URL}/compensations/${id}`,
+
+  // Roadmap de proyecto
+  PROYECT_ROADMAP_GET: (slug: string) =>
+    `${API_BASE_URL}/proyects/${slug}/roadmap`,
+  PROYECT_ROADMAP_SAVE: (slug: string) =>
+    `${API_BASE_URL}/proyects/${slug}/roadmap`,
 }
