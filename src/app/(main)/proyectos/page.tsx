@@ -5,10 +5,10 @@ import { useRouter } from 'next/navigation'
 import { Building2, TrendingUp, Users, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Proyect } from '@/types/proyect'
 import { getAllProyects } from '@/services/proyects-service'
 import { ProjectFilters } from './components/ProjectFilters'
 import { ProjectCard } from './components/ProjectCard'
+import { Proyect } from '@/store/proyectStore'
 
 export default function Projects() {
   const [selectedPhase, setSelectedPhase] = useState('all')
@@ -47,9 +47,10 @@ export default function Projects() {
       const matchesSearch =
         searchTerm === '' ||
         project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.address[0]?.city
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase())
+        (project.address?.[0]?.city &&
+          project.address[0].city
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()))
 
       return matchesPhase && matchesType && matchesSearch
     }) || []
@@ -170,13 +171,17 @@ export default function Projects() {
           </div>
         ) : filteredProjects.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredProjects.map((project: Proyect) => (
-              <ProjectCard
-                key={project.id}
-                project={project}
-                onViewDetails={handleViewDetails}
-              />
-            ))}
+            {filteredProjects.map((project: Proyect) => {
+              if (project.visible) {
+                return (
+                  <ProjectCard
+                    key={project.id}
+                    project={project}
+                    onViewDetails={handleViewDetails}
+                  />
+                )
+              }
+            })}
           </div>
         ) : (
           <div className="text-center py-12">

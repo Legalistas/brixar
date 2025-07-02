@@ -13,6 +13,7 @@ import {
   Trash2,
   Search,
   BadgeDollarSign,
+  EyeOff,
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { CreateProyectInput, Proyect } from '@/store/proyectStore'
@@ -20,7 +21,7 @@ import { toast } from '@/hooks/useToast'
 import ProjectForm from './ProjectForm'
 import ProjectViewForm from './ProjectViewForm'
 import { useRouter } from 'next/navigation'
-import { createProyect, getAllProyects, getProjectUnits, updateProyect } from '@/services/proyects-service'
+import { createProyect, getAllProyects, updateProyect } from '@/services/proyects-service'
 
 // Mock service functions with complete data
 const mockProjectService = {
@@ -362,16 +363,16 @@ const ProjectManagement: React.FC = () => {
   })
 
   // Delete project mutation
-  const deleteProjectMutation = useMutation({
-    mutationFn: mockProjectService.deleteProyect,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projects'] })
-      toast({
-        title: 'Proyecto eliminado',
-        description: 'El proyecto se ha eliminado exitosamente.',
-      })
-    },
-  })
+  // const deleteProjectMutation = useMutation({
+  //   mutationFn: mockProjectService.deleteProyect,
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ['projects'] })
+  //     toast({
+  //       title: 'Proyecto eliminado',
+  //       description: 'El proyecto se ha eliminado exitosamente.',
+  //     })
+  //   },
+  // })
 
   const handleCreateProject = (data: CreateProyectInput) => {
     createProjectMutation.mutate(data)
@@ -383,11 +384,11 @@ const ProjectManagement: React.FC = () => {
     }
   }
 
-  const handleDeleteProject = (id: number) => {
-    if (confirm('¿Estás seguro de que quieres eliminar este proyecto?')) {
-      deleteProjectMutation.mutate(id)
-    }
-  }
+  // const handleDeleteProject = (id: number) => {
+  //   if (confirm('¿Estás seguro de que quieres eliminar este proyecto?')) {
+  //     deleteProjectMutation.mutate(id)
+  //   }
+  // }
 
   const handleViewProject = (project: any) => {
     setSelectedProject(project)
@@ -423,6 +424,23 @@ const ProjectManagement: React.FC = () => {
       project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       project.slug.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  const handleToggleVisible = async (project: any) => {
+    try {
+      await updateProyect(project.slug, { ...project, visible: !project.visible });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      toast({
+        title: 'Visibilidad actualizada',
+        description: `El proyecto ahora está ${project.visible ? 'oculto' : 'visible'}.`,
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'No se pudo actualizar la visibilidad.',
+        variant: 'destructive',
+      });
+    }
+  };
 
   if (currentView === 'create') {
     return (
@@ -568,7 +586,7 @@ const ProjectManagement: React.FC = () => {
                             e.stopPropagation()
                             setSelectedProject(project)
                             router.push(
-                                `/admin/dashboard/proyectos/costos?slug=maggi-43`
+                                `/admin/dashboard/proyectos/costos?slug=${project.slug}`
                             ) //${project.slug}
                             }}
                         >
@@ -590,11 +608,21 @@ const ProjectManagement: React.FC = () => {
                             size="sm"
                             onClick={(e) => {
                             e.stopPropagation()
-                            handleDeleteProject(project.id)
+                            // handleDeleteProject(project.id)
                             }}
                             className="text-red-600 hover:text-red-800"
                         >
                             <Trash2 className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={async (e) => {
+                            e.stopPropagation();
+                            await handleToggleVisible(project);
+                            }}
+                        >
+                            {project.visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </Button>
                         </div>
                     </div>

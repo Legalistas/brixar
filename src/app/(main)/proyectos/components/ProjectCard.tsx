@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Proyect } from "@/types/proyect";
+import { Proyect } from "@/store/proyectStore";
 import { MapPin, Calendar, TrendingUp, Building2, Users, Square } from "lucide-react";
 
 interface ProjectCardProps {
@@ -36,7 +36,7 @@ export const ProjectCard = ({ project, onViewDetails }: ProjectCardProps) => {
     }
   };
 
-  const address = project.address[0];
+  const address = project?.address?.[0];
   const location = `${address?.city}, ${address?.state?.name}`;
 
   return (
