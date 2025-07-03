@@ -131,6 +131,7 @@ model PropertyVideo {
 model Proyect {
   id             Int                  @id @default(autoincrement())
   slug           String               @unique
+  sku            String               
   title          String
   openingLine    String?              @db.Text
   description    String?              @db.Text

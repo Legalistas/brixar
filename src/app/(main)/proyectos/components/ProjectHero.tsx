@@ -1,6 +1,6 @@
 import { Badge } from '@/components/ui/badge'
 import { ChevronLeft, ChevronRight, Expand, MapPin, X } from 'lucide-react'
-import { Proyect } from '@/types/proyect'
+import { Proyect } from '@/store/proyectStore'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 
@@ -38,7 +38,7 @@ export const ProjectHero = ({ project }: ProjectHeroProps) => {
     }
   }
 
-  const address = project.address[0]
+  const address = project.address?.[0]
   const location = `${address?.streetName}, ${address?.city}, ${address?.state?.name}`
 
   // Mock images for demonstration - in real app these would come from project.projectMedia

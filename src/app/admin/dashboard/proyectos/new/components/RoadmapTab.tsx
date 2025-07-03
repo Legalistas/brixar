@@ -658,6 +658,7 @@ export default function RoadmapTab({ initialData }: RoadmapProps) {
         setIsGanttGenerated(false) // Reset Gantt cuando cambien las fechas
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectInfo.startDate])
 
   const updateTask = (taskId: number, field: keyof Task, value: any) => {

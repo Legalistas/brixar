@@ -53,6 +53,7 @@ export async function POST(request: Request) {
       data: {
         slug: data.slug,
         title: data.title,
+        sku: data.sku,
         openingLine: data.openingLine,
         description: data.description,
         promotorId: data.promotorId,

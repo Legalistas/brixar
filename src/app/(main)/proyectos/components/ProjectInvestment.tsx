@@ -1,9 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { TrendingUp, Clock, Shield, DollarSign, Link } from 'lucide-react'
-import { Proyect } from '@/types/proyect'
-import WhatsappIcon from '../../../../components/Icons/WhatsappIcon'
+import { Clock } from 'lucide-react'
+import { Proyect } from '@/store/proyectStore'
 
 interface ProjectInvestmentProps {
   project: Proyect

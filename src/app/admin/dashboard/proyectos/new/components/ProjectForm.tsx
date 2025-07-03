@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
@@ -43,6 +43,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
   const emptyProject: Proyect = {
     id: 0,
     slug: '',
+    sku: '',
     title: '',
     openingLine: undefined,
     description: '',
@@ -71,7 +72,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
   const [showUnitForm, setShowUnitForm] = useState(false)
   const [editingUnit, setEditingUnit] = useState<ProjectUnit | null>(null)
 
-  let isCreatingForm: boolean = !initialData
+  const isCreatingForm: boolean = !initialData
   console.log('bool', isCreatingForm)
 
   const handleInputChange = (field: keyof CreateProyectInput, value: any) => {
@@ -82,9 +83,16 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
   }
 
   const { data: units = [], refetch: refetchUnits } = useQuery({
-    queryKey: ['project-units', initialData?.slug],
-    queryFn: () => getProjectUnits(initialData?.slug!),
+    queryKey: ['project-units', initialData!.slug],
+    // @typescript-eslint/no-non-null-asserted-optional-chain
+    queryFn: () => getProjectUnits(initialData!.slug!),
   })
+
+  useEffect(() => {
+    refetchUnits()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  
 
   const handleNestedInputChange = (
     parentField: keyof CreateProyectInput,
@@ -138,6 +146,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
     const {
       title,
       slug,
+      sku,
       openingLine,
       description,
       phase,
@@ -159,6 +168,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
     const projectData: CreateProyectInput = {
       title,
       slug,
+      sku,
       openingLine,
       description,
       phase: (['IN_STUDY', 'FUNDING', 'CONSTRUCTION', 'COMPLETED'].includes(
@@ -259,7 +269,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
             <TabsTrigger value="units">Unidades</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="diagram" className="space-y-6" hidden={isCreatingForm} >
+          <TabsContent value="diagram" className="space-y-6" hidden={isCreatingForm}>
             <RoadmapTab initialData={formData} />
           </TabsContent>
 
@@ -301,6 +311,17 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                       required
                     />
                   </div>
+                </div>
+                {/* SKU del Proyecto */}
+                <div className="space-y-2">
+                  <Label htmlFor="sku">SKU del Proyecto *</Label>
+                  <Input
+                    id="sku"
+                    value={formData.sku}
+                    onChange={(e) => handleInputChange('sku', e.target.value)}
+                    placeholder="SKU único del proyecto"
+                    required
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -916,6 +937,8 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
             setShowUnitForm(false)
             setEditingUnit(null)
           }}
+          projectSku={formData.sku}
+          existingUnitsCount={formData.projectUnits.length}
         />
       )}
     </div>

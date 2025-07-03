@@ -68,6 +68,7 @@ interface ProyectFound {
 export interface Proyect {
   id: number
   slug: string
+  sku: string
   title: string
   openingLine?: string
   description?: string
@@ -116,6 +117,7 @@ export interface ProjectUnit {
 export interface CreateProyectInput {
   title: string
   slug: string
+  sku: string
   openingLine?: string
   description?: string
   phase: ProjectPhase

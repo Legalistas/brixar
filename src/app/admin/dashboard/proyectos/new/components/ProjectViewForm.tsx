@@ -114,6 +114,17 @@ const ProjectViewForm: React.FC<ProjectViewFormProps> = ({
                   />
                 </div>
               </div>
+              {/* SKU del Proyecto */}
+              <div className="space-y-2">
+                <Label htmlFor="sku">SKU del Proyecto *</Label>
+                <Input
+                  id="sku"
+                  value={project.sku}
+                  // onChange={(e) => handleInputChange('sku', e.target.value)}
+                  placeholder="SKU único del proyecto"
+                  required
+                />
+              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="openingLine">Línea de Apertura</Label>

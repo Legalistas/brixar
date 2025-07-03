@@ -16,6 +16,7 @@ import {
   Receipt,
 } from 'lucide-react'
 import { useProyectStore } from '@/store/proyectStore'
+import { ProjectPhase } from '@/types/proyect'
 
 export default function ProyectosPage() {
   const router = useRouter()
@@ -31,7 +32,7 @@ export default function ProyectosPage() {
   const [deleting, setDeleting] = useState(false)
   const [showEditPopup, setShowEditPopup] = useState<string | null>(null)
   const [showPhasePopup, setShowPhasePopup] = useState<string | null>(null)
-  const [selectedPhase, setSelectedPhase] = useState<ProyectPhase | null>(null)
+  const [selectedPhase, setSelectedPhase] = useState<ProjectPhase | null>(null)
   const [phaseUpdating, setPhaseUpdating] = useState(false)
 
   // Cargar proyectos al montar el componente
@@ -126,12 +127,10 @@ export default function ProyectosPage() {
     }
   }
 
-  const getPhaseLabel = (phase: ProyectPhase) => {
+  const getPhaseLabel = (phase: ProjectPhase) => {
     switch (phase) {
-      case 'IN_STUDY':
-        return 'En Estudio'
-      case 'FUNDING':
-        return 'Financiación'
+      case 'PLANNING':
+        return 'En planeación'
       case 'CONSTRUCTION':
         return 'Construcción'
       case 'COMPLETED':
@@ -141,11 +140,9 @@ export default function ProyectosPage() {
     }
   }
 
-  const getPhaseClasses = (phase: ProyectPhase) => {
+  const getPhaseClasses = (phase: ProjectPhase) => {
     switch (phase) {
-      case 'IN_STUDY':
-        return 'bg-blue-50 text-blue-700 border border-blue-100'
-      case 'FUNDING':
+      case 'PLANNING':
         return 'bg-amber-50 text-amber-700 border border-amber-100'
       case 'CONSTRUCTION':
         return 'bg-orange-50 text-orange-700 border border-orange-100'
@@ -190,29 +187,15 @@ export default function ProyectosPage() {
               <div>
                 <input
                   type="radio"
-                  id="in_study"
+                  id="planning"
                   name="phase"
-                  value="IN_STUDY"
-                  checked={selectedPhase === 'IN_STUDY'}
-                  onChange={() => setSelectedPhase('IN_STUDY')}
-                  className="mr-2"
-                />
-                <label htmlFor="in_study" className="text-sm text-slate-600">
-                  En Estudio
-                </label>
-              </div>
-              <div>
-                <input
-                  type="radio"
-                  id="funding"
-                  name="phase"
-                  value="FUNDING"
-                  checked={selectedPhase === 'FUNDING'}
-                  onChange={() => setSelectedPhase('FUNDING')}
+                  value="PLANNING"
+                  checked={selectedPhase === 'PLANNING'}
+                  onChange={() => setSelectedPhase('PLANNING')}
                   className="mr-2"
                 />
                 <label htmlFor="funding" className="text-sm text-slate-600">
-                  Financiación
+                  En planificación
                 </label>
               </div>
               <div>
@@ -449,7 +432,7 @@ export default function ProyectosPage() {
                         src={
                           project.projectMedia &&
                           project.projectMedia.length > 0
-                            ? project.projectMedia[0].link
+                            ? project.projectMedia[0].url
                             : '/images/placeholder.svg'
                         }
                         alt={project.title}
@@ -476,7 +459,9 @@ export default function ProyectosPage() {
                     {formatDate(project.createdAt)}
                   </td>
                   <td className="py-3 px-4 text-slate-700">
-                    {project?.proyectDetails?.surface ? `${project?.proyectDetails?.surface} m²` : 'N/A'}
+                    {project?.proyectDetails?.surface
+                      ? `${project?.proyectDetails?.surface} m²`
+                      : 'N/A'}
                   </td>
                   <td className="py-3 px-4">
                     {deleteConfirm === project.slug ? (

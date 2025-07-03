@@ -25,26 +25,36 @@ interface ProjectUnitFormProps {
   onSave: (unit: ProjectUnit) => void
   onCancel: () => void
   projectId?: number
+  projectSku: string
+  existingUnitsCount: number
 }
 
 const ProjectUnitForm: React.FC<ProjectUnitFormProps> = ({
   unit,
   onSave,
   onCancel,
-  projectId
+  projectId,
+  projectSku,
+  existingUnitsCount,
 }) => {
-    console.log('UNIT ', unit)
-  const [formData, setFormData] = useState<ProjectUnit>({
-    // id: 0,
-    projectId: projectId ?? 0,
-    sku: '',
-    surface: 0,
-    priceUsd: 0,
-    parking: false,
-    isPublished: false,
-    createdAt: new Date().toISOString(),
-    availabilityDate: '',
-  })
+  const getInitialFormData = () => {
+    if (unit) return unit;
+    const nextNumber = existingUnitsCount + 1;
+    const padded = String(nextNumber).padStart(2, '0');
+    return {
+      projectId: projectId ?? 0,
+      sku: projectSku,
+      surface: 0,
+      priceUsd: 0,
+      parking: false,
+      isPublished: false,
+      createdAt: new Date().toISOString(),
+      availabilityDate: '',
+      unitNumber: `${projectSku}-${padded}`,
+    };
+  };
+
+  const [formData, setFormData] = useState<ProjectUnit>(getInitialFormData());
 
   useEffect(() => {
     if (unit) {
@@ -98,8 +108,9 @@ const ProjectUnitForm: React.FC<ProjectUnitFormProps> = ({
               <Input
                 id="sku"
                 value={formData.sku}
-                onChange={(e) => handleInputChange('sku', e.target.value)}
-                placeholder="Código único de la unidad"
+                disabled
+                readOnly
+                placeholder="SKU del proyecto"
                 required
               />
             </div>
@@ -108,10 +119,9 @@ const ProjectUnitForm: React.FC<ProjectUnitFormProps> = ({
               <Input
                 id="unitNumber"
                 value={formData.unitNumber || ''}
-                onChange={(e) =>
-                  handleInputChange('unitNumber', e.target.value)
-                }
-                placeholder="101, A-1, etc."
+                disabled
+                readOnly
+                placeholder="Número correlativo autogenerado"
               />
             </div>
           </div>

@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useProyectStore } from '@/store/proyectStore'
-import { ProyectPhase, BusinessModel } from '@prisma/client'
+import { BusinessModel } from '@prisma/client'
 import { AlertCircle, Loader2, ArrowLeft, Upload, Plus, Trash2, FileText } from 'lucide-react'
 
 import Ubicacion from '@/app/admin/dashboard/proyectos/crear/components/Ubicacion'
+import { ProjectPhase } from '@/types/proyect'
 
 export default function EditarProyectoPage({ params }: { params: { slug: string } }) {
   const router = useRouter()
@@ -21,9 +22,10 @@ export default function EditarProyectoPage({ params }: { params: { slug: string 
   // Estados para los campos del formulario
   const [title, setTitle] = useState('')
   const [slug, setSlug] = useState('')
+  const [sku, setSku] = useState('')
   const [openingLine, setOpeningLine] = useState('')
   const [description, setDescription] = useState('')
-  const [phase, setPhase] = useState<ProyectPhase>('FUNDING')
+  const [phase, setPhase] = useState<ProjectPhase>('PLANNING')
   const [businessModel, setBusinessModel] = useState<BusinessModel | string>('SOLD')
   const [openingPhase, setOpeningPhase] = useState<number>(0)
   const [priority, setPriority] = useState<number>(0)
@@ -121,7 +123,7 @@ export default function EditarProyectoPage({ params }: { params: { slug: string 
       setSlug(currentProyect.slug || '')
       setOpeningLine(currentProyect.openingLine || '')
       setDescription(currentProyect.description || '')
-      setPhase(currentProyect.phase)
+      setPhase(currentProyect.phase as ProjectPhase)
       setBusinessModel(currentProyect.businessModel)
       setOpeningPhase(currentProyect.openingPhase || 0)
       setPriority(currentProyect.priority || 0)
@@ -149,15 +151,15 @@ export default function EditarProyectoPage({ params }: { params: { slug: string 
       }
       
       // Cargar medios del proyecto
-      if (currentProyect.projectMedia && currentProyect.projectMedia.length > 0) {
-        setMediaItems(currentProyect.projectMedia.map(media => ({
-          id: media.id,
-          link: media.link,
-          type: media.type,
-          title: media.title,
-          description: media.description || ''
-        })))
-      }
+      // if (currentProyect.projectMedia && currentProyect.projectMedia.length > 0) {
+      //   setMediaItems(currentProyect.projectMedia.map(media => ({
+      //     id: media.id,
+      //     link: media.link,
+      //     type: media.type,
+      //     title: media.title,
+      //     description: media.description || ''
+      //   })))
+      // }
       
       // Cargar detalles del proyecto si existen
       if (currentProyect.proyectDetails) {
@@ -325,7 +327,7 @@ export default function EditarProyectoPage({ params }: { params: { slug: string 
         } : undefined
       }
       
-      const result = await updateProyect(params.slug, proyectData)
+      const result = await updateProyect(params.slug, proyectData as any)
       
       if (result) {
         router.push('/admin/dashboard/proyectos')
@@ -411,6 +413,21 @@ export default function EditarProyectoPage({ params }: { params: { slug: string 
                 URL amigable para el proyecto (sin espacios ni caracteres especiales)
               </p>
             </div>
+            <div>
+              <label htmlFor="sku" className="block text-sm font-medium text-slate-700 mb-1">
+                SKU
+              </label>
+              <input
+                id="sku"
+                type="text"
+                value={sku}
+                onChange={(e) => setSku(e.target.value)}
+                className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
+              />
+              <p className="mt-1 text-xs text-slate-500">
+                Código único de inventario para el proyecto
+              </p>
+            </div>
             
             <div>
               <label htmlFor="businessModel" className="block text-sm font-medium text-slate-700 mb-1">
@@ -436,7 +453,7 @@ export default function EditarProyectoPage({ params }: { params: { slug: string 
               <select
                 id="phase"
                 value={phase}
-                onChange={(e) => setPhase(e.target.value as ProyectPhase)}
+                onChange={(e) => setPhase(e.target.value as ProjectPhase)}
                 className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
                 required
               >

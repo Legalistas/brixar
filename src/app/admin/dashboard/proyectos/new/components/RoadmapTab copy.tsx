@@ -861,6 +861,7 @@ export default function RoadmapTab({ initialData }: RoadmapProps) {
   useEffect(() => {
     const updatedTasks = calculateDates(tasks, projectInfo.startDate)
     setTasks(updatedTasks)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectInfo.startDate])
 
   const updateTask = (taskId: number, field: keyof Task, value: any) => {

@@ -1,14 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { MapPin, Navigation } from 'lucide-react'
-import { Proyect } from '@/types/proyect'
 import { GoogleMap } from '@/components/GoogleMap'
+import { Proyect } from '@/store/proyectStore'
 
 interface ProjectLocationProps {
   project: Proyect
 }
 
 export const ProjectLocation = ({ project }: ProjectLocationProps) => {
-  const address = project.address[0]
+  const address = project.address?.[0]
 
   return (
     <Card>
@@ -44,10 +44,10 @@ export const ProjectLocation = ({ project }: ProjectLocationProps) => {
         </div>
 
         {/* Map Placeholder */}
-        {address.positions.length > 0 ? (
+        {(address?.positions && address.positions.length > 0) ? (
           <div className="mt-4">
-            {address.positions[0].latitude &&
-              address.positions[0].longitude && (
+            {address.positions[0]?.latitude &&
+              address.positions[0]?.longitude && (
                 <div className="aspect-video rounded-lg overflow-hidden">
                   <GoogleMap
                     latitude={Number(address.positions[0].latitude)}

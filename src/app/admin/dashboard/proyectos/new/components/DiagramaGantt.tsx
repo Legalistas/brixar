@@ -1,7 +1,8 @@
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import React from 'react'
-import { ProjectInfo, Task } from './RoadmapTab'
+import { ProjectInfo } from './RoadmapTab'
+import { Task } from '@/types/roadmap'
 
 interface DiagramaGanttProps {
   tasks: Task[]

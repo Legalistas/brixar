@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Building2, Calendar, Square, TrendingUp, AlertTriangle } from "lucide-react";
-import { Proyect } from "@/types/proyect";
+import { Proyect } from "@/store/proyectStore";
 
 interface ProjectOverviewProps {
   project: Proyect;
