@@ -18,11 +18,13 @@ export async function PUT(req: NextRequest, { params }: { params: { slug: string
   const { slug } = params
   const body = await req.json()
   const proyect = await prisma.proyect.findUnique({ where: { slug } })
+  console.log('project endpoint response', proyect)
   if (!proyect) return NextResponse.json({ error: 'Proyecto no encontrado' }, { status: 404 })
 
   // Si ya existe, actualiza. Si no, crea.
   const existing = await prisma.roadmap.findUnique({ where: { proyectId: proyect.id } })
   let roadmap
+  console.log('existing', existing)
   if (existing) {
     roadmap = await prisma.roadmap.update({
       where: { proyectId: proyect.id },

@@ -2,7 +2,7 @@ import axios from 'axios'
 import { API_ENDPOINTS } from '@/constants/api-endpoint'
 import { ProjectUnit } from '@/types/projectUnit'
 import { CreateProyectInput, Proyect } from '@/store/proyectStore'
-import { Roadmap } from '@/types/roadmap'
+import { Roadmap, Task } from '@/types/roadmap'
 
 export const getAllProyects = async (): Promise<Proyect[]> => {
   try {
@@ -112,7 +112,7 @@ export const getProyectRoadmap = async (slug: string): Promise<Roadmap | null> =
   }
 }
 
-export const saveProyectRoadmap = async (slug: string, tasks: any[]): Promise<Roadmap> => {
+export const saveProyectRoadmap = async (slug: string, tasks: Task[]): Promise<Roadmap> => {
   const response = await axios.put(`/api/proyects/${slug}/roadmap`, { tasks })
   return response.data
 }

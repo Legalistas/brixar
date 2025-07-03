@@ -40,9 +40,39 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
   onCancel,
   isLoading = false,
 }) => {
-  const [formData, setFormData] = useState<Proyect>(initialData!)
+  const emptyProject: Proyect = {
+    id: 0,
+    slug: '',
+    title: '',
+    openingLine: undefined,
+    description: '',
+    promotorId: undefined,
+    openingPhase: undefined,
+    phase: 'CONSTRUCTION',
+    businessModel: '',
+    fundedDate: undefined,
+    details: undefined,
+    timeline: undefined,
+    daysToEnd: undefined,
+    priority: undefined,
+    daysToStart: undefined,
+    createdAt: '',
+    updatedAt: '',
+    address: [],
+    projectMedia: [],
+    proyectDetails: {} as any,
+    promotor: {} as any,
+    projectUnits: [],
+  };
+
+  const [formData, setFormData] = useState<Proyect>(
+    initialData ?? emptyProject
+  )
   const [showUnitForm, setShowUnitForm] = useState(false)
   const [editingUnit, setEditingUnit] = useState<ProjectUnit | null>(null)
+
+  let isCreatingForm: boolean = !initialData
+  console.log('bool', isCreatingForm)
 
   const handleInputChange = (field: keyof CreateProyectInput, value: any) => {
     setFormData((prev) => ({
@@ -221,15 +251,15 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <Tabs defaultValue="diagram" className="w-full">
+        <Tabs defaultValue={isCreatingForm ? "basic" : "diagram"} className="w-full">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="diagram">Diagrama</TabsTrigger>
+            {!isCreatingForm && (<TabsTrigger value="diagram">Diagrama</TabsTrigger>)}
             <TabsTrigger value="basic">Información</TabsTrigger>
             <TabsTrigger value="funding">Financiación</TabsTrigger>
             <TabsTrigger value="units">Unidades</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="diagram" className="space-y-6">
+          <TabsContent value="diagram" className="space-y-6" hidden={isCreatingForm} >
             <RoadmapTab initialData={formData} />
           </TabsContent>
 

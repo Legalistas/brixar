@@ -45,37 +45,7 @@ import { DiagramaGantt } from './DiagramaGantt'
 import DatePicker from './DatePicker'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getProyectRoadmap, saveProyectRoadmap } from '@/services/proyects-service'
-
-export interface Task {
-  id: number
-  description: string
-  duration: number
-  dependentTask: number | null
-  dependencyType: 'FC' | 'CC' | 'none'
-  dependencyDays: number
-  start: Date | null
-  end: Date | null
-  // Fechas planificadas originales
-  plannedStart: Date | null
-  plannedEnd: Date | null
-  // Fechas reales
-  realStart: Date | null
-  realEnd: Date | null
-  realEndDate: Date | null
-  responsible: string
-  status: 'Pendiente' | 'En Progreso' | 'Completado'
-  effectiveDays: number | null
-  // Nuevos campos para tracking
-  isDelayed: boolean
-  delayDays: number
-  isAhead: boolean
-  aheadDays: number
-  // Nuevos campos para gestión
-  isDefault: boolean // Si es una tarea del template por defecto
-  isHidden: boolean // Si está oculta
-  order: number // Orden de visualización
-  isCustom: boolean // Si es una tarea personalizada agregada por el usuario
-}
+import { Task } from '@/types/roadmap'
 
 export interface ProjectInfo {
   name: string
@@ -520,7 +490,7 @@ export default function RoadmapTab({ initialData }: RoadmapProps) {
   // Cuando roadmap cambie, setea las tareas
   useEffect(() => {
     if (roadmap && roadmap.tasks) {
-      setTasks(roadmap.tasks)
+      setTasks(roadmap.tasks.map(parseTaskDates))
     }
   }, [roadmap])
 
@@ -802,20 +772,17 @@ export default function RoadmapTab({ initialData }: RoadmapProps) {
     }
   }
 
-  // Guardar roadmap (simulado)
-  const mutation = useMutation(
-    (tasks: Task[]) => saveProyectRoadmap(initialData.slug, tasks),
-    {
-      onSuccess: () => {
-        // Opcional: refetch para actualizar el roadmap
-        queryClient.invalidateQueries({ queryKey: ['roadmap', initialData.slug] })
-        alert('Roadmap guardado exitosamente!')
-      },
-      onError: () => {
-        alert('Error al guardar roadmap')
-      }
+  // Guardar roadmap
+  const mutation = useMutation({
+    mutationFn: (tasks: Task[]) => saveProyectRoadmap(initialData.slug, tasks),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['roadmap', initialData.slug] })
+      alert('Roadmap guardado exitosamente!')
+    },
+    onError: () => {
+      alert('Error al guardar roadmap')
     }
-  )
+  })
 
   const saveRoadmap = () => {
     mutation.mutate(tasks)
@@ -914,6 +881,19 @@ export default function RoadmapTab({ initialData }: RoadmapProps) {
   const visibleTasks = tasks
     .filter((t) => !t.isHidden || showHiddenTasks)
     .sort((a, b) => a.order - b.order)
+
+  function parseTaskDates(task: any): any {
+    const dateFields = [
+      'start', 'end', 'plannedStart', 'plannedEnd',
+      'realStart', 'realEnd', 'realEndDate'
+    ];
+    const parsed: any = { ...task };
+    dateFields.forEach(field => {
+      if (parsed[field]) parsed[field] = new Date(parsed[field]);
+      else parsed[field] = null;
+    });
+    return parsed;
+  }
 
   return (
     <div className="w-full space-y-6">
