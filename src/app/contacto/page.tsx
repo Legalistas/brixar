@@ -8,8 +8,9 @@ import { Mail, Phone, MapPin } from 'lucide-react'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import dynamic from 'next/dynamic'
+import ContactPage from './components/contact'
 
-const DynamicMap = dynamic(() => import('./map'), {
+const DynamicMap = dynamic(() => import('./components/map'), {
   ssr: false,
   loading: () => <p>Cargando mapa...</p>
 })
@@ -18,7 +19,8 @@ export default function ContactoPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <ContactPage />
+      {/* <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <main className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
           <h1 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900 dark:text-white">
             Contáctanos
@@ -37,7 +39,7 @@ export default function ContactoPage() {
             </div>
           </div>
         </main>
-      </div>
+      </div> */}
       <Footer />
     </>
   )

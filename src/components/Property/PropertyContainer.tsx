@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import { getAllProperties } from '@/services/properties-service'
-import PropertyCard from './PropertyCard'
+// import PropertyCard from './PropertyCard'
 import PropertySkeleton from './PropertySkeleton'
 import { Property } from '@prisma/client'
 import Link from 'next/link'
+import { PropertyCard } from './Propiedades'
 
 interface Filters {
   price?: number

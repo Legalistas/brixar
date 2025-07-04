@@ -1,3 +1,5 @@
+import { ProyectPhase } from "@prisma/client"
+
 export type ProjectPhase = 'CONSTRUCTION' | 'COMPLETED' | 'PLANNING'
 export type ProjectType = 'APARTMENT' | 'HOUSE'
 
@@ -9,7 +11,7 @@ export interface Proyect {
   description: string
   promotorId: number
   openingPhase: string | null
-  phase: ProjectPhase
+  phase: ProyectPhase
   businessModel: string
   fundedDate: string | null
   details: any | null

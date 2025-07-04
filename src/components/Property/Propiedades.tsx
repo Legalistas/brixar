@@ -32,6 +32,8 @@ import { PropertyProps } from './PropertyCard'
 import { useCurrency } from '@/context/CurrencyContext'
 import { useRouter } from 'next/navigation'
 import PropertySkeleton, { PropertyListItemSkeleton } from './PropertySkeleton'
+import { PrimaryFeatures } from '../PrimaryFeatures'
+import { CallToAction } from '../CallToAction'
 
 function formatPrice(price: number | string) {
   const numPrice = typeof price === 'string' ? Number.parseInt(price) : price
@@ -369,6 +371,7 @@ export const Propiedades = () => {
   const propiedadesVendidas = propiedades?.filter(
     (propiedad) => propiedad.status === 'VENDIDA'
   )
+  const lenProperties = propiedades?.length ?? 0
 
   return (
     <div
@@ -454,13 +457,13 @@ export const Propiedades = () => {
           {isLoading ? (
             viewMode === 'grid' ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {Array.from({ length: 6 }).map((_, i) => (
+                {Array.from({ length: lenProperties }).map((_, i) => (
                   <PropertySkeleton key={i} />
                 ))}
               </div>
             ) : (
               <div className="space-y-4">
-                {Array.from({ length: 6 }).map((_, i) => (
+                {Array.from({ length: lenProperties }).map((_, i) => (
                   <PropertyListItemSkeleton key={i} />
                 ))}
               </div>
@@ -523,6 +526,13 @@ export const Propiedades = () => {
             </div>
           )}
         </section>
+      </div>
+
+      <div className="w-full bg-neutral-900">
+        <div className="max-w-7xl mx-auto">
+          <PrimaryFeatures />
+          <CallToAction />
+        </div>
       </div>
     </div>
   )

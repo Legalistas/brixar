@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { API_ENDPOINTS } from '@/constants/api-endpoint'
-import { ProjectMedia, ProjectPhase, ProjectType, Promotor } from '@/types/proyect'
+import { ProjectMedia, ProjectType, Promotor } from '@/types/proyect'
+import { ProyectPhase } from '@prisma/client'
 
 // Interfaces para las entidades relacionadas
 // interface ProyectMedia {
@@ -74,7 +75,7 @@ export interface Proyect {
   description?: string
   promotorId?: number
   openingPhase?: number
-  phase: ProjectPhase
+  phase: ProyectPhase
   businessModel: string
   fundedDate?: string
   details?: any
@@ -120,7 +121,7 @@ export interface CreateProyectInput {
   sku: string
   openingLine?: string
   description?: string
-  phase: ProjectPhase
+  phase: ProyectPhase
   businessModel: string
   openingPhase?: number
   priority?: number

@@ -13,6 +13,7 @@ import Ubicacion from './components/Ubicacion'
 import MediaItems from './components/MediaItems'
 import BotonesAcciones from './components/BotonesAcciones'
 import { ProjectUnit } from '@/types/projectUnit'
+import { ProjectPhase } from '@/types/proyect'
 
 export default function CrearProyectoPage() {
   const router = useRouter()
@@ -31,7 +32,7 @@ export default function CrearProyectoPage() {
   const [slug, setSlug] = useState('')
   const [openingLine, setOpeningLine] = useState('')
   const [description, setDescription] = useState('')
-  const [phase, setPhase] = useState<ProyectPhase>('FUNDING')
+  const [phase, setPhase] = useState<ProyectPhase>('IN_STUDY')
   const [businessModel, setBusinessModel] = useState<BusinessModel>('SOLD')
   const [openingPhase, setOpeningPhase] = useState<number>(0)
   const [priority, setPriority] = useState<number>(0)

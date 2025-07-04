@@ -122,9 +122,9 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           } lg:translate-x-0 lg:static lg:z-auto`}
       >
         <div className="p-4 flex justify-center">
-          <Link href="/" className="flex items-center bg-white p-2 rounded-md">
+          <Link href="/" className="flex items-center p-2 rounded-md">
             <Image
-              src="/images/logos/BRIXAR_png-Logo-02.png"
+              src="/images/logos/BRIXAR_png-Logo-05.png"
               alt="Logo"
               width={1000}
               height={300}

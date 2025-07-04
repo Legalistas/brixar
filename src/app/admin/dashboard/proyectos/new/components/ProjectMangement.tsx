@@ -14,6 +14,7 @@ import {
   Search,
   BadgeDollarSign,
   EyeOff,
+  FileText,
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { CreateProyectInput, Proyect } from '@/store/proyectStore'
@@ -22,276 +23,10 @@ import ProjectForm from './ProjectForm'
 import ProjectViewForm from './ProjectViewForm'
 import { useRouter } from 'next/navigation'
 import { createProyect, getAllProyects, updateProyect } from '@/services/proyects-service'
-
-// Mock service functions with complete data
-const mockProjectService = {
-  getAllProyects: async () => {
-    // Simulate API call with complete mock data
-    return [
-      {
-        id: 1,
-        title: 'Torre Residencial Ejemplo',
-        slug: 'torre-residencial-ejemplo',
-        openingLine: 'Vivir en el corazón de la ciudad',
-        description:
-          'Un moderno complejo residencial con todas las comodidades que necesitas para vivir cómodamente en el centro de la ciudad. Ubicado estratégicamente cerca de centros comerciales, escuelas y transporte público.',
-        phase: 'CONSTRUCTION',
-        businessModel: 'SOLD',
-        openingPhase: 1,
-        priority: 8,
-        daysToStart: 30,
-        daysToEnd: 365,
-        address: {
-          id: 1,
-          city: 'Buenos Aires',
-          postalCode: '1001',
-          streetName: 'Av. Corrientes 1234',
-          description: 'Ubicado en el centro financiero de la ciudad',
-          countryId: 1,
-          stateId: 1,
-          positions: [
-            {
-              id: 1,
-              latitude: '-34.6037',
-              longitude: '-58.3816',
-            },
-          ],
-        },
-        projectMedia: [
-          {
-            id: 1,
-            link: 'https://example.com/imagen1.jpg',
-            type: 'image',
-            title: 'Vista frontal del edificio',
-            description: 'Fachada principal del complejo residencial',
-          },
-          {
-            id: 2,
-            link: 'https://example.com/video1.mp4',
-            type: 'video',
-            title: 'Recorrido virtual',
-            description: 'Tour virtual por las instalaciones',
-          },
-        ],
-        proyectDetails: {
-          id: 1,
-          type: 'RESIDENTIAL',
-          surface: 2500,
-          rooms: 45,
-          floors: 15,
-          buildingYear: 2024,
-          investmentPeriod: 24,
-          riskScore: 7,
-          profitabilityScore: 8,
-          features: {
-            gym: true,
-            pool: true,
-            parking: true,
-            security: true,
-          },
-        },
-        proyectFound: {
-          id: 1,
-          startInvestDate: '2024-01-15',
-          endInvestDate: '2025-12-31',
-          companyCapital: 500000,
-          quantityFunded: 300000,
-          quantityToFund: 1200000,
-          maxOverfunding: 1500000,
-          rentProfitability: 8.5,
-          totalNetProfitability: 12.3,
-          totalNetProfitabilityToShow: 12.0,
-          apreciationProfitability: 15.2,
-          fields: {
-            minimumInvestment: 10000,
-            targetInvestors: 120,
-          },
-        },
-        projectUnits: [
-          {
-            id: 1,
-            projectId: 1,
-            sku: 'TR-001',
-            surface: 85,
-            priceUsd: 120000,
-            floor: 5,
-            rooms: 2,
-            bathrooms: 1,
-            parking: true,
-            isPublished: true,
-            status: 'AVAILABLE',
-            type: 'APARTMENT',
-            unitNumber: '501',
-            description: 'Departamento con vista al río y balcón amplio',
-            availabilityDate: '2024-06-01',
-            features: {
-              balcony: true,
-              airConditioning: true,
-              builtInClosets: true,
-            },
-            createdAt: '2024-01-15T10:00:00Z',
-          },
-          {
-            id: 2,
-            projectId: 1,
-            sku: 'TR-002',
-            surface: 65,
-            priceUsd: 95000,
-            floor: 3,
-            rooms: 1,
-            bathrooms: 1,
-            parking: false,
-            isPublished: true,
-            status: 'RESERVED',
-            type: 'APARTMENT',
-            unitNumber: '302',
-            description: 'Moderno monoambiente en excelente ubicación',
-            availabilityDate: '2024-07-15',
-            features: {
-              balcony: false,
-              airConditioning: true,
-              builtInClosets: false,
-            },
-            createdAt: '2024-01-15T10:30:00Z',
-          },
-          {
-            id: 3,
-            projectId: 1,
-            sku: 'TR-003',
-            surface: 120,
-            priceUsd: 180000,
-            floor: 8,
-            rooms: 3,
-            bathrooms: 2,
-            parking: true,
-            isPublished: false,
-            status: 'AVAILABLE',
-            type: 'APARTMENT',
-            unitNumber: '801',
-            description: 'Amplio departamento familiar con vista panorámica',
-            availabilityDate: '2024-08-01',
-            features: {
-              balcony: true,
-              airConditioning: true,
-              builtInClosets: true,
-            },
-            createdAt: '2024-01-15T11:00:00Z',
-          },
-        ],
-      },
-      {
-        id: 2,
-        title: 'Complejo de Casas Los Álamos',
-        slug: 'complejo-casas-los-alamos',
-        openingLine: 'Tu casa soñada te está esperando',
-        description:
-          'Exclusivo barrio privado con casas de diseño moderno, amplios jardines y todas las comodidades para la familia.',
-        phase: 'FUNDING',
-        businessModel: 'POZO',
-        openingPhase: 2,
-        priority: 6,
-        daysToStart: 120,
-        daysToEnd: 720,
-        address: {
-          id: 2,
-          city: 'Córdoba',
-          postalCode: '5000',
-          streetName: 'Ruta Provincial 24 Km 8',
-          description: 'Barrio privado en las afueras de la ciudad',
-          countryId: 1,
-          stateId: 2,
-          positions: [
-            {
-              id: 2,
-              latitude: '-31.4201',
-              longitude: '-64.1888',
-            },
-          ],
-        },
-        projectMedia: [
-          {
-            id: 3,
-            link: 'https://example.com/casa1.jpg',
-            type: 'image',
-            title: 'Casa modelo tipo A',
-            description: 'Diseño de casa de 3 dormitorios',
-          },
-        ],
-        proyectDetails: {
-          id: 2,
-          type: 'RESIDENTIAL',
-          surface: 15000,
-          rooms: 24,
-          floors: 1,
-          buildingYear: 2025,
-          investmentPeriod: 36,
-          riskScore: 5,
-          profitabilityScore: 6,
-          features: {
-            gym: true,
-            pool: true,
-            parking: true,
-            security: true,
-            playArea: true,
-          },
-        },
-        proyectFound: {
-          id: 2,
-          startInvestDate: '2024-03-01',
-          endInvestDate: '2026-06-30',
-          companyCapital: 800000,
-          quantityFunded: 150000,
-          quantityToFund: 2000000,
-          maxOverfunding: 2500000,
-          rentProfitability: 6.8,
-          totalNetProfitability: 9.5,
-          totalNetProfitabilityToShow: 9.0,
-          apreciationProfitability: 12.8,
-          fields: {
-            minimumInvestment: 15000,
-            targetInvestors: 80,
-          },
-        },
-        projectUnits: [
-          {
-            id: 4,
-            projectId: 2,
-            sku: 'LA-001',
-            surface: 150,
-            priceUsd: 220000,
-            rooms: 3,
-            bathrooms: 2,
-            parking: true,
-            isPublished: true,
-            status: 'AVAILABLE',
-            type: 'HOUSE',
-            unitNumber: 'Casa 1',
-            description: 'Casa de 3 dormitorios con jardín y quincho',
-            availabilityDate: '2025-06-01',
-            features: {
-              garden: true,
-              quincho: true,
-              garage: true,
-            },
-            createdAt: '2024-01-20T09:00:00Z',
-          },
-        ],
-      },
-    ]
-  },
-  createProyect: async (data: CreateProyectInput) => {
-    console.log('Creating project:', data)
-    return { id: Date.now(), ...data }
-  },
-  updateProyect: async (id: number, data: CreateProyectInput) => {
-    console.log('Updating project:', id, data)
-    return { id, ...data }
-  },
-  deleteProyect: async (id: number) => {
-    console.log('Deleting project:', id)
-    return true
-  },
-}
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
+import { ProjectPhase } from '@/types/proyect'
+import { ProyectPhase } from '@prisma/client'
 
 const ProjectManagement: React.FC = () => {
   const router = useRouter()
@@ -301,6 +36,9 @@ const ProjectManagement: React.FC = () => {
   >('list')
   const [selectedProject, setSelectedProject] = useState<any>(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const [showPhaseModal, setShowPhaseModal] = useState<string | null>(null)
+  const [selectedPhase, setSelectedPhase] = useState<ProyectPhase>("IN_STUDY")
+  const [phaseUpdating, setPhaseUpdating] = useState(false)
 
   const queryClient = useQueryClient()
 
@@ -330,7 +68,7 @@ const ProjectManagement: React.FC = () => {
         description: 'El proyecto se ha creado exitosamente.',
       })
     },
-    onError: (error) => {
+    onError: () => {
       toast({
         title: 'Error',
         description: 'No se pudo crear el proyecto. Intenta de nuevo.',
@@ -353,7 +91,7 @@ const ProjectManagement: React.FC = () => {
         description: 'Los cambios se han guardado exitosamente.',
       })
     },
-    onError: (error) => {
+    onError: () => {
       toast({
         title: 'Error',
         description: 'No se pudo actualizar el proyecto. Intenta de nuevo.',
@@ -441,6 +179,45 @@ const ProjectManagement: React.FC = () => {
       });
     }
   };
+
+  const handleOpenPhaseModal = (project: any) => {
+    setShowPhaseModal(project.slug)
+    setSelectedPhase(project.phase)
+  }
+
+  const handleClosePhaseModal = () => {
+    setShowPhaseModal(null)
+    setSelectedPhase("IN_STUDY")
+  }
+
+  const handlePhaseChange = async () => {
+    if (!showPhaseModal || !selectedPhase) return
+    setPhaseUpdating(true)
+    try {
+      const project = projects.find((p: any) => p.slug === showPhaseModal)
+      if (!project) return
+      await updateProyect(showPhaseModal, {
+        ...project,
+        phase: selectedPhase,
+        title: project.title ?? "",
+        description: project.description ?? "",
+      })
+      queryClient.invalidateQueries({ queryKey: ['projects'] })
+      handleClosePhaseModal()
+      toast({
+        title: 'Fase actualizada',
+        description: 'La fase del proyecto se ha actualizado.',
+      })
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'No se pudo actualizar la fase.',
+        variant: 'destructive',
+      })
+    } finally {
+      setPhaseUpdating(false)
+    }
+  }
 
   if (currentView === 'create') {
     return (
@@ -579,51 +356,86 @@ const ProjectManagement: React.FC = () => {
                         className="flex space-x-1"
                         onClick={(e) => e.stopPropagation()}
                         >
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                            e.stopPropagation()
-                            setSelectedProject(project)
-                            router.push(
-                                `/admin/dashboard/proyectos/costos?slug=${project.slug}`
-                            ) //${project.slug}
-                            }}
-                        >
-                            <BadgeDollarSign className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                            e.stopPropagation()
-                            setSelectedProject(project)
-                            setCurrentView('edit')
-                            }}
-                        >
-                            <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                            e.stopPropagation()
-                            // handleDeleteProject(project.id)
-                            }}
-                            className="text-red-600 hover:text-red-800"
-                        >
-                            <Trash2 className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={async (e) => {
-                            e.stopPropagation();
-                            await handleToggleVisible(project);
-                            }}
-                        >
-                            {project.visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </Button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setSelectedProject(project)
+                                router.push(
+                                  `/admin/dashboard/proyectos/costos?slug=${project.slug}`
+                                )
+                              }}
+                            >
+                              <BadgeDollarSign className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Gestionar costos</TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setSelectedProject(project)
+                                setCurrentView('edit')
+                              }}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Editar</TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                // handleDeleteProject(project.id)
+                              }}
+                              className="text-red-600 hover:text-red-800"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Eliminar</TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={async (e) => {
+                                e.stopPropagation();
+                                await handleToggleVisible(project);
+                              }}
+                            >
+                              {project.visible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Visibilidad</TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleOpenPhaseModal(project)
+                              }}
+                            >
+                              <FileText className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Cambiar fase</TooltipContent>
+                        </Tooltip>
                         </div>
                     </div>
                     </CardHeader>
@@ -679,6 +491,47 @@ const ProjectManagement: React.FC = () => {
             })}
         </div>
       )}
+      {/* Phase Change Modal */}
+      <Dialog open={!!showPhaseModal} onOpenChange={open => { if (!open) handleClosePhaseModal() }}>
+        <DialogContent>
+          {showPhaseModal && (() => {
+            const project = projects.find((p: any) => p.slug === showPhaseModal)
+            if (!project) return null
+            return (
+              <>
+                <DialogHeader>
+                  <DialogTitle>Cambiar fase del proyecto</DialogTitle>
+                </DialogHeader>
+                <div className="mb-4">
+                  <p className="mb-2 text-gray-700">Proyecto: <span className="font-medium text-gray-900">{project.title}</span></p>
+                  <p className="mb-4 text-gray-700">Fase actual: <span className="ml-2 inline-block rounded-md px-2 py-1 text-xs font-medium bg-gray-100">{getPhaseLabel(project.phase)}</span></p>
+                  <label className="block mb-2 text-sm font-medium text-gray-700">Seleccionar nueva fase:</label>
+                  <div className="space-y-2">
+                    <div>
+                      <input type="radio" id="instudy" name="phase" value="IN_STUDY" checked={selectedPhase === 'IN_STUDY'} onChange={() => setSelectedPhase('IN_STUDY')} className="mr-2" />
+                      <label htmlFor="instudy" className="text-sm text-gray-600">En planeación</label>
+                    </div>
+                    <div>
+                      <input type="radio" id="construction" name="phase" value="CONSTRUCTION" checked={selectedPhase === 'CONSTRUCTION'} onChange={() => setSelectedPhase('CONSTRUCTION')} className="mr-2" />
+                      <label htmlFor="construction" className="text-sm text-gray-600">Construcción</label>
+                    </div>
+                    <div>
+                      <input type="radio" id="completed" name="phase" value="COMPLETED" checked={selectedPhase === 'COMPLETED'} onChange={() => setSelectedPhase('COMPLETED')} className="mr-2" />
+                      <label htmlFor="completed" className="text-sm text-gray-600">Completado</label>
+                    </div>
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={handleClosePhaseModal} disabled={phaseUpdating}>Cancelar</Button>
+                  <Button onClick={handlePhaseChange} disabled={!selectedPhase || phaseUpdating} className="bg-blue-600 hover:bg-blue-700 text-white">
+                    {phaseUpdating ? 'Actualizando...' : 'Guardar'}
+                  </Button>
+                </DialogFooter>
+              </>
+            )
+          })()}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

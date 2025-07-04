@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useProyectStore } from '@/store/proyectStore'
-import { BusinessModel } from '@prisma/client'
+import { BusinessModel, ProyectPhase } from '@prisma/client'
 import { AlertCircle, Loader2, ArrowLeft, Upload, Plus, Trash2, FileText } from 'lucide-react'
 
 import Ubicacion from '@/app/admin/dashboard/proyectos/crear/components/Ubicacion'
@@ -25,7 +25,7 @@ export default function EditarProyectoPage({ params }: { params: { slug: string 
   const [sku, setSku] = useState('')
   const [openingLine, setOpeningLine] = useState('')
   const [description, setDescription] = useState('')
-  const [phase, setPhase] = useState<ProjectPhase>('PLANNING')
+  const [phase, setPhase] = useState<ProyectPhase>('IN_STUDY')
   const [businessModel, setBusinessModel] = useState<BusinessModel | string>('SOLD')
   const [openingPhase, setOpeningPhase] = useState<number>(0)
   const [priority, setPriority] = useState<number>(0)
@@ -123,7 +123,7 @@ export default function EditarProyectoPage({ params }: { params: { slug: string 
       setSlug(currentProyect.slug || '')
       setOpeningLine(currentProyect.openingLine || '')
       setDescription(currentProyect.description || '')
-      setPhase(currentProyect.phase as ProjectPhase)
+      setPhase(currentProyect.phase as ProyectPhase)
       setBusinessModel(currentProyect.businessModel)
       setOpeningPhase(currentProyect.openingPhase || 0)
       setPriority(currentProyect.priority || 0)
@@ -453,7 +453,7 @@ export default function EditarProyectoPage({ params }: { params: { slug: string 
               <select
                 id="phase"
                 value={phase}
-                onChange={(e) => setPhase(e.target.value as ProjectPhase)}
+                onChange={(e) => setPhase(e.target.value as ProyectPhase)}
                 className="w-full rounded-md border border-slate-300 px-4 py-2 focus:border-slate-500 focus:ring-slate-500"
                 required
               >

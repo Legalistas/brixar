@@ -29,6 +29,7 @@ import {
   Settings,
   RefreshCw,
   ArrowRight,
+  Info,
 } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import {
@@ -44,8 +45,12 @@ import { ReferenciasSection } from './ReferenciasSection'
 import { DiagramaGantt } from './DiagramaGantt'
 import DatePicker from './DatePicker'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getProyectRoadmap, saveProyectRoadmap } from '@/services/proyects-service'
+import {
+  getProyectRoadmap,
+  saveProyectRoadmap,
+} from '@/services/proyects-service'
 import { Task } from '@/types/roadmap'
+import TaskDetailsModal from './TaskDetailsModal'
 
 export interface ProjectInfo {
   name: string
@@ -464,7 +469,8 @@ export default function RoadmapTab({ initialData }: RoadmapProps) {
     plannedWorkDays: 300,
     endDate: new Date('2025-12-31'),
   })
-
+  const [selectedTaskForDetails, setSelectedTaskForDetails] =
+    useState<Task | null>(null)
   const [tasks, setTasks] = useState<Task[]>([])
   const [showGantt, setShowGantt] = useState(true)
   const [showHiddenTasks, setShowHiddenTasks] = useState(false)
@@ -479,11 +485,16 @@ export default function RoadmapTab({ initialData }: RoadmapProps) {
 
   const queryClient = useQueryClient()
 
-  const { data: roadmap, isLoading, isError, refetch } = useQuery(
+  const {
+    data: roadmap,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery(
     {
       queryKey: ['roadmap', initialData.slug],
       queryFn: () => getProyectRoadmap(initialData.slug),
-    },
+    }
     // () => getProyectRoadmap(initialData.slug)
   )
 
@@ -658,7 +669,7 @@ export default function RoadmapTab({ initialData }: RoadmapProps) {
         setIsGanttGenerated(false) // Reset Gantt cuando cambien las fechas
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectInfo.startDate])
 
   const updateTask = (taskId: number, field: keyof Task, value: any) => {
@@ -782,7 +793,7 @@ export default function RoadmapTab({ initialData }: RoadmapProps) {
     },
     onError: () => {
       alert('Error al guardar roadmap')
-    }
+    },
   })
 
   const saveRoadmap = () => {
@@ -885,15 +896,20 @@ export default function RoadmapTab({ initialData }: RoadmapProps) {
 
   function parseTaskDates(task: any): any {
     const dateFields = [
-      'start', 'end', 'plannedStart', 'plannedEnd',
-      'realStart', 'realEnd', 'realEndDate'
-    ];
-    const parsed: any = { ...task };
-    dateFields.forEach(field => {
-      if (parsed[field]) parsed[field] = new Date(parsed[field]);
-      else parsed[field] = null;
-    });
-    return parsed;
+      'start',
+      'end',
+      'plannedStart',
+      'plannedEnd',
+      'realStart',
+      'realEnd',
+      'realEndDate',
+    ]
+    const parsed: any = { ...task }
+    dateFields.forEach((field) => {
+      if (parsed[field]) parsed[field] = new Date(parsed[field])
+      else parsed[field] = null
+    })
+    return parsed
   }
 
   return (
@@ -1154,7 +1170,280 @@ export default function RoadmapTab({ initialData }: RoadmapProps) {
           </CardHeader>
           <CardContent className="p-0">
             <div className="space-y-2 max-h-[600px] overflow-y-auto px-6 pb-6">
-              {visibleTasks.map((task, index) => (
+            {visibleTasks.map((task, index) => (
+                <Card
+                  key={task.id}
+                  className={`border-l-4 transition-all duration-200 ${
+                    task.isHidden
+                      ? "opacity-50 border-l-gray-400 bg-gray-50"
+                      : task.status === "Completado"
+                        ? "border-l-green-500 bg-green-50/30"
+                        : task.status === "En Progreso"
+                          ? "border-l-blue-500 bg-blue-50/30"
+                          : "border-l-gray-300"
+                  } ${task.status === "Completado" ? "scale-95" : ""}`}
+                >
+                  <CardContent className={`${task.status === "Completado" ? "p-3" : "p-4"}`}>
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+                      {/* Número y descripción */}
+                      <div className={`${task.status === "Completado" ? "lg:col-span-8" : "lg:col-span-4"} space-y-2`}>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className="text-xs px-2 py-1">
+                            #{task.id}
+                          </Badge>
+                          {getStatusIcon(task.status)}
+                          {task.isCustom && (
+                            <Badge variant="secondary" className="text-xs">
+                              Custom
+                            </Badge>
+                          )}
+                          {task.isHidden && (
+                            <Badge variant="outline" className="text-xs text-gray-500">
+                              Oculta
+                            </Badge>
+                          )}
+                        </div>
+                        <Input
+                          value={task.description}
+                          onChange={(e) => updateTask(task.id, "description", e.target.value)}
+                          className={`text-sm font-medium border-0 p-0 h-auto bg-transparent focus-visible:ring-0 ${
+                            task.status === "Completado" ? "text-gray-600" : ""
+                          }`}
+                          placeholder="Descripción de la tarea..."
+                          disabled={task.isHidden}
+                        />
+                      </div>
+
+                      {/* Layout simplificado para tareas completadas */}
+                      {task.status === "Completado" ? (
+                        <div className="lg:col-span-4 flex items-center justify-between">
+                          <div className="flex items-center gap-4 text-sm text-gray-600">
+                            <span>Duración: {task.effectiveDays || task.duration}d</span>
+                            <span>Fin: {formatDate(task.end)}</span>
+                            <span>Responsable: {task.responsible || "Sin asignar"}</span>
+                          </div>
+                          <div className="flex gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setSelectedTaskForDetails(task)}
+                              className="h-8 w-8 p-0 text-blue-600"
+                              title="Ver detalles"
+                            >
+                              <Info className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => toggleTaskVisibility(task.id)}
+                              className="h-8 w-8 p-0"
+                            >
+                              {task.isHidden ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                            </Button>
+                            {task.isCustom && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => deleteCustomTask(task.id)}
+                                className="h-8 w-8 p-0 text-red-600"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          {/* Duración y dependencias */}
+                          <div className="lg:col-span-3 grid grid-cols-3 gap-2">
+                            <div className="space-y-1">
+                              <Label className="text-xs text-gray-500">Días</Label>
+                              <Input
+                                type="number"
+                                value={task.duration}
+                                onChange={(e) => updateTask(task.id, "duration", Number.parseInt(e.target.value) || 0)}
+                                className="h-8 text-sm"
+                                disabled={task.isHidden}
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs text-gray-500">Dep.</Label>
+                              <Select
+                                value={task.dependentTask?.toString() || "none"}
+                                onValueChange={(value) =>
+                                  updateTask(task.id, "dependentTask", value === "none" ? null : Number.parseInt(value))
+                                }
+                                disabled={task.isHidden}
+                              >
+                                <SelectTrigger className="h-8 text-sm">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="none">-</SelectItem>
+                                  {tasks
+                                    .filter((t) => t.id !== task.id && !t.isHidden)
+                                    .map((t) => (
+                                      <SelectItem key={t.id} value={t.id.toString()}>
+                                        {t.id}
+                                      </SelectItem>
+                                    ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs text-gray-500">Tipo</Label>
+                              <Select
+                                value={task.dependencyType}
+                                onValueChange={(value: "FC" | "CC" | "none") =>
+                                  updateTask(task.id, "dependencyType", value)
+                                }
+                                disabled={task.isHidden}
+                              >
+                                <SelectTrigger className="h-8 text-sm">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="none">-</SelectItem>
+                                  <SelectItem value="FC">FC</SelectItem>
+                                  <SelectItem value="CC">CC</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+
+                          {/* Fechas mejoradas */}
+                          <div className="lg:col-span-2 grid grid-cols-2 gap-2">
+                            <div className="space-y-1">
+                              <Label className="text-xs text-gray-500 flex items-center gap-1">
+                                <CalendarIcon className="h-3 w-3" />
+                                Inicio
+                              </Label>
+                              {task.dependentTask === null ? (
+                                <div className="space-y-1">
+                                  <DatePicker
+                                    date={task.realStart}
+                                    onDateChange={(date) => updateTask(task.id, "realStart", date)}
+                                    placeholder="Seleccionar fecha"
+                                    disabled={task.isHidden}
+                                  />
+                                  {task.start && (
+                                    <div className="flex items-center gap-1 text-xs text-gray-600">
+                                      <ArrowRight className="h-3 w-3" />
+                                      <span className="font-mono">{formatDate(task.start)}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <div className="text-sm font-mono bg-gray-50 p-2 rounded text-center h-8 flex items-center justify-center">
+                                  {formatDate(task.start)}
+                                </div>
+                              )}
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs text-gray-500 flex items-center gap-1">
+                                <CalendarIcon className="h-3 w-3" />
+                                Fin
+                              </Label>
+                              <div className="text-sm font-mono bg-gray-50 p-2 rounded text-center h-8 flex items-center justify-center">
+                                {formatDate(task.end)}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Responsable y estado */}
+                          <div className="lg:col-span-2 grid grid-cols-2 gap-2 items-end">
+                            <div className="space-y-1">
+                              <Label className="text-xs text-gray-500 flex items-center gap-1">
+                                <User className="h-3 w-3" />
+                                Responsable
+                              </Label>
+                              <Input
+                                value={task.responsible}
+                                onChange={(e) => updateTask(task.id, "responsible", e.target.value)}
+                                placeholder="Asignar..."
+                                className="h-8 text-sm"
+                                disabled={task.isHidden}
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs text-gray-500">Estado</Label>
+                              <Select
+                                value={task.status}
+                                onValueChange={(value: Task["status"]) => updateTask(task.id, "status", value)}
+                                disabled={task.isHidden}
+                              >
+                                <SelectTrigger className={`h-8 text-sm ${getStatusColor(task.status)}`}>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="Pendiente">Pendiente</SelectItem>
+                                  <SelectItem value="En Progreso">En Progreso</SelectItem>
+                                  <SelectItem value="Completado">Completado</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+
+                          {/* Controles de tarea */}
+                          <div className="lg:col-span-1 flex flex-col gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setSelectedTaskForDetails(task)}
+                              className="h-8 w-full text-xs text-blue-600"
+                              title="Ver detalles"
+                            >
+                              <Info className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => toggleTaskVisibility(task.id)}
+                              className="h-8 w-full text-xs"
+                            >
+                              {task.isHidden ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                            </Button>
+                            {task.isCustom && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => deleteCustomTask(task.id)}
+                                className="h-8 w-full text-xs text-red-600"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Fechas reales para tareas en progreso */}
+                    {task.status === "En Progreso" && (
+                      <div className="mt-4 pt-4 border-t border-gray-200">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <Label className="text-xs text-gray-500 font-medium">📅 Fecha real de inicio</Label>
+                            <DatePicker
+                              date={task.realStart}
+                              onDateChange={(date) => updateTask(task.id, "realStart", date)}
+                              placeholder="Seleccionar fecha real"
+                              disabled={task.isHidden}
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs text-gray-500 font-medium">🏁 Fecha real de finalización</Label>
+                            <DatePicker
+                              date={task.realEndDate}
+                              onDateChange={(date) => updateTask(task.id, "realEndDate", date)}
+                              placeholder="Seleccionar fecha real"
+                              disabled={task.isHidden}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+              {/* {visibleTasks.map((task, index) => (
                 <Card
                   key={task.id}
                   className={`border-l-4 transition-all duration-200 ${
@@ -1173,11 +1462,11 @@ export default function RoadmapTab({ initialData }: RoadmapProps) {
                     }`}
                   >
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
-                      {/* Número y descripción */}
+                      {/* Número y descripción
                       <div
                         className={`${
                           task.status === 'Completado'
-                            ? 'lg:col-span-6'
+                            ? 'lg:col-span-8'
                             : 'lg:col-span-4'
                         } space-y-2`}
                       >
@@ -1216,46 +1505,54 @@ export default function RoadmapTab({ initialData }: RoadmapProps) {
                         />
                       </div>
 
-                      {/* Controles compactos para tareas completadas */}
+                      {/* Controles compactos para tareas completadas 
                       {task.status === 'Completado' ? (
-                        <div className="lg:col-span-6 flex items-center justify-between">
-                          <div className="flex items-center gap-4 text-sm text-gray-600">
-                            <span>
-                              Duración: {task.effectiveDays || task.duration}d
-                            </span>
-                            <span>Fin: {formatDate(task.end)}</span>
-                            <span>
-                              Responsable: {task.responsible || 'Sin asignar'}
-                            </span>
-                          </div>
-                          <div className="flex gap-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => toggleTaskVisibility(task.id)}
-                              className="h-8 w-8 p-0"
-                            >
-                              {task.isHidden ? (
-                                <Eye className="h-4 w-4" />
-                              ) : (
-                                <EyeOff className="h-4 w-4" />
-                              )}
-                            </Button>
-                            {task.isCustom && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => deleteCustomTask(task.id)}
-                                className="h-8 w-8 p-0 text-red-600"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            )}
-                          </div>
+                        <div className="lg:col-span-4 flex items-center justify-between">
+                        <div className="flex items-center gap-4 text-sm text-gray-600">
+                          <span>Duración: {task.effectiveDays || task.duration}d</span>
+                          <span>Fin: {formatDate(task.end)}</span>
+                          <span>Responsable: {task.responsible || "Sin asignar"}</span>
                         </div>
+                        </div>
+                      )
+                        {/* // <div className="lg:col-span-6 flex items-center justify-between"> 
+                        //   <div className="flex items-center gap-4 text-sm text-gray-600">
+                        //     <span>
+                        //       Duración: {task.effectiveDays || task.duration}d
+                        //     </span>
+                        //     <span>Fin: {formatDate(task.end)}</span>
+                        //     <span>
+                        //       Responsable: {task.responsible || 'Sin asignar'}
+                        //     </span>
+                        //   </div>
+                        //   <div className="flex gap-1">
+                        //     <Button
+                        //       variant="ghost"
+                        //       size="sm"
+                        //       onClick={() => toggleTaskVisibility(task.id)}
+                        //       className="h-8 w-8 p-0"
+                        //     >
+                        //       {task.isHidden ? (
+                        //         <Eye className="h-4 w-4" />
+                        //       ) : (
+                        //         <EyeOff className="h-4 w-4" />
+                        //       )}
+                        //     </Button>
+                        //     {task.isCustom && (
+                        //       <Button
+                        //         variant="ghost"
+                        //         size="sm"
+                        //         onClick={() => deleteCustomTask(task.id)}
+                        //         className="h-8 w-8 p-0 text-red-600"
+                        //       >
+                        //         <Trash2 className="h-4 w-4" />
+                        //       </Button>
+                        //     )}
+                        //   </div>
+                        // </div>
                       ) : (
                         <>
-                          {/* Duración y dependencias */}
+                          {/* Duración y dependencias 
                           <div className="lg:col-span-3 grid grid-cols-3 gap-2">
                             <div className="space-y-1">
                               <Label className="text-xs text-gray-500">
@@ -1335,7 +1632,7 @@ export default function RoadmapTab({ initialData }: RoadmapProps) {
                             </div>
                           </div>
 
-                          {/* Fechas mejoradas */}
+                          {/* Fechas mejoradas *
                           <div className="lg:col-span-2 grid grid-cols-2 gap-2">
                             <div className="space-y-1">
                               <Label className="text-xs text-gray-500 flex items-center gap-1">
@@ -1378,7 +1675,7 @@ export default function RoadmapTab({ initialData }: RoadmapProps) {
                             </div>
                           </div>
 
-                          {/* Responsable y estado - CORREGIDA LA ALINEACIÓN */}
+                          {/* Responsable y estado - CORREGIDA LA ALINEACIÓN 
                           <div className="lg:col-span-2 grid grid-cols-2 gap-2 items-end">
                             <div className="space-y-1">
                               <Label className="text-xs text-gray-500 flex items-center gap-1">
@@ -1432,7 +1729,7 @@ export default function RoadmapTab({ initialData }: RoadmapProps) {
                             </div>
                           </div>
 
-                          {/* Controles de tarea */}
+                          {/* Controles de tarea 
                           <div className="lg:col-span-1 flex flex-col gap-1">
                             <Button
                               variant="ghost"
@@ -1461,7 +1758,7 @@ export default function RoadmapTab({ initialData }: RoadmapProps) {
                       )}
                     </div>
 
-                    {/* Fechas reales para tareas en progreso o completadas */}
+                    {/* Fechas reales para tareas en progreso o completadas
                     {(task.status === 'En Progreso' ||
                       task.status === 'Completado') &&
                       !task.isHidden &&
@@ -1496,24 +1793,36 @@ export default function RoadmapTab({ initialData }: RoadmapProps) {
                             />
                           </div>
                         </div>
-                      )}
+                      )}*/}
                   </CardContent>
                 </Card>
-              ))}
+              ))} 
             </div>
           </CardContent>
         </Card>
       )}
 
+      {/* Modal de Detalles de Tarea */}
+      {selectedTaskForDetails && (
+        <TaskDetailsModal
+          task={selectedTaskForDetails}
+          isOpen={!!selectedTaskForDetails}
+          onClose={() => setSelectedTaskForDetails(null)}
+          onUpdate={updateTask}
+        />
+      )}
+
       {/* Diagrama de Gantt sincronizado con la tabla */}
       {isGanttGenerated && showGantt && tasks.length > 0 && (
-        <DiagramaGantt tasks={tasks} projectInfo={projectInfo} visibleTasks={visibleTasks} />
+        <DiagramaGantt
+          tasks={tasks}
+          projectInfo={projectInfo}
+          visibleTasks={visibleTasks}
+        />
       )}
 
       {/* Referencias mejoradas */}
-      {tasks.length > 0 && (
-        <ReferenciasSection />
-      )}
+      {tasks.length > 0 && <ReferenciasSection />}
     </div>
   )
 }

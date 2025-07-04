@@ -34,32 +34,33 @@ export interface MenuItem {
 }
 
 export const MENU_DATA: MenuItem[] = [
-  { icon: PlusCircle, label: 'Publicar', href: '/admin/dashboard/publicar' },
-  {
-    icon: Building2,
-    label: 'Publicaciones',
-    href: '/admin/dashboard/publicaciones',
-  },
-  {
-    icon: MessageSquare,
-    label: 'Consultas',
-    href: '/admin/dashboard/consultas',
-  },
-  {
-    icon: ShoppingCart,
-    label: 'Ventas',
-    href: '/admin/dashboard/ventas',
-  },
   {
     icon: ClipboardList,
     label: 'Proyectos',
     href: '/admin/dashboard/proyectos',
   },
+  // {
+  //   icon: Building2,
+  //   label: 'Publicaciones',
+  //   href: '/admin/dashboard/publicaciones',
+  // },
+  // { icon: PlusCircle, label: 'Publicar', href: '/admin/dashboard/publicar' },
+  // {
+  //   icon: MessageSquare,
+  //   label: 'Consultas',
+  //   href: '/admin/dashboard/consultas',
+  // },
   {
-    icon: ClipboardList,
-    label: 'Proyectos Nuevos',
-    href: '/admin/dashboard/proyectos/new',
-  }
+    icon: ShoppingCart,
+    label: 'Ventas',
+    href: '/admin/dashboard/ventas',
+  },
+  // {
+  //   icon: ClipboardList,
+  //   label: 'Proyectos',
+  //   href: '/admin/dashboard/proyectos/old',
+  // },
+  
 ]
 
 export const REPORTS_DATA: MenuItem[] = [

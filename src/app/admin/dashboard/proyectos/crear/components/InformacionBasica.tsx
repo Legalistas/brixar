@@ -1,5 +1,6 @@
 'use client'
 
+import { ProjectPhase } from '@/types/proyect'
 import { ProyectPhase, BusinessModel } from '@prisma/client'
 
 interface InformacionBasicaProps {

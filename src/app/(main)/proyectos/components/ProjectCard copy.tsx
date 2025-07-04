@@ -9,8 +9,9 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { generatePropertySku } from '@/lib/utils'
+import { ProyectPhase } from '@prisma/client'
 
-type ProjectPhase = 'CONSTRUCTION' | 'COMPLETED' | 'PLANNING'
+// type ProjectPhase = 'CONSTRUCTION' | 'COMPLETED' | 'PLANNING'
 type ProjectType = 'APARTMENT' | 'HOUSE'
 
 interface ProjectCardProps {
@@ -19,7 +20,7 @@ interface ProjectCardProps {
     slug: string
     title: string
     description: string
-    phase: ProjectPhase
+    phase: ProyectPhase
     address: Array<{
       city: string
       streetName: string
@@ -39,10 +40,11 @@ interface ProjectCardProps {
   }
 }
 
-const phaseColors: Record<ProjectPhase | 'DEFAULT', string> = {
+const phaseColors: Record<ProyectPhase | 'DEFAULT', string> = {
   CONSTRUCTION: 'from-yellow-500 to-orange-500',
   COMPLETED: 'from-green-500 to-emerald-500',
-  PLANNING: 'from-blue-500 to-indigo-500',
+  IN_STUDY: 'from-blue-500 to-indigo-500',
+  FUNDING: 'from-blue-500 to-indigo-500',
   DEFAULT: 'from-gray-500 to-gray-700',
 } as const
 
@@ -64,7 +66,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
     return typeLabels[type]
   }
 
-  const getPhaseColor = (phase: ProjectPhase): string => {
+  const getPhaseColor = (phase: ProyectPhase): string => {
     return phaseColors[phase] || phaseColors.DEFAULT
   }
 
