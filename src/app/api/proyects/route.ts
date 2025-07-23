@@ -5,6 +5,12 @@ import { authOptions } from '@/auth'
 
 export async function GET() {
   try {
+    console.log('Attempting to fetch proyects...')
+
+    // Verificar que Prisma esté conectado
+    await prisma.$connect()
+    console.log('Prisma connected successfully')
+
     const proyects = await prisma.proyect.findMany({
       include: {
         address: {
@@ -21,10 +27,26 @@ export async function GET() {
         projectUnits: true,
       },
     })
+
+    console.log(`Successfully fetched ${proyects.length} proyects`)
     return NextResponse.json(proyects)
   } catch (error) {
     console.error('Error fetching proyects:', error)
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+
+    // Log más detallado del error
+    if (error instanceof Error) {
+      console.error('Error message:', error.message)
+      console.error('Error stack:', error.stack)
+    }
+
+    return NextResponse.json(
+      {
+        error: 'Internal Server Error',
+        details: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString(),
+      },
+      { status: 500 }
+    )
   }
 }
 
@@ -37,17 +59,25 @@ export async function POST(request: Request) {
 
     const data = await request.json()
 
-    const addressData = data.address ? {
-      create: {
-        city: data.address.city,
-        postalCode: data.address.postalCode,
-        streetName: data.address.streetName,
-        description: data.address.description,
-        ...(data.address.countryId ? { countryId: parseInt(data.address.countryId) } : {}),
-        ...(data.address.stateId ? { stateId: parseInt(data.address.stateId) } : {}),
-        positions: data.address.positions ? { create: data.address.positions } : undefined
-      }
-    } : undefined
+    const addressData = data.address
+      ? {
+          create: {
+            city: data.address.city,
+            postalCode: data.address.postalCode,
+            streetName: data.address.streetName,
+            description: data.address.description,
+            ...(data.address.countryId
+              ? { countryId: parseInt(data.address.countryId) }
+              : {}),
+            ...(data.address.stateId
+              ? { stateId: parseInt(data.address.stateId) }
+              : {}),
+            positions: data.address.positions
+              ? { create: data.address.positions }
+              : undefined,
+          },
+        }
+      : undefined
 
     const newProyect = await prisma.proyect.create({
       data: {
@@ -66,7 +96,9 @@ export async function POST(request: Request) {
         daysToEnd: data.daysToEnd,
         daysToStart: data.daysToStart,
         priority: data.priority,
-        estimatedDeadline: data.estimatedDeadline ? new Date(data.estimatedDeadline) : null,
+        estimatedDeadline: data.estimatedDeadline
+          ? new Date(data.estimatedDeadline)
+          : null,
         startDate: data.startDate ? new Date(data.startDate) : null,
         endDate: data.endDate ? new Date(data.endDate) : null,
         annualReturn: data.annualReturn,
@@ -82,46 +114,64 @@ export async function POST(request: Request) {
 
         address: addressData,
 
-        projectMedia: data.projectMedia ? {
-          create: data.projectMedia
-        } : undefined,
+        projectMedia: data.projectMedia
+          ? {
+              create: data.projectMedia,
+            }
+          : undefined,
 
-        proyectDetails: data.proyectDetails ? {
-          create: {
-            type: data.proyectDetails.type,
-            investmentPeriod: data.proyectDetails.investmentPeriod,
-            surface: data.proyectDetails.surface,
-            rooms: data.proyectDetails.rooms,
-            floors: data.proyectDetails.floors,
-            features: data.proyectDetails.features,
-            buildingYear: data.proyectDetails.buildingYear,
-            riskScore: data.proyectDetails.riskScore,
-            profitabilityScore: data.proyectDetails.profitabilityScore,
-          }
-        } : undefined,
+        proyectDetails: data.proyectDetails
+          ? {
+              create: {
+                type: data.proyectDetails.type,
+                investmentPeriod: data.proyectDetails.investmentPeriod,
+                surface: data.proyectDetails.surface,
+                rooms: data.proyectDetails.rooms,
+                floors: data.proyectDetails.floors,
+                features: data.proyectDetails.features,
+                buildingYear: data.proyectDetails.buildingYear,
+                riskScore: data.proyectDetails.riskScore,
+                profitabilityScore: data.proyectDetails.profitabilityScore,
+              },
+            }
+          : undefined,
 
-        proyectFound: data.proyectFound ? {
-          create: {
-            startInvestDate: data.proyectFound.startInvestDate ? new Date(data.proyectFound.startInvestDate) : null,
-            endInvestDate: data.proyectFound.endInvestDate ? new Date(data.proyectFound.endInvestDate) : null,
-            startPreFundingDate: data.proyectFound.startPreFundingDate ? new Date(data.proyectFound.startPreFundingDate) : null,
-            endPreFundingDate: data.proyectFound.endPreFundingDate ? new Date(data.proyectFound.endPreFundingDate) : null,
-            companyCapital: data.proyectFound.companyCapital,
-            quantityFunded: data.proyectFound.quantityFunded,
-            quantityToFund: data.proyectFound.quantityToFund,
-            maxOverfunding: data.proyectFound.maxOverfunding,
-            investors: data.proyectFound.investors,
-            fields: data.proyectFound.fields,
-            rentProfitability: data.proyectFound.rentProfitability,
-            totalNetProfitability: data.proyectFound.totalNetProfitability,
-            totalNetProfitabilityToShow: data.proyectFound.totalNetProfitabilityToShow,
-            apreciationProfitability: data.proyectFound.apreciationProfitability,
-          }
-        } : undefined,
+        proyectFound: data.proyectFound
+          ? {
+              create: {
+                startInvestDate: data.proyectFound.startInvestDate
+                  ? new Date(data.proyectFound.startInvestDate)
+                  : null,
+                endInvestDate: data.proyectFound.endInvestDate
+                  ? new Date(data.proyectFound.endInvestDate)
+                  : null,
+                startPreFundingDate: data.proyectFound.startPreFundingDate
+                  ? new Date(data.proyectFound.startPreFundingDate)
+                  : null,
+                endPreFundingDate: data.proyectFound.endPreFundingDate
+                  ? new Date(data.proyectFound.endPreFundingDate)
+                  : null,
+                companyCapital: data.proyectFound.companyCapital,
+                quantityFunded: data.proyectFound.quantityFunded,
+                quantityToFund: data.proyectFound.quantityToFund,
+                maxOverfunding: data.proyectFound.maxOverfunding,
+                investors: data.proyectFound.investors,
+                fields: data.proyectFound.fields,
+                rentProfitability: data.proyectFound.rentProfitability,
+                totalNetProfitability: data.proyectFound.totalNetProfitability,
+                totalNetProfitabilityToShow:
+                  data.proyectFound.totalNetProfitabilityToShow,
+                apreciationProfitability:
+                  data.proyectFound.apreciationProfitability,
+              },
+            }
+          : undefined,
 
-        projectUnits: data.projectUnits ? {
-          create: data.projectUnits
-        } : undefined,
+        projectUnits: data.projectUnits
+          ? {
+              create: data.projectUnits,
+            }
+          : undefined,
       },
       include: {
         address: {
@@ -143,7 +193,10 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Error creating proyect:', error)
     return NextResponse.json(
-      { error: 'Error al crear el proyecto', details: error instanceof Error ? error.message : 'Error desconocido' },
+      {
+        error: 'Error al crear el proyecto',
+        details: error instanceof Error ? error.message : 'Error desconocido',
+      },
       { status: 500 }
     )
   }

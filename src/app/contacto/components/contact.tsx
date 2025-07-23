@@ -184,8 +184,8 @@ const ContactPage = () => {
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Teléfono</p>
-                      <a href="tel:+543492282324" className="font-medium text-gray-800 hover:text-green-600 transition-colors">
-                        3492 282324
+                      <a href="tel:+5434922588400" className="font-medium text-gray-800 hover:text-green-600 transition-colors">
+                        3492 2588400
                       </a>
                     </div>
                   </div>
